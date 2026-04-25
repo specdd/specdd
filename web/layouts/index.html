@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Title }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}{{ end }}">
+  <link rel="stylesheet" href="/main.css">
+</head>
+<body>
+
+<header id="site-header">
+  <button id="toc-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="toc">
+    <span></span><span></span><span></span>
+  </button>
+  <h1 id="site-title"><a href="/">SpecDD</a></h1>
+  <p id="site-subtitle">SpecDD is a framework that enables AI agents to build better software</p>
+  <a id="site-github" href="https://github.com/specdd/specdd" target="_blank" rel="noopener">GitHub</a>
+</header>
+
+<div id="toc-overlay"></div>
+
+<aside id="toc">
+  <span id="toc-label">Contents</span>
+  <nav>{{ .TableOfContents }}</nav>
+</aside>
+
+<main id="content">
+  {{ .Content }}
+</main>
+
+<script>
+  (function () {
+    const toc = document.getElementById('toc');
+    const overlay = document.getElementById('toc-overlay');
+    const toggle = document.getElementById('toc-toggle');
+
+    function openToc() {
+      toc.classList.add('open');
+      overlay.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeToc() {
+      toc.classList.remove('open');
+      overlay.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', () => {
+      toc.classList.contains('open') ? closeToc() : openToc();
+    });
+
+    overlay.addEventListener('click', closeToc);
+
+    const links = document.querySelectorAll('#toc a');
+    if (!links.length) return;
+
+    const headings = Array.from(
+      document.querySelectorAll('#content h1, #content h2, #content h3, #content h4')
+    );
+
+    let paused = false;
+    let pauseTimer;
+
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        closeToc();
+        paused = true;
+        links.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        clearTimeout(pauseTimer);
+        pauseTimer = setTimeout(() => { paused = false; }, 600);
+      });
+    });
+
+    function activate() {
+      if (paused) return;
+      const threshold = document.getElementById('site-header').offsetHeight + 16;
+      let current = null;
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top <= threshold) current = h;
+      }
+      links.forEach(a => a.classList.remove('active'));
+      if (current && current.id) {
+        const match = document.querySelector('#toc a[href="#' + current.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    }
+
+    window.addEventListener('scroll', activate, { passive: true });
+    activate();
+  })();
+</script>
+
+</body>
+</html>

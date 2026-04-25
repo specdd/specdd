@@ -1,0 +1,16 @@
+baseURL = 'https://specdd.ai/'
+languageCode = 'en-us'
+title = 'SpecDD'
+
+[params]
+description = 'SpecDD is a framework that enables AI agents to build better software'
+
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 4
+ordered = false
+
+[module]
+[[module.mounts]]
+source = "../README.md"
+target = "content/_index.md"

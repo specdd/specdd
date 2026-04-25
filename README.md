@@ -66,7 +66,6 @@ Scenario: add numbers
   Then 5 is returned
 ```
 
-
 ## The problem SpecDD solves
 
 Software projects are hard for AI agents to reason about because the relevant context is usually quite large, scattered,
@@ -133,7 +132,6 @@ SpecDD is language-agnostic. It can be used with JavaScript, TypeScript, Python,
 platforms. It can be used with object-oriented, functional, procedural, service-oriented, or mixed styles. The main
 assumption is that the project has code organized in files.
 
-
 ## Workflow
 
 The recommended workflow is **spec-first**, similar in spirit to BDD.
@@ -169,7 +167,6 @@ Implement the invoice service spec only.
 Both workflows work well. The important part is that implementation should be driven by reviewed specs, not by vague
 prompts alone.
 
-
 ## Basic project layout
 
 SpecDD bootstrap instructions live in `.specdd`.
@@ -188,7 +185,6 @@ Load order:
 -> .specdd/bootstrap.project.md
 -> .specdd/bootstrap.local.md
 ```
-
 
 ## The role of the bootstrap file
 
@@ -220,7 +216,6 @@ instructed otherwise.
 ```
 
 The bootstrap file is for agents. The `.sdd` files are for both humans and agents.
-
 
 ## Spec files
 
@@ -269,7 +264,6 @@ src/billing/invoice.service.ts
 
 The spec kind is inferred from the filename or its location in the project tree.
 
-
 ## Naming conventions for project files
 
 To assist the agents you should generally align project and spec file naming as close as possible. It improves
@@ -299,7 +293,6 @@ invoice.model.ts
 invoice.service.ts
 stripe.adapter.ts
 ```
-
 
 ## Directory-based inheritance
 
@@ -348,7 +341,6 @@ Horizontal references are explicit.
 
 Parent specs are automatically inherited. Sibling specs are not.
 
-
 ## Multiple hierarchies
 
 A codebase can contain multiple spec hierarchies.
@@ -374,7 +366,6 @@ References:
   ../../support/customer-support.sdd
 ```
 
-
 ## Constraint inheritance
 
 Parent specs provide constraints and context. Child specs add or narrow them.
@@ -396,7 +387,6 @@ A child spec must not silently:
 - contradict inherited architecture
 
 If two specs conflict, the stricter rule wins unless the Operator explicitly resolves the conflict.
-
 
 ## Write authority
 
@@ -429,7 +419,6 @@ If `Can modify` is absent, `Owns` acts as the modification boundary.
 Parent specs do not automatically grant broad edit rights. A module spec can define architectural context for a whole
 module, but a service-level task should not freely edit the whole module unless the local spec allows it.
 
-
 ## Universal spec language
 
 All specs use the same basic language. Not every section is required for every spec.
@@ -461,7 +450,6 @@ Done when:
 ```
 
 A spec should include only sections that add useful local information.
-
 
 ## Section reference
 
@@ -708,7 +696,6 @@ Done when:
   Public contract is preserved.
 ```
 
-
 ## Tasks
 
 Specs may include lightweight implementation tasks.
@@ -767,7 +754,6 @@ Task rules:
 - Mark `[x]` only when implementation and relevant tests/checks are complete.
 - Use `[!]` for blocked work.
 - Use `[?]` for unresolved design decisions.
-
 
 ## Spec levels
 
@@ -1082,7 +1068,6 @@ invoice-access.policy.sdd
 
 Use for rules that decide whether something is allowed.
 
-
 ## Working with SpecDD manually
 
 You can use SpecDD without any special tooling.
@@ -1112,7 +1097,6 @@ Tasks:
 
 Do not mark a task done just because code was written. Mark it done when the behavior is implemented and checked.
 
-
 ## Working with AI agents
 
 A good agent prompt is short:
@@ -1134,7 +1118,6 @@ In a correct coding environment, the agent should:
 
 Best practice: prompt implementation in small chunks. Depending on spec complexity, ask for at most one to three specs
 at a time. Prefer one spec at a time for best results.
-
 
 ## Creating a new SpecDD project
 
@@ -1213,7 +1196,6 @@ Scenario: add todo
   Then the todo appears in the list
 ```
 
-
 ## Best practices and observations
 
 Keep specs short and concise. Long specs are harder for humans to maintain and harder for agents to use reliably.
@@ -1233,7 +1215,6 @@ Keep tasks local. A task should usually be implementable inside the local specâ€
 
 Review agent output. SpecDD improves reliability, but it does not remove the need for human review, tests, and
 verification.
-
 
 ## Conflict handling
 
@@ -1258,7 +1239,6 @@ Tasks:
 ```
 
 The task is invalid because it violates `Must not`.
-
 
 ## Good specs and bad specs
 
@@ -1311,7 +1291,6 @@ Bad specs:
 - ask for broad refactors without scope
 - describe unrelated parts of the system
 
-
 ## Relationship to tests
 
 Specs are not tests, but they should guide tests.
@@ -1332,7 +1311,6 @@ This should usually become a test.
 
 Tests prove behavior. Specs explain why the behavior exists and where it belongs.
 
-
 ## Relationship to documentation
 
 Specs are not ordinary documentation.
@@ -1344,7 +1322,6 @@ That said, specs are still readable by humans and can serve as useful project do
 rules, development intent, architecture, and operational constraints in a structured way.
 
 The difference is that specs are operational. Developers and agents use them while changing code.
-
 
 ## Relationship to issues and tickets
 
@@ -1367,7 +1344,6 @@ Use SpecDD tasks for:
 
 A good SpecDD task should be small enough to implement locally.
 
-
 ## Tooling status
 
 SpecDD is currently an informal language and convention.
@@ -1388,15 +1364,13 @@ This is intentional for the early stage. SpecDD should work with plain files and
 Future tooling could add validation, highlighting, chain resolution, forbidden-import checks, prompt generation, task
 tracking, and editor support. Contributions are welcome.
 
+## What is in the SpecDD repository
 
-## What is in this repository
-
-In this repository:
+In the SpecDD repository:
 
 - `src/.specdd/` contains SpecDD bootstrap templates and project bootstrap files.
 - `src/AGENTS.md` is the agent entrypoint. It tells agents to read the bootstrap files and follow their instructions.
 - `src/CLAUDE.md` is a compatibility entrypoint for Claude-style workflows. It simply points to `AGENTS.md`.
-
 
 ## Recommended repository files
 
@@ -1437,7 +1411,6 @@ Before working on this project, read `.specdd/bootstrap.md` and any bootstrap ov
 Assume the role, rules, workflow, and implementation constraints described there. Treat SpecDD specs as source-adjacent
 development contracts, not optional documentation.
 ```
-
 
 ## FAQ
 
@@ -1496,8 +1469,6 @@ Yes. Specs define architecture and implementation authority, so they should be r
 
 No. SpecDD works well for both greenfield and existing projects. For existing codebases, start small: add specs around
 the parts you are actively modifying, then expand coverage as needed.
-
-
 
 ## License
 
