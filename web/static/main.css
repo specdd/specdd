@@ -55,8 +55,19 @@ body {
 }
 
 #site-title a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   color: inherit;
   text-decoration: none;
+}
+
+#site-logo {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 #site-subtitle {

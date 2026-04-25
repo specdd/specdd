@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ .Title }}</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}{{ end }}">
   <link rel="stylesheet" href="/main.css">
 </head>
@@ -13,7 +14,7 @@
   <button id="toc-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="toc">
     <span></span><span></span><span></span>
   </button>
-  <h1 id="site-title"><a href="/">SpecDD</a></h1>
+  <h1 id="site-title"><a href="/"><img src="/logo.png" alt="SpecDD" id="site-logo">SpecDD</a></h1>
   <p id="site-subtitle">SpecDD is a framework that enables AI agents to build better software</p>
   <a id="site-github" href="https://github.com/specdd/specdd" target="_blank" rel="noopener">GitHub</a>
 </header>
