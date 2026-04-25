@@ -14,10 +14,10 @@ files that are actively changing.
 
 SpecDD is deliberately simple. You do not need to install anything to use it.
 
-Add a `.specdd/bootstrap.md` file to your project, place small `.sdd` specs beside the code they describe, and tell your
-AI agent to read the bootstrap file before it starts working. The agent then uses those specs as local source-of-truth
-context for implementation. For best results, mirror all the contents of `src/` from this repository into your
-code project.
+Add a [`.specdd/bootstrap.md`](https://github.com/specdd/specdd/blob/main/src/.specdd/bootstrap.md) file to your
+project, place small `.sdd` specs beside the code they describe, and tell your AI agent to read the bootstrap file
+before it starts working. The agent then uses those specs as local source-of-truth context for implementation. For best
+results, mirror all the contents of `src/` from this repository into your code project.
 
 ## Tooling
 
