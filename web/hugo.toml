@@ -1,9 +1,9 @@
 baseURL = 'https://specdd.ai/'
 languageCode = 'en-us'
-title = 'SpecDD'
+title = 'SpecDD - Specification-Driven Development framework'
 
 [params]
-description = 'SpecDD is a framework that enables AI agents to build better software'
+description = 'SpecDD is a Specification-Driven Development framework that enables humans and AI agents to build better software'
 
 [markup.tableOfContents]
 startLevel = 2
