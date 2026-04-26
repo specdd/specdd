@@ -25,8 +25,8 @@ SpecDD is at a fairly informal state right now but the core workflow should work
 any AI coding agent that can read project files. Future tooling could help validate specs, resolve inheritance chains,
 check forbidden dependencies, highlight syntax, or enforce task status rules. Tooling contributions are welcome.
 
-It is strongly recommended to follow the documented language closely and avoid inventing custom syntax unless necessary.
-Future tooling may rely on the current conventions.
+It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
+may rely on the current conventions.
 
 ## Current status
 
