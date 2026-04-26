@@ -92,8 +92,8 @@ event.sdd
 policy.sdd
 ```
 
-Named specs are allowed when multiple specs exist in one directory and unsuffixed names would collide or be ambiguous,
-but default to no suffix.
+Named specs are allowed when multiple specs exist in one directory and unsuffixed names would collide or be ambiguous.
+When in doubt, omit the suffix.
 
 ```text
 invoice.service.sdd
@@ -114,7 +114,10 @@ Examples:
 
 ## 4. Naming conventions
 
-When creating files, use this priority:
+Align spec and source file naming as closely as possible. If the project already has established naming conventions,
+follow those and apply them consistently. The guidance below describes sensible defaults for when no convention exists.
+
+When no existing project naming convention applies, consider this priority order:
 
 1. Follow existing project naming conventions.
 2. If the folder already describes the thing, do not suffix.
@@ -130,7 +133,7 @@ services/invoice.ts
 adapters/stripe.ts
 ```
 
-Use suffixes when the folder does not disambiguate:
+A suffix is useful when the folder does not disambiguate:
 
 ```text
 invoice.model.ts

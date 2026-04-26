@@ -230,7 +230,7 @@ invoice.model.sdd
 invoice.service.sdd
 ```
 
-Common spec names include:
+Common spec names include - adapt these to your platform's naming conventions as needed (including capitalization):
 
 ```text
 app.sdd
@@ -246,16 +246,14 @@ event.sdd
 policy.sdd
 ```
 
-You should default to no suffix when the directory already makes the role clear.
-
-Example:
+A good default is to omit the suffix when the directory already makes the role clear. For example:
 
 ```text
 src/billing/services/invoice.sdd
 src/billing/services/invoice.ts
 ```
 
-Use a suffix when the folder does not disambiguate:
+A suffix is useful when the folder does not disambiguate. For example:
 
 ```text
 src/billing/invoice.service.sdd
@@ -266,11 +264,11 @@ The spec kind is inferred from the filename or its location in the project tree.
 
 ## Naming conventions for project files
 
-To assist the agents you should generally align project and spec file naming as close as possible. It improves
-performance of the spec files significantly, however, you can of course elect not to if your project does not
-support such naming for whatever reason.
+Aligning spec and source file naming as closely as possible improves how reliably agents locate and apply specs.
+The guidance below describes sensible defaults - if your platform, language, or team already has established naming
+conventions, follow those instead and apply them consistently across the project.
 
-When creating files in a SpecDD project, use this priority:
+When no existing convention applies, consider this priority order:
 
 1. Follow existing project naming conventions.
 2. If the folder already describes the thing, do not suffix.
@@ -1068,6 +1066,21 @@ invoice-access.policy.sdd
 
 Use for rules that decide whether something is allowed.
 
+## Minimum viable spec
+
+The minimum viable spec contains exactly 2 sections - Spec and Purpose, with all other sections being optional. SpecDD
+itself does not prescribe how detailed (or not) your specs have to be. You can use as many, or as few sections as needed
+to describe the subject of the spec.
+
+Following example is valid minimal spec.
+
+```text
+Spec: Math service
+
+Purpose:
+  Simple service that exposes methods to add and subtract two numbers.
+```
+
 ## Working with SpecDD manually
 
 You can use SpecDD without any special tooling.
@@ -1198,23 +1211,81 @@ Scenario: add todo
 
 ## Best practices and observations
 
-Keep specs short and concise. Long specs are harder for humans to maintain and harder for agents to use reliably.
+### Start small and iterate
 
-Be explicit. The less an agent must infer, the better the outcome. State constraints, non-goals, dependencies, and
-completion criteria directly.
+Begin with minimal specs. Just `Spec`, `Purpose`, and a few `Must not` rules and `Scenario` or two . Run the workflow,
+observe what the agent gets right and wrong, then add sections to address gaps. A spec that is too thin will produce
+unfocused output; a spec that is too detailed will become hard to maintain and slow to write. Iterate toward the level
+of detail that produces reliable results without becoming a burden in your specific scenario. Most specs settle into a
+natural balance after a few cycles.
 
-Prefer many small specs over one large spec. Local specs preserve context and reduce prompt size.
+### Prefer many small specs over large ones
+
+Keep specs short and concise. Long specs are harder for humans to maintain and harder for agents to use reliably. Prefer
+many small specs over one large spec. Local specs preserve context and reduce prompt size.
+
+### Implement one spec at a time
 
 Prompt implementation in small chunks. One spec at a time gives the best results. One to three related specs can work
 when the task is simple and the boundaries are clear.
 
-Use `Must not` aggressively. Non-goals and forbidden behavior are often more important for AI agents than positive
-requirements.
+### Use automated spec generation
 
-Keep tasks local. A task should usually be implementable inside the local spec’s `Owns` or `Can modify` boundary.
+It might be overwhelming to start writing all these specs by hand. The magic of SpecDD is that, you can use AI to
+generate specs and effectively use SpecDD specs as planning stage of your projects. Just make sure to review your specs
+thoroughly!
 
-Review agent output. SpecDD improves reliability, but it does not remove the need for human review, tests, and
-verification.
+### Be explicit
+
+The less an agent must infer, the better the outcome. State constraints, non-goals, dependencies, and completion
+criteria directly in the spec rather than relying on the agent to fill in the gaps.
+
+### Use Must not aggressively
+
+Non-goals and forbidden behavior are often more valuable for AI agents than positive requirements. A clear `Must not`
+prevents entire classes of wrong implementation without requiring the agent to reason about alternatives.
+
+### Keep tasks local
+
+A task should usually be implementable entirely inside the local spec’s `Owns` or `Can modify` boundary. Tasks that
+require touching files outside the local boundary are a signal that the spec or its ownership needs review.
+
+### Review agent output
+
+SpecDD improves reliability and reduces the scope of what agents can change, but it does not remove the need for human
+review, tests, and verification. Always inspect generated code before relying on it.
+
+### Keep specs in sync with code changes
+
+Stale specs are worse than no specs. They actively mislead agents and erode trust in the spec chain. Commit spec
+changes in the same changeset as the code they govern. If a task changes behavior, update the spec and the code
+together, not as a follow-up.
+
+### Use Done when to avoid over-implementation
+
+Without a clear completion signal, agents tend to either stop short or keep going. A `Done when` clause makes the
+boundary explicit and gives both agents and reviewers a concrete checklist. Use it whenever the scope of a spec
+might otherwise be ambiguous.
+
+### Start with the app spec before adding local specs
+
+Without a root `app.sdd`, child specs have no architectural context to inherit from and agents must infer global
+rules. Even a minimal app spec with a handful of `Must` and `Must not` entries establishes the foundation that
+all local specs build on. Add it before writing module or service specs.
+
+### Do not duplicate parent constraints in child specs
+
+Restating inherited rules in child specs creates silent drift. When the parent rule changes, the copy in the child
+does not update automatically and will eventually contradict the parent. Write each rule once, in the spec that
+owns it, and let inheritance carry it down.
+
+### Follow platform, language and project conventions in naming
+
+The naming examples in SpecDD, such as dot-separated suffixes, lowercase filenames, are illustrations, not rules. If
+your platform, language, or team has established naming conventions, follow those instead. A Python project may prefer
+`invoice.sdd`, a Java project may use `Invoice.sdd` or `InvoiceService.sdd`. What matters is that naming is consistent
+across the project, that spec files align closely with the source files and components they describe, and that the
+convention is applied uniformly so both people and agents can locate specs reliably.
 
 ## Conflict handling
 
@@ -1418,6 +1489,11 @@ development contracts, not optional documentation.
 
 SpecDD is experimental. Results are generally very good, but you should expect surprises and always verify agent
 outputs.
+
+### I am not technical, can I use SpecDD too?
+
+Yes. Follow the SpecDD structure and focus on non-technical descriptions of features and purpose. It will greatly
+improve the quality of your outcomes and any future technical contributors will thank you!
 
 ### Is SpecDD a programming language?
 
