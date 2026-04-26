@@ -1503,8 +1503,8 @@ No. SpecDD is a lightweight specification convention.
 
 No. It is currently informal. There is no official parser, validator, or highlighter yet.
 
-It is strongly recommended to follow the documented language closely and avoid inventing custom syntax unless necessary.
-Future tooling may rely on the current conventions.
+It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
+may rely on the current conventions.
 
 ### Is SpecDD a testing framework?
 
