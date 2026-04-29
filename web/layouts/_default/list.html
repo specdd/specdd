@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{ partial "site-head.html" . }}
+</head>
+<body>
+
+{{ partial "site-header.html" . }}
+
+<main id="content" class="wide">
+  <h1>Articles</h1>
+
+  {{ $pages := .Paginator.Pages }}
+  {{ if $pages }}
+    <ul class="post-list">
+      {{ range $pages }}
+      <li class="post-item">
+        {{ with .Date }}<time class="post-date" datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}
+        <a class="post-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+        {{ with .Params.excerpt }}<p class="post-excerpt">{{ . }}</p>{{ else }}{{ with .Summary | plainify | truncate 280 " …" }}<p class="post-excerpt">{{ . }}</p>{{ end }}{{ end }}
+        <a class="post-read-more" href="{{ .RelPermalink }}">Continue reading →</a>
+      </li>
+      {{ end }}
+    </ul>
+  {{ else }}
+    <p class="post-empty">No articles yet.</p>
+  {{ end }}
+
+  {{ $paginator := .Paginator }}
+  {{ if gt $paginator.TotalPages 1 }}
+  <nav class="pagination">
+    {{ if $paginator.HasPrev }}
+      <a href="{{ $paginator.Prev.URL }}" class="pagination-link">← Newer</a>
+    {{ end }}
+    <span class="pagination-info">Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</span>
+    {{ if $paginator.HasNext }}
+      <a href="{{ $paginator.Next.URL }}" class="pagination-link">Older →</a>
+    {{ end }}
+  </nav>
+  {{ end }}
+</main>
+
+{{ partial "site-footer.html" . }}
+
+</body>
+</html>

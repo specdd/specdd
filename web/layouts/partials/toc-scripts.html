@@ -1,0 +1,65 @@
+<script>
+  (function () {
+    const toc = document.getElementById('toc');
+    const overlay = document.getElementById('toc-overlay');
+    const toggle = document.getElementById('toc-toggle');
+
+    if (!toc || !overlay || !toggle) return;
+
+    function openToc() {
+      toc.classList.add('open');
+      overlay.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeToc() {
+      toc.classList.remove('open');
+      overlay.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', () => {
+      toc.classList.contains('open') ? closeToc() : openToc();
+    });
+
+    overlay.addEventListener('click', closeToc);
+
+    const links = document.querySelectorAll('#toc a');
+    if (!links.length) return;
+
+    const headings = Array.from(
+      document.querySelectorAll('#content h1, #content h2, #content h3, #content h4')
+    );
+
+    let paused = false;
+    let pauseTimer;
+
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        closeToc();
+        paused = true;
+        links.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        clearTimeout(pauseTimer);
+        pauseTimer = setTimeout(() => { paused = false; }, 600);
+      });
+    });
+
+    function activate() {
+      if (paused) return;
+      const threshold = document.getElementById('site-header').offsetHeight + 16;
+      let current = null;
+      for (const h of headings) {
+        if (h.getBoundingClientRect().top <= threshold) current = h;
+      }
+      links.forEach(a => a.classList.remove('active'));
+      if (current && current.id) {
+        const match = document.querySelector('#toc a[href="#' + current.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    }
+
+    window.addEventListener('scroll', activate, { passive: true });
+    activate();
+  })();
+</script>

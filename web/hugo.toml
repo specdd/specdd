@@ -1,4 +1,5 @@
 baseURL = 'https://specdd.ai/'
+disableKinds = ['taxonomy', 'term']
 languageCode = 'en-us'
 title = 'SpecDD - Specification-Driven Development framework'
 
@@ -10,7 +11,14 @@ startLevel = 2
 endLevel = 4
 ordered = false
 
+[pagination]
+pagerSize = 10
+
 [module]
+[[module.mounts]]
+source = "content"
+target = "content"
+
 [[module.mounts]]
 source = "../README.md"
 target = "content/_index.md"
