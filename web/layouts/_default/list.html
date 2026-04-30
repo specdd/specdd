@@ -15,7 +15,7 @@
     <ul class="post-list">
       {{ range $pages }}
       <li class="post-item">
-        {{ with .Date }}<time class="post-date" datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}
+        <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}</p>
         <a class="post-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
         {{ with .Params.excerpt }}<p class="post-excerpt">{{ . }}</p>{{ else }}{{ with .Summary | plainify | truncate 280 " …" }}<p class="post-excerpt">{{ . }}</p>{{ end }}{{ end }}
         <a class="post-read-more" href="{{ .RelPermalink }}">Continue reading →</a>

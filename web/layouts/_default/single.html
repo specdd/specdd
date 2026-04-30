@@ -20,7 +20,7 @@
 <main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
   {{ if eq .Section "articles" }}<p class="post-back"><a href="/articles/">← All articles</a></p>{{ end }}
   <h1>{{ .Title }}</h1>
-  {{ with .Date }}<p class="post-meta"><time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time></p>{{ end }}
+  <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}</p>
   {{ .Content }}
   {{ if eq .Section "articles" }}<p class="post-back post-back-end"><a href="/articles/">← All articles</a></p>{{ end }}
 </main>

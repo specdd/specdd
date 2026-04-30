@@ -430,7 +430,7 @@ body:not(.has-toc) #toc-toggle {
   border-top: 1px solid var(--border);
 }
 
-.post-date {
+.post-item .post-meta {
   display: block;
   font-size: 0.7rem;
   font-weight: 600;

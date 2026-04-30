@@ -4,4 +4,7 @@ build:
 	hugo
 	zip -r specdd.zip public
 
-.PHONY: build
+up:
+	hugo server --bind=0.0.0.0 --buildFuture
+
+.PHONY: build up

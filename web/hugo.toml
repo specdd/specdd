@@ -1,4 +1,5 @@
 baseURL = 'https://specdd.ai/'
+ignoreFiles = ['\.draft\.', '\.note\.']
 disableKinds = ['taxonomy', 'term']
 languageCode = 'en-us'
 title = 'SpecDD - Specification-Driven Development framework'
