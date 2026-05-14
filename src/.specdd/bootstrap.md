@@ -1,5 +1,7 @@
 ---
-Version: 1.0
+Version: 1.1
+Homepage: https://specdd.ai
+Changelog: https://specdd.ai/changelog/
 ---
 
 # SpecDD Bootstrap
@@ -228,37 +230,68 @@ By default:
   changes.
 
 
-## 8. Universal spec language
+## Universal spec language
 
-All specs use the same basic language. Not every section is required.
+All specs use the same basic language. Not every section is required for every spec.
 
-Preferred sections:
+Currently, the defined sections are:
 
-```text
+```sdd
+# Identity
 Spec:
 Platform:
 Purpose:
+
+# Scope / ownership
 Structure:
 Owns:
 Can modify:
 Can read:
 References:
+
+# Positive requirements
 Must:
+
+# Negative constraints
 Must not:
-Depends on:
 Forbids:
+
+# Interface / contract
+Depends on:
 Exposes:
 Accepts:
 Returns:
 Raises:
 Handles:
+
+# Workflow
 Tasks:
+Done when:
+
+# Behavior / examples
 Scenario:
 Example:
-Done when:
 ```
 
-Omit sections that add no useful local information. Avoid noisy metadata.
+A spec should include only sections that add useful local information.
+
+### Comments
+
+Specs may include whole-line comments prefixed with `#`.
+
+```sdd
+# This is a comment
+```
+
+Comment rules:
+
+- A comment line begins with optional whitespace followed by `#`.
+- Comments are ignored as spec content.
+- Comments do not create requirements, constraints, tasks, or write authority.
+- Inline trailing comments are not supported.
+
+Use comments sparingly. If a line affects implementation behavior, express it as `Must`, `Must not`, `Tasks`,
+`Scenario`, or `Done when` instead.
 
 
 ## 9. Section meanings
@@ -267,7 +300,7 @@ Omit sections that add no useful local information. Avoid noisy metadata.
 
 Names the thing being specified.
 
-```text
+```sdd
 Spec: Invoice Service
 ```
 
@@ -281,7 +314,7 @@ language[/qualifier[/qualifier]]
 
 Examples:
 
-```text
+```sdd
 Platform: JavaScript/ES6
 Platform: Python/Django/5.2
 ```
@@ -290,7 +323,7 @@ Platform: Python/Django/5.2
 
 Short statement of why this part exists.
 
-```text
+```sdd
 Purpose:
   Coordinate invoice validation, provider creation, and persistence.
 ```
@@ -305,7 +338,7 @@ path-or-glob: description
 
 Example:
 
-```text
+```sdd
 Structure:
   lib: Libraries
   models: Models
@@ -318,7 +351,7 @@ Structure:
 Files, directories, symbols, concepts, or responsibilities owned by this spec. Only one spec should own a specific item
 at any given time.
 
-```text
+```sdd
 Owns:
   invoice.ts
   invoice.test.ts
@@ -328,7 +361,7 @@ Owns:
 
 Files or paths you may change when working under this spec.
 
-```text
+```sdd
 Can modify:
   invoice.ts
   invoice.test.ts
@@ -338,7 +371,7 @@ Can modify:
 
 Files, paths, or specs you may read for context.
 
-```text
+```sdd
 Can read:
   ../models/*
   ../ports/*
@@ -349,7 +382,7 @@ Can read:
 
 Explicit horizontal references to other SpecDD specs or contracts.
 
-```text
+```sdd
 References:
   ../models/invoice.sdd
   ../ports/billing-provider.sdd
@@ -361,7 +394,7 @@ Use references to include sibling or cross-cutting context. Do not infer sideway
 
 Responsibilities, rules, and required behavior.
 
-```text
+```sdd
 Must:
   Validate invoice input before provider calls.
   Persist invoice records after successful provider creation.
@@ -372,7 +405,7 @@ Must:
 
 Forbidden behavior, non-goals, and architectural boundaries.
 
-```text
+```sdd
 Must not:
   Call Stripe directly.
   Calculate tax.
@@ -384,7 +417,7 @@ Must not:
 
 Allowed dependencies, collaborators, modules, ports, libraries, or abstractions.
 
-```text
+```sdd
 Depends on:
   InvoiceRepository
   BillingCustomerRepository
@@ -397,7 +430,7 @@ Depends on:
 
 Forbidden dependencies, paths, modules, libraries, or architectural access.
 
-```text
+```sdd
 Forbids:
   stripe
   ../../api/*
@@ -408,7 +441,7 @@ Forbids:
 
 Public exports, endpoints, commands, components, events, or interfaces.
 
-```text
+```sdd
 Exposes:
   InvoiceService.createInvoice(input)
 ```
@@ -417,7 +450,7 @@ Exposes:
 
 Inputs accepted by this unit.
 
-```text
+```sdd
 Accepts:
   CreateInvoiceInput
 ```
@@ -426,7 +459,7 @@ Accepts:
 
 Outputs returned by this unit.
 
-```text
+```sdd
 Returns:
   InvoiceResult
 ```
@@ -435,7 +468,7 @@ Returns:
 
 Errors this unit may raise or return.
 
-```text
+```sdd
 Raises:
   InvalidInvoiceError
   BillingProviderError
@@ -445,7 +478,7 @@ Raises:
 
 Errors, events, messages, states, or cases this unit must handle.
 
-```text
+```sdd
 Handles:
   provider timeout
   unsupported currency
@@ -460,7 +493,7 @@ Lightweight local implementation checklist. See section 10.
 
 Behavioral examples in Gherkin-like style.
 
-```text
+```sdd
 Scenario: invalid invoice amount
   Given an invoice input with amount less than or equal to zero
   When createInvoice is called
@@ -478,7 +511,7 @@ Small concrete examples, payloads, usage snippets, or expected transformations. 
 
 Completion criteria.
 
-```text
+```sdd
 Done when:
   All scenarios have tests.
   No forbidden dependencies are imported.
@@ -492,7 +525,7 @@ Specs may include lightweight implementation tasks.
 
 Tasks guide implementation order while keeping work local to the spec.
 
-```text
+```sdd
 Tasks:
   [ ] Add validation for zero or negative amount.
   [ ] Persist provider invoice id after successful provider call.
@@ -512,7 +545,7 @@ Allowed task states:
 
 Examples:
 
-```text
+```sdd
 Tasks:
   [x] Define createInvoice public method.
   [ ] Add validation for unsupported currency.
@@ -535,7 +568,7 @@ Task rules:
 
 Optional task IDs may be used:
 
-```text
+```sdd
 Tasks:
   [ ] #1 Add validation for zero or negative amount.
   [ ] #2 Persist provider invoice id after success.
@@ -561,7 +594,7 @@ Typical file:
 
 Example:
 
-```text
+```sdd
 Spec: Billing Platform
 
 Purpose:
@@ -592,7 +625,7 @@ Typical file:
 
 Example:
 
-```text
+```sdd
 Spec: Billing Module
 
 Purpose:
@@ -624,7 +657,7 @@ Typical file:
 
 Example:
 
-```text
+```sdd
 Spec: Invoice Creation
 
 Purpose:
@@ -661,7 +694,7 @@ invoice.service.sdd
 
 Example:
 
-```text
+```sdd
 Spec: Invoice Service
 
 Purpose:
@@ -709,7 +742,7 @@ invoice.model.sdd
 
 Example:
 
-```text
+```sdd
 Spec: Invoice
 
 Purpose:
@@ -738,7 +771,7 @@ stripe.adapter.sdd
 
 Example:
 
-```text
+```sdd
 Spec: Stripe Billing Adapter
 
 Purpose:
@@ -772,7 +805,7 @@ create-invoice.api.sdd
 
 Example:
 
-```text
+```sdd
 Spec: Create Invoice API
 
 Purpose:
@@ -938,14 +971,14 @@ Specs should stay small.
 
 Prefer:
 
-```text
+```sdd
 Must:
   Validate input before provider calls.
 ```
 
 Over:
 
-```text
+```sdd
 Must:
   The implementation should carefully validate every possible kind of user input in a robust and production-quality way before it makes any calls to downstream services or external providers.
 ```
@@ -973,7 +1006,7 @@ Avoid:
 
 ## 16. Minimal complete spec
 
-```text
+```sdd
 Spec: Invoice Service
 
 Purpose:
@@ -1006,6 +1039,8 @@ Scenario: invalid invoice
 Done when:
   All scenarios have tests.
   No forbidden imports exist.
+
+# Comment
 ```
 
 
