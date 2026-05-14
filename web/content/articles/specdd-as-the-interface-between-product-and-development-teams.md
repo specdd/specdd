@@ -69,7 +69,7 @@ scope.
 
 At that point, they have already written a useful spec.
 
-```text
+```sdd
 Spec: Trial Signup
 
 Purpose:
@@ -121,7 +121,7 @@ it changes how the meaning should enter the system.
 
 The same spec can now be tightened with implementation context.
 
-```text
+```sdd
 Owns:
   trial-signup.flow.ts
   trial-signup.service.ts

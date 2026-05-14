@@ -391,6 +391,140 @@ body {
   font-size: inherit;
 }
 
+#content pre.sdd-pre code.language-specdd,
+#content .sdd-highlight code.language-specdd {
+  color: var(--fg);
+}
+
+#content .language-specdd .hljs-punctuation {
+  color: var(--muted-soft);
+}
+
+#content .language-specdd .hljs-comment {
+  color: var(--muted-soft);
+  font-style: italic;
+}
+
+#content .language-specdd .hljs-sdd-title {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+#content .language-specdd .hljs-sdd-meta,
+#content .language-specdd .hljs-sdd-section-value,
+#content .language-specdd .hljs-sdd-text {
+  color: var(--fg);
+}
+
+#content .language-specdd .hljs-sdd-section-spec,
+#content .language-specdd .hljs-sdd-section-platform,
+#content .language-specdd .hljs-sdd-section-purpose,
+#content .language-specdd .hljs-sdd-section-structure,
+#content .language-specdd .hljs-sdd-section-owns,
+#content .language-specdd .hljs-sdd-section-can-modify,
+#content .language-specdd .hljs-sdd-section-can-read,
+#content .language-specdd .hljs-sdd-section-references,
+#content .language-specdd .hljs-sdd-section-must,
+#content .language-specdd .hljs-sdd-section-must-not,
+#content .language-specdd .hljs-sdd-section-forbids,
+#content .language-specdd .hljs-sdd-section-depends-on,
+#content .language-specdd .hljs-sdd-section-exposes,
+#content .language-specdd .hljs-sdd-section-accepts,
+#content .language-specdd .hljs-sdd-section-returns,
+#content .language-specdd .hljs-sdd-section-raises,
+#content .language-specdd .hljs-sdd-section-handles,
+#content .language-specdd .hljs-sdd-section-tasks,
+#content .language-specdd .hljs-sdd-section-done-when,
+#content .language-specdd .hljs-sdd-section-scenario,
+#content .language-specdd .hljs-sdd-section-example {
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-section-spec,
+#content .language-specdd .hljs-sdd-section-platform,
+#content .language-specdd .hljs-sdd-section-purpose {
+  color: var(--accent-dark);
+}
+
+#content .language-specdd .hljs-sdd-section-structure,
+#content .language-specdd .hljs-sdd-section-owns,
+#content .language-specdd .hljs-sdd-section-can-modify,
+#content .language-specdd .hljs-sdd-section-can-read,
+#content .language-specdd .hljs-sdd-section-references {
+  color: #365f80;
+}
+
+#content .language-specdd .hljs-sdd-section-must {
+  color: #266d3f;
+}
+
+#content .language-specdd .hljs-sdd-section-must-not,
+#content .language-specdd .hljs-sdd-section-forbids {
+  color: #9a3d3d;
+}
+
+#content .language-specdd .hljs-sdd-section-depends-on,
+#content .language-specdd .hljs-sdd-section-exposes,
+#content .language-specdd .hljs-sdd-section-accepts,
+#content .language-specdd .hljs-sdd-section-returns,
+#content .language-specdd .hljs-sdd-section-raises,
+#content .language-specdd .hljs-sdd-section-handles {
+  color: #5d5f93;
+}
+
+#content .language-specdd .hljs-sdd-section-tasks,
+#content .language-specdd .hljs-sdd-section-done-when {
+  color: #7a5b1f;
+}
+
+#content .language-specdd .hljs-sdd-section-scenario,
+#content .language-specdd .hljs-sdd-section-example {
+  color: var(--accent);
+}
+
+#content .language-specdd .hljs-sdd-step {
+  color: #7a4b83;
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-open {
+  color: var(--muted-soft);
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-done {
+  color: #266d3f;
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-blocked {
+  color: #a33d3d;
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-question {
+  color: #8a5a00;
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-skipped {
+  color: #77736e;
+  font-weight: 700;
+}
+
+#content .language-specdd .hljs-sdd-task-id {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+#content .language-specdd .hljs-sdd-path {
+  color: #365f80;
+}
+
+#content .language-specdd .hljs-sdd-symbol {
+  color: #5d5f93;
+}
+
 #content blockquote {
   border-left: 3px solid var(--accent);
   background: var(--surface-subtle);

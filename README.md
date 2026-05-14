@@ -1,14 +1,22 @@
 # SpecDD
 
-SpecDD is an experimental approach to **Specification-Driven Development** for AI-assisted software projects.
+SpecDD™ is an open-source framework for **specification-driven development** in AI-assisted software projects.
 
-SpecDD uses small, local, human-readable `.sdd` files that live beside the code they describe. These specs document
-intent, architecture, behavior, boundaries, and implementation tasks in a way that both humans and AI coding agents can
-follow.
+The SpecDD framework uses small, local, human-readable `.sdd` files that live beside the code they describe. These specs
+document intent, architecture, behavior, boundaries, and implementation tasks in a way that both human developers and AI
+coding agents can follow.
 
 SpecDD works for both greenfield and existing projects. In new projects, specs can define structure before
 implementation starts. In existing projects, specs can be introduced gradually around modules, services, features, or
 files that are actively changing.
+
+## Official project
+
+The official SpecDD project is published at:
+
+- Website: https://specdd.ai/
+- Source repository: https://github.com/specdd/specdd
+- Release downloads: https://github.com/specdd/specdd/releases
 
 ## Download
 
@@ -102,7 +110,7 @@ responsibilities, define boundaries, state non-goals, and decide where behavior 
 
 ## What SpecDD is
 
-SpecDD is a lightweight convention for organizing software projects around source-adjacent specification files.
+SpecDD is a framework and reference format for organizing software projects around source-adjacent specification files.
 
 A SpecDD spec describes a part of a system:
 
@@ -1534,7 +1542,7 @@ improve the quality of your outcomes and any future technical contributors will 
 
 ### Is SpecDD a programming language?
 
-No. SpecDD is a lightweight specification convention.
+No. SpecDD is a framework and reference format for source-adjacent software specifications.
 
 ### Is SpecDD a formal language?
 
@@ -1583,6 +1591,12 @@ Yes. Specs define architecture and implementation authority, so they should be r
 No. SpecDD works well for both greenfield and existing projects. For existing codebases, start small: add specs around
 the parts you are actively modifying, then expand coverage as needed.
 
-## License
+## Legal
 
-SpecDD is licensed under the Apache License 2.0.
+SpecDD is licensed under the Apache License 2.0. SpecDD™ is a trademark of Matīss Treinis.
+
+The Apache License 2.0 applies to the project source files and documentation. It does not grant permission to use the
+SpecDD name, logo, or other brand identifiers except for reasonable reference to the official project.
+
+You may describe a project as using the SpecDD framework when that statement is accurate. Do not use the SpecDD name for
+forks, derived projects, services, or products in a way that implies official endorsement or affiliation.

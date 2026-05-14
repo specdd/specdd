@@ -69,7 +69,7 @@ and test coverage that has to match the security model.
 
 Here is a deliberately compact first spec:
 
-```text
+```sdd
 Spec: Password Reset
 
 Purpose:
@@ -117,7 +117,7 @@ That is not the agent being difficult. It is the checkpoint doing its job.
 
 The spec can now become clearer before code exists:
 
-```text
+```sdd
 Spec: Password Reset
 
 Purpose:
@@ -161,7 +161,7 @@ During this slice, the work may expose another missing rule. For example, the ag
 reset token invalidates older unused tokens for the same account. That was not in the first spec, but it matters. If the
 team decides the answer is yes, the spec changes before the agent continues:
 
-```text
+```sdd
 Must:
   Invalidate older unused reset tokens when a new token is issued.
   Record token creation and use timestamps.
@@ -197,7 +197,7 @@ Do not send email directly from the controller.
 
 If that rule belongs permanently in the local contract, it can move into the spec:
 
-```text
+```sdd
 Must:
   Use the existing email handoff pattern for reset emails.
 
@@ -264,7 +264,7 @@ A firm rule can become `Must` or `Must not`. A behavior example can become a `Sc
 
 For example:
 
-```text
+```sdd
 Tasks:
   [ ] Revoke existing sessions after password reset.
   [ ] Add reset request rate limiting in the shared auth middleware.

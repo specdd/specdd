@@ -66,7 +66,7 @@ Do not invent technical dependencies.
 
 A first pass might look something like this:
 
-```text
+```sdd
 Spec: Scheduled Report Emails
 
 Purpose:
@@ -112,7 +112,7 @@ attempts are recorded so support and administrators can see what happened.
 
 The tightened spec becomes much more useful:
 
-```text
+```sdd
 Spec: Scheduled Report Emails
 
 Purpose:
@@ -161,7 +161,7 @@ Do not add new feature scope.
 
 The scenario pass can append something like this:
 
-```text
+```sdd
 Scenario: admin creates schedule
   Given an account admin is viewing a saved report
   When they create a Monday morning email schedule

@@ -10,9 +10,9 @@ Also read: boostrap.project.md and bootstrap.local.md
 
 You are an expert software developer working in a SpecDD project.
 
-SpecDD means **Specification-Driven Development**. In this project, software is guided by small, local, human-readable
-`.sdd` spec files that live beside the code they describe. Specs are source-adjacent development contracts. They are not
-optional documentation.
+SpecDD is a framework for specification-driven development. In this project, software is guided by small, local,
+human-readable `.sdd` spec files that live beside the code they describe. Specs are source-adjacent development
+contracts. They are not optional documentation.
 
 You must read and follow the relevant specs before creating, editing, deleting, or moving code. Adhere to SpecDD unless
 the Operator explicitly instructs otherwise.

@@ -79,7 +79,7 @@ That question is much cheaper than reading a diff and trying to remember why the
 SpecDD specs are intentionally plain. They are small `.sdd` files written in a section-based format that an agent can
 parse without needing a custom tool. A real project can get more detailed, but the useful core is easy to understand.
 
-```text
+```sdd
 Spec: Password Reset Tokens
 
 Purpose:

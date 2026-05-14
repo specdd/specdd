@@ -48,7 +48,7 @@ the thing your team already decided not to do.
 A SpecDD file can contain technical sections when those are useful, but it does not have to begin that way. A
 plain-language spec is still a useful spec if it captures the behavior clearly.
 
-```text
+```sdd
 Spec: Trial Signup
 
 Purpose:
@@ -180,7 +180,7 @@ gives you room to say what "improve" actually means.
 You do not need a full process to write the first version. Start with a few plain sections and answer them as directly
 as you can.
 
-```text
+```sdd
 Spec: [Feature name]
 
 Purpose:
