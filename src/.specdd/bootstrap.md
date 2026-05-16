@@ -1,84 +1,148 @@
 ---
-Version: 1.1
-Homepage: https://specdd.ai
+Version: 1.2
+Website: https://specdd.ai
 Changelog: https://specdd.ai/changelog/
+Copyright: Copyright (c) 2026 Matiss Treinis and SpecDD contributors
 ---
 
 # SpecDD Bootstrap
 
-Also read: boostrap.project.md and bootstrap.local.md
+You are working in a SpecDD project.
 
-You are an expert software developer working in a SpecDD project.
+SpecDD means Specification-Driven Development. The project is guided by small `.sdd` spec files that live near the
+files, directories, workflows, or contracts they describe.
 
-SpecDD is a framework for specification-driven development. In this project, software is guided by small, local,
-human-readable `.sdd` spec files that live beside the code they describe. Specs are source-adjacent development
-contracts. They are not optional documentation.
+Specs are source-adjacent development contracts. Treat them as binding instructions, not optional documentation.
 
-You must read and follow the relevant specs before creating, editing, deleting, or moving code. Adhere to SpecDD unless
-the Operator explicitly instructs otherwise.
+This bootstrap file defines the base operating rules for agents working in the project. It tells you how to find specs,
+how to resolve inherited constraints, and how to determine what you may read or modify.
 
-The human directing you is the **Operator**. When the Operator asks you to implement code, work only inside the
-boundaries defined by the applicable specs. When the Operator asks you to create or modify specs, follow this bootstrap
-and do not alter code unless explicitly asked.
-
-When making changes:
-
-1. Resolve the relevant SpecDD spec chain.
-2. Follow inherited constraints.
-3. Work only within local spec authority.
-4. Implement the smallest correct change.
-5. Keep code, tests, tasks, and specs aligned.
-
-
-## 1. Bootstrap files
-
-SpecDD bootstrap instructions live in `.specdd`.
-
-Load order:
+Also read adjacent bootstrap files when they exist:
 
 ```text
 .specdd/bootstrap.md
-→ .specdd/bootstrap.project.md
-→ .specdd/bootstrap.local.md
+-> .specdd/bootstrap.project.md
+-> .specdd/bootstrap.local.md
 ```
 
-Later files override earlier files.
+Use them in order:
 
-- `bootstrap.md` defines global SpecDD behavior.
-- `bootstrap.project.md` defines project-specific rules.
-- `bootstrap.local.md` defines local Operator or environment overrides and should usually be gitignored.
+- `bootstrap.md` defines the general SpecDD framework rules.
+- `bootstrap.project.md` defines project-specific rules and overrides.
+- `bootstrap.local.md` defines local operator or environment preferences.
 
-If override files exist, read them before working.
+Later files override earlier files when they are stricter or more specific. Local overrides must not silently weaken
+project contracts, inherited constraints, or write authority.
 
+Before editing any file, identify:
 
-## 2. Core model
+- The requested target path or task.
+- The applicable bootstrap files.
+- The effective spec chain.
+- The nearest spec that grants write authority.
 
-SpecDD projects are developed top-down.
-
-Operators define structure, boundaries, behavior, and implementation tasks through small specs. You implement
-locally within those boundaries.
-
-A spec answers:
-
-- What this part of the system is for.
-- What it owns.
-- What it may modify.
-- What it may read.
-- What it must do.
-- What it must not do.
-- What it may depend on.
-- What behavior must be supported.
-- What implementation tasks remain.
-- When the work is done.
-
-Specs should be small, local, specific, and easy to load into context. Do not turn specs into long design documents.
+If you cannot identify write authority, stop and ask the Operator.
 
 
-## 3. Spec files
+## Execution Contract
+
+For implementation work, follow this loop:
+
+```text
+Resolve -> Read -> Authorize -> Change -> Verify -> Report
+```
+
+Do not skip directly to `Change`.
+
+- `Resolve`: identify the target path or task and the applicable bootstrap/spec chain.
+- `Read`: read the bootstrap files, inherited specs, and relevant explicit `References`.
+- `Authorize`: confirm the nearest local spec grants the needed write authority.
+- `Change`: make the smallest correct change inside that authority.
+- `Verify`: run relevant checks when available, or explain why they were not run.
+- `Report`: summarize specs used, files changed, verification, and any remaining uncertainty.
+
+
+## Operating Rules
+
+When making changes:
+
+- Resolve the relevant SpecDD spec chain.
+- Follow inherited constraints.
+- Work only within local authority.
+- Implement the smallest correct change.
+- Keep changed files, checks, tasks, specs, and other relevant assets aligned.
+
+If any instruction conflicts with your default coding habits or assumptions, follow SpecDD. Do not treat examples,
+conventions, nearby files, or familiar project patterns as permission to ignore the active spec chain.
+
+If the Operator asks you to create or modify specs, follow this bootstrap and do not alter implementation files unless
+explicitly asked.
+
+If unclear requirements affect scope, write authority, destructive changes, security, or public behavior, ask the
+Operator before editing. For minor ambiguity, choose the option that best preserves inherited constraints and local
+scope.
+
+Stop and ask the Operator before editing when:
+
+- No applicable spec exists.
+- Write authority is unclear.
+- Requested work cannot be completed without violating `Must not` or `Forbids`.
+- The change would touch files outside `Can modify` or `Owns`.
+- Requirements affect security, destructive behavior, or public contracts and are ambiguous.
+
+
+## Planning Mode
+
+If the Operator asks for a plan, do not edit files.
+
+Instead:
+
+- Resolve the relevant bootstrap files and spec chain.
+- Summarize the target scope.
+- Identify specs or files that would need changes.
+- Call out unclear requirements, conflicts, and risks.
+- Propose the smallest safe sequence of changes.
+- Wait for the Operator to approve or revise the plan.
+
+Use planning mode especially when the request is to apply framework or spec changes.
+
+
+## Core Model
+
+SpecDD projects are developed top-down. Operators define structure, boundaries, behavior, and implementation tasks
+through local specs. Agents implement locally within those boundaries.
+
+A spec should include only sections that add useful local authority, constraints, behavior, or context. Do not repeat
+parent rules unless narrowing or clarifying them.
+
+A useful spec answers the local parts of these questions:
+
+- What is this for?
+- What does it own?
+- What may be modified?
+- What may be read?
+- What must happen?
+- What must not happen?
+- What may it depend on?
+- What behavior or examples matter?
+- What tasks or completion criteria remain?
+
+Good specs are:
+
+- Local.
+- Specific.
+- Short.
+- Behavioral.
+- Constraint-oriented.
+- Easy for humans to review.
+- Easy for agents to follow.
+
+
+## Spec Files
 
 Spec files use a lightweight Gherkin-like format and the `.sdd` extension.
 
-Common names:
+Common spec names include:
 
 ```text
 app.sdd
@@ -94,87 +158,100 @@ event.sdd
 policy.sdd
 ```
 
+These names are examples, not universal requirements. Projects may use different names and levels for infrastructure,
+automation, documentation, operations, data, policy, or mixed repositories.
+
 Named specs are allowed when multiple specs exist in one directory and unsuffixed names would collide or be ambiguous.
 When in doubt, omit the suffix.
 
+Same-directory basename matching is an explicit SpecDD rule. When a target file and a `.sdd` file live in the same
+directory and share the same basename, the `.sdd` file is the matching local spec for that target file.
+
+Examples:
+
 ```text
+invoice.ts -> invoice.sdd
+bootstrap.md -> bootstrap.sdd
+main.test.ts -> main.test.sdd
+Dockerfile -> Dockerfile.sdd
+```
+
+This is not a guess. It is part of spec resolution. Similar names in other directories, symbols inside files, module
+names, or test names do not create a spec relationship by themselves.
+
+Align other spec and source file naming when a project convention exists, but conventions beyond same-directory
+basename matching do not define inheritance, write authority, or ownership by themselves.
+
+When no project naming convention applies, prefer this order:
+
+- Follow existing project conventions.
+- If the folder already describes the thing, do not suffix.
+- If the folder does not describe the thing, use a descriptive suffix.
+
+Examples:
+
+```text
+invoice.sdd
 invoice.service.sdd
 stripe.adapter.sdd
-invoice.model.sdd
-create-invoice.api.sdd
-```
-
-Examples:
-
-```text
-/src/billing/module.sdd
-/src/billing/invoice.sdd
-/src/billing/stripe.service.sdd
-/src/billing/stripe.adapter.sdd
 ```
 
 
-## 4. Naming conventions
+## Common Spec Roles
 
-Align spec and source file naming as closely as possible. If the project already has established naming conventions,
-follow those and apply them consistently. The guidance below describes sensible defaults for when no convention exists.
+Spec names and roles are project conventions, not framework requirements. Common roles include:
 
-When no existing project naming convention applies, consider this priority order:
-
-1. Follow existing project naming conventions.
-2. If the folder already describes the thing, do not suffix.
-3. If the folder does not describe the thing, use a descriptive suffix.
-
-Prefer option 2 when project naming is not defined.
-
-Examples:
-
-```text
-models/invoice.ts
-services/invoice.ts
-adapters/stripe.ts
-```
-
-A suffix is useful when the folder does not disambiguate:
-
-```text
-invoice.model.ts
-invoice.service.ts
-stripe.adapter.ts
-```
-
-Apply the same principle to `.sdd` files.
+- `app.sdd`: global application, repository, or project context.
+- `module.sdd`: bounded domain, subsystem, package, role, stack, or area.
+- `feature.sdd`: user-visible, operational, or business capability.
+- `service.sdd`: orchestration or application/domain behavior.
+- `model.sdd`: domain state, data shape, entity, value object, or invariant.
+- `adapter.sdd`: boundary implementation for an external system.
+- `api.sdd`: inbound interface such as HTTP, GraphQL, RPC, CLI, or webhook.
+- `component.sdd`: UI or reusable component behavior.
+- `job.sdd`: background, scheduled, or automated work.
+- `event.sdd`: emitted or consumed event/message contract.
+- `policy.sdd`: authorization, permission, or decision rules.
 
 
-## 5. Directory-based inheritance
+## Path-Based Resolution
 
 Spec inheritance is implicit and directory-based.
 
-When working on a target path, collect specs from the repository root down to the target directory. There can be
-multiple spec hierarchies in a codebase; only the target path’s ancestor tree is relevant.
+Path-based resolution is the core SpecDD invariant. Applicable specs come from ancestor specs, explicit `References`,
+and same-directory basename matches. Do not infer the applicable spec, ownership, or write authority from similar names
+in other directories, symbols, programming languages, module names, test names, or tool-specific conventions unless a
+project-specific spec or configuration explicitly defines that mapping.
 
-Example:
+When working on a target path, start at that target and walk upward to the repository root or configured project root.
+There can be multiple spec hierarchies in a codebase; only the target path's ancestor tree is relevant.
 
-```text
-/app.sdd
-/src/billing/module.sdd
-/src/billing/features/invoicing/feature.sdd
-/src/billing/features/invoicing/services/invoice.sdd
-```
+Resolution algorithm:
 
-For work inside:
+- Start at the target path.
+- If the target is a file, include the same-directory basename spec when it exists.
+- Walk upward through parent directories until the repository root or configured project root.
+- At each directory, collect specs whose declared governing scope applies to the target.
+- Reverse the collected inherited specs so they are read from root to target.
+- Include explicit `References` declared by included specs when they affect the task or when building context.
 
-```text
-/src/billing/features/invoicing/services/invoice.ts
-```
+A spec's governing scope should be discoverable from the spec itself. Relevant signals include:
 
-the effective spec context is:
+- `Owns`, `Can modify`, or `Structure` entries that cover the target path.
+- Same-directory basename matching.
+- A clear directory-scope role, such as an app, module, feature, or service spec governing that directory subtree.
+- A project-specific rule that explicitly defines the mapping.
+
+If a spec's scope is not discoverable, do not guess from similar names. Use the nearest applicable parent spec and ask
+the Operator when write authority is unclear.
+
+Example for `src/billing/services/invoice.ts`:
 
 ```text
 app.sdd
-→ module.sdd
-→ feature.sdd
-→ invoice.sdd
+src/billing/module.sdd
+src/billing/services/service.sdd
+src/billing/services/invoice.sdd
 ```
 
 Parent specs provide inherited context and constraints. Child specs add or narrow context and constraints.
@@ -189,8 +266,11 @@ Horizontal references are explicit.
 Do not automatically load sibling specs. Use sibling or cross-tree specs only when the local spec explicitly references
 them, or when directly necessary to understand a contract being implemented.
 
+Do not infer context from symbols or nearby files. Use path inheritance, same-directory basename matching, and explicit
+`References`. Nearby files are optional context, not authority.
 
-## 6. Constraint inheritance
+
+## Constraint Inheritance
 
 Parent constraints remain active in child specs.
 
@@ -210,31 +290,30 @@ A child spec must not silently:
 - Expand modification scope beyond local authority.
 - Contradict inherited architecture.
 
-If a local task or rule appears to conflict with a parent spec, prefer the stricter interpretation. If implementation
-must continue, choose the safest implementation that does not violate inherited constraints.
+If a local task or rule appears to conflict with a parent spec, prefer the stricter interpretation.
 
 
-## 7. Write authority
+## Write Authority
 
 Inherited specs provide context and constraints. The nearest relevant local spec provides write authority.
 
 By default:
 
-- Modify only files listed in the nearest spec’s `Can modify` or `Owns`.
+- Modify only files listed in the nearest spec's `Can modify` or `Owns`.
 - If `Can modify` is absent, treat `Owns` as the modification boundary.
 - Read files listed in `Can read`, `References`, or inherited context as needed.
+- Treat `References` as read context only. References do not grant write authority.
 - Do not edit parent-level files unless the targeted spec is a parent spec.
 - Do not perform broad refactors unless the spec or Operator explicitly asks for them.
 - If no local spec exists, use the nearest parent spec and modify only the smallest necessary set of files.
-- If no applicable spec can be found, ask the Operator to identify or create the relevant spec before making code
-  changes.
+- If no applicable spec can be found, ask the Operator to identify or create the relevant spec before making changes.
 
 
-## Universal spec language
+## Universal Spec Language
 
 All specs use the same basic language. Not every section is required for every spec.
 
-Currently, the defined sections are:
+Defined sections:
 
 ```sdd
 # Identity
@@ -273,15 +352,91 @@ Scenario:
 Example:
 ```
 
-A spec should include only sections that add useful local information.
+Prefer `Spec` and `Purpose` in every non-empty spec. Use other sections only when they add useful local information.
 
-### Comments
 
-Specs may include whole-line comments prefixed with `#`.
+## Section Meanings
+
+`Spec` names the thing being specified.
+
+`Platform` describes implementation language or platform when useful. It is free-form and optional.
+
+`Purpose` states why this part exists. It should describe the purpose of the implementation, contract, workflow, or
+area being specified.
+
+`Structure` describes files and directories for the current and descendant scope.
+
+`Owns` lists files, directories, concepts, or responsibilities owned by this spec. Only one spec should own a specific
+item at a given time.
+
+`Can modify` lists files or paths that may be changed when working under this spec.
+
+`Can read` lists files, paths, or specs that may be read for context.
+
+`References` lists explicit horizontal references to other SpecDD specs or contracts.
+
+`Must` lists responsibilities, rules, and required behavior.
+
+`Must not` lists forbidden behavior, non-goals, and architectural boundaries.
+
+`Depends on` lists allowed dependencies, collaborators, modules, ports, libraries, or abstractions. It never overrides
+inherited `Forbids` or `Must not`.
+
+`Forbids` lists forbidden dependencies, paths, modules, libraries, or architectural access.
+
+`Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles` describe public contracts and handled cases when relevant.
+
+`Tasks` is a lightweight local implementation checklist.
+
+`Scenario` defines behavior in Gherkin-like form. Scenarios should be implemented and tested when relevant.
+
+`Example` provides small concrete examples, payloads, usage snippets, or expected transformations. Use sparingly.
+
+`Done when` describes local completion criteria when the spec needs them.
+
+Examples for sections that commonly need shape:
 
 ```sdd
-# This is a comment
+Structure:
+  lib: Libraries
+  models: Models
+  templates: Project templates
+
+References:
+  ../models/invoice.sdd
+  ../ports/billing-provider.sdd
+
+Scenario: invalid invoice amount
+  Given an invoice input with amount less than or equal to zero
+  When createInvoice is called
+  Then the invoice is rejected
+  And the billing provider is not called
+
+Done when:
+  All scenarios have tests.
+  No forbidden dependencies are used.
+  Public contract is preserved.
 ```
+
+
+## References
+
+Use `References` to include sibling or cross-cutting context. Do not infer sideways inheritance.
+
+Reference paths are resolved relative to the spec file that declares them.
+
+Referenced specs provide context and contracts, but they do not grant write authority unless the active spec's
+`Can modify` or `Owns` allows it.
+
+A referenced spec is horizontal context, not an inherited parent. Its parent chain may be read when needed to understand
+that referenced contract, but it does not become inherited authority for the active target.
+
+Missing references should be reported by validation. Strict validation should treat missing references as errors.
+
+
+## Comments
+
+Specs may include whole-line comments prefixed with `#`.
 
 Comment rules:
 
@@ -294,244 +449,9 @@ Use comments sparingly. If a line affects implementation behavior, express it as
 `Scenario`, or `Done when` instead.
 
 
-## 9. Section meanings
-
-### Spec
-
-Names the thing being specified.
-
-```sdd
-Spec: Invoice Service
-```
-
-### Platform
-
-Implementation language and platform. Format is free-form but should usually be:
-
-```text
-language[/qualifier[/qualifier]]
-```
-
-Examples:
-
-```sdd
-Platform: JavaScript/ES6
-Platform: Python/Django/5.2
-```
-
-### Purpose
-
-Short statement of why this part exists.
-
-```sdd
-Purpose:
-  Coordinate invoice validation, provider creation, and persistence.
-```
-
-### Structure
-
-File and directory structure for the current and descendant scope. Format is:
-
-```text
-path-or-glob: description
-```
-
-Example:
-
-```sdd
-Structure:
-  lib: Libraries
-  models: Models
-  templates: Project templates
-  templates/email: Email templates
-```
-
-### Owns
-
-Files, directories, symbols, concepts, or responsibilities owned by this spec. Only one spec should own a specific item
-at any given time.
-
-```sdd
-Owns:
-  invoice.ts
-  invoice.test.ts
-```
-
-### Can modify
-
-Files or paths you may change when working under this spec.
-
-```sdd
-Can modify:
-  invoice.ts
-  invoice.test.ts
-```
-
-### Can read
-
-Files, paths, or specs you may read for context.
-
-```sdd
-Can read:
-  ../models/*
-  ../ports/*
-  ../repositories/*
-```
-
-### References
-
-Explicit horizontal references to other SpecDD specs or contracts.
-
-```sdd
-References:
-  ../models/invoice.sdd
-  ../ports/billing-provider.sdd
-```
-
-Use references to include sibling or cross-cutting context. Do not infer sideways inheritance.
-
-### Must
-
-Responsibilities, rules, and required behavior.
-
-```sdd
-Must:
-  Validate invoice input before provider calls.
-  Persist invoice records after successful provider creation.
-  Normalize provider errors before returning them.
-```
-
-### Must not
-
-Forbidden behavior, non-goals, and architectural boundaries.
-
-```sdd
-Must not:
-  Call Stripe directly.
-  Calculate tax.
-  Send emails.
-  Import HTTP request or response objects.
-```
-
-### Depends on
-
-Allowed dependencies, collaborators, modules, ports, libraries, or abstractions.
-
-```sdd
-Depends on:
-  InvoiceRepository
-  BillingCustomerRepository
-  BillingProviderPort
-```
-
-`Depends on` never overrides inherited `Forbids` or `Must not`.
-
-### Forbids
-
-Forbidden dependencies, paths, modules, libraries, or architectural access.
-
-```sdd
-Forbids:
-  stripe
-  ../../api/*
-  ../../ui/*
-```
-
-### Exposes
-
-Public exports, endpoints, commands, components, events, or interfaces.
-
-```sdd
-Exposes:
-  InvoiceService.createInvoice(input)
-```
-
-### Accepts
-
-Inputs accepted by this unit.
-
-```sdd
-Accepts:
-  CreateInvoiceInput
-```
-
-### Returns
-
-Outputs returned by this unit.
-
-```sdd
-Returns:
-  InvoiceResult
-```
-
-### Raises
-
-Errors this unit may raise or return.
-
-```sdd
-Raises:
-  InvalidInvoiceError
-  BillingProviderError
-```
-
-### Handles
-
-Errors, events, messages, states, or cases this unit must handle.
-
-```sdd
-Handles:
-  provider timeout
-  unsupported currency
-  missing customer id
-```
-
-### Tasks
-
-Lightweight local implementation checklist. See section 10.
-
-### Scenario
-
-Behavioral examples in Gherkin-like style.
-
-```sdd
-Scenario: invalid invoice amount
-  Given an invoice input with amount less than or equal to zero
-  When createInvoice is called
-  Then the invoice is rejected
-  And the billing provider is not called
-```
-
-Scenarios define behavior that should be implemented and tested when relevant.
-
-### Example
-
-Small concrete examples, payloads, usage snippets, or expected transformations. Use sparingly.
-
-### Done when
-
-Completion criteria.
-
-```sdd
-Done when:
-  All scenarios have tests.
-  No forbidden dependencies are imported.
-  Public contract is preserved.
-```
-
-
-## 10. Tasks
+## Tasks
 
 Specs may include lightweight implementation tasks.
-
-Tasks guide implementation order while keeping work local to the spec.
-
-```sdd
-Tasks:
-  [ ] Add validation for zero or negative amount.
-  [ ] Persist provider invoice id after successful provider call.
-  [ ] Map provider timeout to retryable BillingProviderError.
-  [ ] Add unit tests for invalid input.
-```
 
 Allowed task states:
 
@@ -543,17 +463,6 @@ Allowed task states:
 [?] needs decision
 ```
 
-Examples:
-
-```sdd
-Tasks:
-  [x] Define createInvoice public method.
-  [ ] Add validation for unsupported currency.
-  [!] Decide whether provider timeout should retry automatically.
-  [?] Confirm whether draft invoices can be deleted.
-  [-] Skip PDF rendering; owned by invoice-pdf feature.
-```
-
 Task rules:
 
 - Tasks are local to the spec where they appear.
@@ -563,347 +472,46 @@ Task rules:
 - Only update task status in the currently targeted spec unless instructed otherwise.
 - Prefer completing one task or a small related group of tasks at a time.
 - Do not complete unrelated tasks opportunistically.
-- Update `[ ]` to `[x]` only when implementation and relevant tests/checks are complete.
+- Update `[ ]` to `[x]` only when implementation and relevant checks are complete.
 - Use `[!]` for blocked work and `[?]` for unresolved design decisions.
 
 Optional task IDs may be used:
 
 ```sdd
 Tasks:
-  [ ] #1 Add validation for zero or negative amount.
-  [ ] #2 Persist provider invoice id after success.
-  [ ] #3 Add tests for provider failure.
+  [ ] #1 Document required release inputs.
+  [ ] #2 Add verification for missing configuration.
 ```
 
 If asked to implement a specific task, implement only that task unless required by direct dependencies.
 
 
-## 11. Spec levels
-
-SpecDD commonly uses these levels.
-
-### App spec
-
-Global application context and architecture.
-
-Typical file:
-
-```text
-/app.sdd
-```
-
-Example:
-
-```sdd
-Spec: Billing Platform
-
-Purpose:
-  Internal platform for creating invoices, collecting payments, and tracking billing state.
-
-Must:
-  Use a modular monolith architecture.
-  Keep domain logic out of controllers.
-  Represent money as integer minor units.
-  Access persistence only through repositories.
-  Keep provider SDKs inside adapters.
-
-Must not:
-  Put business logic in UI components.
-  Import external provider types into domain models.
-  Use floating point numbers for money.
-```
-
-### Module spec
-
-Bounded domain or subsystem.
-
-Typical file:
-
-```text
-/src/billing/module.sdd
-```
-
-Example:
-
-```sdd
-Spec: Billing Module
-
-Purpose:
-  Own invoice creation, billing customer state, payment attempts, and provider interaction.
-
-Owns:
-  src/billing/*
-
-Must:
-  Expose billing behavior through BillingService.
-  Normalize provider errors before they leave the module.
-  Keep billing domain models independent of provider SDKs.
-
-Must not:
-  Own tax calculation.
-  Own accounting ledger behavior.
-  Own authentication.
-```
-
-### Feature spec
-
-User-visible or business capability.
-
-Typical file:
-
-```text
-/src/billing/features/invoice-creation/feature.sdd
-```
-
-Example:
-
-```sdd
-Spec: Invoice Creation
-
-Purpose:
-  Create a valid invoice for a billing customer through an external billing provider.
-
-Must:
-  Validate invoice input before provider calls.
-  Store provider invoice id after successful creation.
-  Return normalized billing errors.
-
-Must not:
-  Collect payment.
-  Render invoice PDFs.
-  Calculate tax.
-
-Scenario: invoice is valid
-  Given a billing customer exists
-  And the invoice amount is greater than zero
-  When an invoice is created
-  Then the provider invoice is created
-  And the local invoice is stored
-```
-
-### Service spec
-
-Orchestration or application/domain service behavior.
-
-Typical files:
-
-```text
-invoice.sdd
-invoice.service.sdd
-```
-
-Example:
-
-```sdd
-Spec: Invoice Service
-
-Purpose:
-  Coordinate invoice creation.
-
-Owns:
-  invoice.ts
-  invoice.test.ts
-
-Must:
-  Validate input before provider calls.
-  Persist invoice after provider success.
-  Normalize provider failures.
-
-Must not:
-  Call Stripe directly.
-  Calculate tax.
-  Send emails.
-
-Depends on:
-  InvoiceRepository
-  BillingProviderPort
-
-Tasks:
-  [ ] Add validation for zero or negative amount.
-  [ ] Add unit tests for invalid input.
-
-Scenario: invalid invoice
-  Given invoice amount is zero
-  When createInvoice is called
-  Then validation fails
-  And provider is not called
-```
-
-### Model spec
-
-Domain state, entities, value objects, and invariants.
-
-Typical files:
-
-```text
-invoice.sdd
-invoice.model.sdd
-```
-
-Example:
-
-```sdd
-Spec: Invoice
-
-Purpose:
-  Represent an invoice and protect invoice state transitions.
-
-Must:
-  Store amounts in integer minor units.
-  Require a supported ISO currency.
-  Prevent paid invoices from returning to draft.
-
-Must not:
-  Import repository code.
-  Import provider SDK types.
-```
-
-### Adapter spec
-
-Boundary implementation for an external system.
-
-Typical files:
-
-```text
-stripe.sdd
-stripe.adapter.sdd
-```
-
-Example:
-
-```sdd
-Spec: Stripe Billing Adapter
-
-Purpose:
-  Implement the billing provider port using Stripe.
-
-Must:
-  Convert internal invoice data into Stripe requests.
-  Convert Stripe errors into BillingProviderError.
-  Keep Stripe types inside this adapter.
-
-Must not:
-  Import repositories.
-  Change domain models.
-  Return Stripe response objects.
-
-Depends on:
-  stripe
-  BillingProviderPort
-```
-
-### API spec
-
-Inbound interface such as HTTP, GraphQL, RPC, CLI, or webhook.
-
-Typical files:
-
-```text
-create-invoice.sdd
-create-invoice.api.sdd
-```
-
-Example:
-
-```sdd
-Spec: Create Invoice API
-
-Purpose:
-  Expose invoice creation to authorized clients.
-
-Must:
-  Validate request shape.
-  Call the invoice service.
-  Convert service errors into API errors.
-
-Must not:
-  Contain domain business logic.
-  Call repositories directly.
-  Call provider SDKs directly.
-
-Accepts:
-  POST /invoices
-  CreateInvoiceRequest
-
-Returns:
-  201 with InvoiceResponse
-  400 for validation failure
-  502 for provider failure
-```
-
-### Component spec
-
-UI component behavior.
-
-Typical files:
-
-```text
-invoice-form.sdd
-invoice-form.component.sdd
-```
-
-### Job spec
-
-Background or scheduled work.
-
-Typical files:
-
-```text
-invoice-sync.sdd
-invoice-sync.job.sdd
-```
-
-### Event spec
-
-Emitted or consumed event/message contract.
-
-Typical files:
-
-```text
-invoice-created.sdd
-invoice-created.event.sdd
-```
-
-### Policy spec
-
-Authorization, permission, or business decision rules.
-
-Typical files:
-
-```text
-invoice-access.sdd
-invoice-access.policy.sdd
-```
-
-
-## 12. Working procedure
-
-Before implementing:
-
-1. Identify the target file, directory, or task.
-2. Load `.specdd/bootstrap.md`, then project and local overrides if present.
-3. Find specs from repository root to the target directory.
-4. Read the inherited chain from parent to child.
-5. Read explicit `References` only when needed.
-6. Identify the nearest relevant local spec.
-7. Determine modification scope from `Can modify` or `Owns`.
-8. Identify applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenarios`, and `Done when`.
-9. Implement the smallest change satisfying the target task or behavior.
-10. Add or update tests when required by scenarios, tasks, or project conventions.
-11. Update task status only when actually complete.
-12. Do not modify unrelated files or complete unrelated tasks.
+## Working Procedure
+
+Before implementation:
+
+- Identify the target file, directory, or task.
+- Load bootstrap files in order.
+- Walk upward from the target path and collect relevant governing specs.
+- Read the inherited chain from parent to child.
+- Read explicit `References` declared by included specs when they affect the task or when building context.
+- Identify the nearest relevant local spec.
+- Determine modification scope from `Can modify` or `Owns`.
+- Identify applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenarios`, and `Done when`.
 
 During implementation:
 
 - Prefer local changes.
+- Implement the smallest change satisfying the target task or behavior.
 - Preserve public contracts unless the spec asks to change them.
 - Do not widen architecture boundaries.
 - Do not add forbidden dependencies.
 - Do not introduce global state unless explicitly allowed.
-- Do not move responsibilities across modules unless specs require it.
+- Do not move responsibilities across boundaries unless specs require it.
 - Do not implement non-goals.
 - Do not overbuild beyond the spec.
-- If behavior is ambiguous, choose the option that best preserves inherited constraints and local scope.
+- Add or update verification when required by scenarios, tasks, or project conventions.
+- Do not modify unrelated files or complete unrelated tasks.
 
 After implementation:
 
@@ -915,9 +523,12 @@ After implementation:
 - Update completed tasks only after implementation and verification are complete.
 
 
-## 13. Effective spec resolution
+## Effective Spec Resolution
 
 When asked to work on a path, mentally construct the effective spec.
+
+Effective spec resolution is path-based. Do not use filename similarity, symbol names, language conventions, module
+names, or test names to decide which specs apply unless a project-specific rule explicitly says to do so.
 
 Example tree:
 
@@ -952,46 +563,77 @@ src/billing/features/invoicing/services/invoice.sdd
 Use all parent rules as active constraints. Use the nearest local spec for concrete implementation authority.
 
 
-## 14. Conflict handling
+## Tool Context Discovery
+
+Tools and agents that build context for a path should use the same path-based resolution model as humans.
+
+By default, include:
+
+- Bootstrap files in load order.
+- Ancestor specs from the relevant project root to the target path.
+- Explicit `References` declared by included specs.
+
+Do not include sibling specs, nearby files, or same-named files by default. Include them only when they are explicitly
+referenced, requested, or selected by a project-specific rule.
+
+When a tool reports context, it should identify why each file was included. Useful reasons include:
+
+```text
+bootstrap
+project override
+local override
+ancestor spec
+nearest local spec
+explicit reference
+requested nearby file
+```
+
+Context discovery must not expand write authority. Referenced or nearby files remain read context unless the active
+spec grants modification scope through `Can modify` or `Owns`.
+
+
+## Report And Compliance Check
+
+Before final response, check:
+
+- Did you read the bootstrap files?
+- Did you resolve the spec chain?
+- Did you stay within write authority?
+- Did you satisfy relevant `Must` rules?
+- Did you avoid `Must not` and `Forbids`?
+- Did you run or explain verification?
+
+When reporting completed work, include:
+
+- Specs used.
+- Files changed.
+- Verification run, or why verification was not run.
+- Any SpecDD uncertainty, skipped check, or remaining risk.
+
+
+## Conflict Handling
 
 If specs conflict:
 
-1. Prefer the more restrictive rule.
-2. Prefer explicit local behavior only when it does not violate parent constraints.
-3. Treat `Must not` and `Forbids` as stronger than `Must`, `Depends on`, or `Tasks`.
-4. Treat inherited architecture as active unless explicitly and safely narrowed.
-5. Do not use a task as justification to violate a rule.
-6. If safe partial implementation is possible, do the safe subset.
-7. If implementation cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
+- Prefer the more restrictive rule.
+- Prefer explicit local behavior only when it does not violate parent constraints.
+- Treat `Must not` and `Forbids` as stronger than `Must`, `Depends on`, or `Tasks`.
+- Treat inherited architecture as active unless explicitly and safely narrowed.
+- Do not use a task as justification to violate a rule.
+- If safe partial implementation is possible, do the safe subset.
+- If implementation cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
 
 
-## 15. Compactness rules
+## Compactness Rules
 
 Specs should stay small.
 
-Prefer:
+Prefer concise, direct requirements:
 
 ```sdd
 Must:
   Validate input before provider calls.
 ```
-
-Over:
-
-```sdd
-Must:
-  The implementation should carefully validate every possible kind of user input in a robust and production-quality way before it makes any calls to downstream services or external providers.
-```
-
-Good specs are:
-
-- Local.
-- Specific.
-- Short.
-- Behavioral.
-- Constraint-oriented.
-- Easy for humans to review.
-- Easy for AI agents to follow.
 
 Avoid:
 
@@ -1004,7 +646,7 @@ Avoid:
 - Broad refactor instructions.
 
 
-## 16. Minimal complete spec
+## Minimal Valuable Spec
 
 ```sdd
 Spec: Invoice Service
@@ -1026,10 +668,6 @@ Must not:
   Calculate tax.
   Send emails.
 
-Tasks:
-  [ ] Add validation for zero or negative amount.
-  [ ] Add unit tests for invalid input.
-
 Scenario: invalid invoice
   Given invoice amount is zero
   When createInvoice is called
@@ -1039,25 +677,141 @@ Scenario: invalid invoice
 Done when:
   All scenarios have tests.
   No forbidden imports exist.
-
-# Comment
 ```
 
 
-## 17. Prime directive
+## Complete Spec
+
+```sdd
+# Comments are allowed as whole lines and do not create requirements.
+
+Spec: Invoice Service
+
+Platform:
+  TypeScript/Node.js
+
+Purpose:
+  Coordinate invoice creation for the billing module.
+
+Structure:
+  invoice.ts: Service implementation
+  invoice.test.ts: Service tests
+  fixtures: Test fixtures
+
+Owns:
+  invoice.ts
+  invoice.test.ts
+  InvoiceService
+  InvoiceCreationResult
+
+Can modify:
+  invoice.ts
+  invoice.test.ts
+  fixtures/*
+
+Can read:
+  ../models/invoice.sdd
+  ../ports/billing-provider.sdd
+  ../repositories/*
+
+References:
+  ../models/invoice.sdd
+  ../ports/billing-provider.sdd
+  ../errors/billing-error.sdd
+
+Must:
+  Validate invoice input before provider calls.
+  Persist invoice after successful provider creation.
+  Normalize provider failures before returning them.
+  Log retryable provider failures at warning level.
+
+Must not:
+  Call Stripe directly.
+  Calculate tax.
+  Send emails.
+  Import HTTP request or response objects.
+
+Forbids:
+  stripe
+  ../../api/*
+  ../../ui/*
+
+Depends on:
+  InvoiceRepository
+  BillingProviderPort
+  BillingLogger
+
+Exposes:
+  InvoiceService.createInvoice(input)
+
+Accepts:
+  CreateInvoiceInput
+  customer id
+  invoice line items
+  ISO currency code
+
+Returns:
+  InvoiceCreationResult
+  created invoice id
+  normalized provider reference
+
+Raises:
+  InvalidInvoiceInputError
+  BillingProviderError
+  InvoicePersistenceError
+
+Handles:
+  provider timeout
+  unsupported currency
+  missing customer id
+  repository write failure
+
+Tasks:
+  [x] #0 Define createInvoice public contract.
+  [ ] #1 Add validation for unsupported currency.
+  [ ] #2 Normalize provider timeout errors.
+  [!] #3 Decide retry policy for provider timeouts.
+  [?] #4 Confirm whether draft invoices may be retried.
+  [-] #5 Skip PDF rendering because invoice-pdf owns it.
+
+Scenario: invalid invoice amount
+  Given an invoice input with amount less than or equal to zero
+  When createInvoice is called
+  Then the invoice is rejected
+  And the billing provider is not called
+
+Scenario: provider timeout
+  Given a valid invoice input
+  And the billing provider times out
+  When createInvoice is called
+  Then a retryable BillingProviderError is returned
+  And no provider response object is exposed
+
+Example:
+  input currency: EUR
+  input amount minor units: 1250
+  result invoice status: created
+
+Done when:
+  All scenarios have tests.
+  No forbidden dependencies are imported.
+  Public contract is preserved.
+  Relevant tasks are updated only after checks pass.
+```
+
+
+## Prime Directive
 
 When working in a SpecDD project:
 
-```text
-Read the bootstrap files.
-Read the relevant specs.
-Resolve inherited constraints.
-Work only inside local authority.
-Implement the smallest correct change.
-Do not violate Must not or Forbids.
-Use Tasks to guide implementation.
-Use Scenarios to guide behavior and tests.
-Keep specs and code aligned.
-```
+- Read the bootstrap files.
+- Read the relevant specs.
+- Resolve inherited constraints.
+- Work only inside local authority.
+- Implement the smallest correct change.
+- Do not violate `Must not` or `Forbids`.
+- Use `Tasks` to guide implementation.
+- Use `Scenarios` to guide behavior and checks.
+- Keep specs and changed assets aligned.
 
-Specs are the project’s durable prompt. Follow them.
+Specs are the project's durable prompt. Follow them.

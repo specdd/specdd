@@ -10,34 +10,34 @@ SpecDD works for both greenfield and existing projects. In new projects, specs c
 implementation starts. In existing projects, specs can be introduced gradually around modules, services, features, or
 files that are actively changing.
 
-## Official project
+## How it works
+
+SpecDD is deliberately simple. Use the CLI to add the framework bootstrap files to your project.
+
+After initialization, place small `.sdd` specs beside the code they describe. If your AI agent does not automatically
+read the SpecDD bootstrap, tell it to read `.specdd/bootstrap.md` before it starts working. The agent then uses those
+specs as local source-of-truth context for implementation.
+
+## Official project and community
 
 The official SpecDD project is published at:
 
 - Website: https://specdd.ai/
 - Source repository: https://github.com/specdd/specdd
+- CLI source and help: https://github.com/specdd/cli
 - Release downloads: https://github.com/specdd/specdd/releases
 
-## Download
+Community links:
 
-Official SpecDD release downloads are published on GitHub Releases:
-
-https://github.com/specdd/specdd/releases
-
-## How it works
-
-SpecDD is deliberately simple. You do not need to install anything to use it.
-
-Add a `.specdd/bootstrap.md` file to your
-project, place small `.sdd` specs beside the code they describe, and tell your AI agent to read the bootstrap file
-before it starts working. The agent then uses those specs as local source-of-truth context for implementation. For best
-results, mirror all the contents of `src/` from this repository into your code project.
+- Reddit: https://www.reddit.com/r/specdd/
+- IRC: `#specdd` on Libera.Chat
 
 ## Tooling
 
-SpecDD is at a fairly informal state right now but the core workflow should work with any editor, any repository, and
-any AI coding agent that can read project files. Future tooling could help validate specs, resolve inheritance chains,
-check forbidden dependencies, highlight syntax, or enforce task status rules. Tooling contributions are welcome.
+The SpecDD CLI manages setup and framework updates. The core workflow still uses plain files and should work with any
+editor, any repository, and any AI coding agent that can read project files. Future tooling could help validate specs,
+resolve inheritance chains, check forbidden dependencies, highlight syntax, or enforce task status rules. Tooling
+contributions are welcome.
 
 It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
 may rely on the current conventions.
@@ -46,11 +46,49 @@ may rely on the current conventions.
 
 SpecDD has been tested and experimented with extensively, and results are generally very good. Still, it is
 experimental technology. Expect unexpected behavior from AI agents, review all outputs, and verify code, tests, specs,
-and generated changes before relying on them.
+and generated changes before relying on them. SpecDD is changing rapidly, so check back often for updates.
+
+## Set up a project
+
+To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer.
+
+```bash
+npm install --global specdd
+```
+
+```bash
+yarn global add specdd
+```
+
+```bash
+brew tap specdd/cli
+brew install specdd
+```
+
+Initialize SpecDD in the current directory:
+
+```bash
+specdd init
+```
+
+Initialize SpecDD in another directory:
+
+```bash
+specdd init path/to/project
+```
+
+Or run the CLI with Docker by mounting your project at `/workspace`:
+
+```bash
+docker run --rm -v "$PWD:/workspace" ghcr.io/specdd/cli:latest init
+```
+
+For CLI update commands, version options, file-safety details, and other command behavior, run `specdd --help`,
+`specdd <command> --help`, or see https://github.com/specdd/cli.
 
 ## Example
 
-A complete working example is available in the SpecDD benchmark repository: https://github.com/specdd/benchmark. It
+A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
 demonstrates a small TODO application with SpecDD bootstrap files, colocated .sdd specs, source code, tests, and agent
 entrypoint files.
 
@@ -110,7 +148,8 @@ responsibilities, define boundaries, state non-goals, and decide where behavior 
 
 ## What SpecDD is
 
-SpecDD is a framework and reference format for organizing software projects around source-adjacent specification files.
+SpecDD is a framework and reference format for organizing file-based technical projects around source-adjacent
+specification files.
 
 A SpecDD spec describes a part of a system:
 
@@ -144,7 +183,7 @@ implementation.
 
 SpecDD is language-agnostic. It can be used with JavaScript, TypeScript, Python, Go, PHP, Java, C#, Rust, Ruby, or other
 platforms. It can be used with object-oriented, functional, procedural, service-oriented, or mixed styles. The main
-assumption is that the project has code organized in files.
+assumption is that project work is organized in files.
 
 ## Workflow
 
@@ -199,6 +238,9 @@ Load order:
 -> .specdd/bootstrap.project.md
 -> .specdd/bootstrap.local.md
 ```
+
+Later bootstrap files may narrow or add local context. They should not silently weaken project contracts, inherited
+constraints, or write authority.
 
 ## The role of the bootstrap file
 
@@ -274,7 +316,10 @@ src/billing/invoice.service.sdd
 src/billing/invoice.service.ts
 ```
 
-The spec kind is inferred from the filename or its location in the project tree.
+Spec names and locations help humans and agents navigate, but they do not create authority by themselves.
+Same-directory basename matching is an explicit SpecDD rule: when a target file and a `.sdd` file live in the same
+directory and share the same basename, the `.sdd` file is the matching local spec for that target. Other naming
+conventions are project conventions unless a spec or project rule defines them.
 
 ## Naming conventions for project files
 
@@ -306,11 +351,19 @@ invoice.service.ts
 stripe.adapter.ts
 ```
 
-## Directory-based inheritance
+## Path-based resolution
 
-SpecDD inheritance is implicit and directory-based.
+SpecDD resolution is path-based. Applicable specs come from ancestor specs, explicit `References`, and same-directory
+basename matches.
 
-When working on a target path, agents must collect specs from the repository root down to the target directory.
+When working on a target path, agents should:
+
+1. Start at the target path.
+2. Include the same-directory basename spec when the target is a file and such a spec exists.
+3. Walk upward through parent directories to the repository root or configured project root.
+4. Collect specs whose declared governing scope applies to the target.
+5. Read the inherited chain from root to target.
+6. Include explicit `References` declared by included specs when they affect the task or context.
 
 Example:
 
@@ -343,6 +396,10 @@ src/billing/features/invoicing/services/invoice.sdd
 ```
 
 This means the service spec inherits constraints from the feature spec, module spec, and app spec.
+
+Do not infer the applicable spec, ownership, or write authority from similar names in other directories, symbols,
+programming languages, module names, test names, or tool-specific conventions unless a project-specific spec or
+configuration explicitly defines that mapping.
 
 The core rule is:
 
@@ -430,6 +487,10 @@ If `Can modify` is absent, `Owns` acts as the modification boundary.
 
 Parent specs do not automatically grant broad edit rights. A module spec can define architectural context for a whole
 module, but a service-level task should not freely edit the whole module unless the local spec allows it.
+
+If no local spec exists but a parent spec applies, use the nearest applicable parent spec and modify only the smallest
+necessary set of files. If no applicable spec can be found, ask the Operator to identify or create the relevant spec
+before making changes.
 
 ## Universal spec language
 
@@ -579,7 +640,7 @@ Use this when writable scope should be narrower or different from ownership.
 
 ### Can read
 
-Files, paths, or specs that may be read to improve context. It serves as a recommendation for Agents to read relevant
+Files, paths, or specs that may be read to improve context. It serves as a recommendation for agents to read relevant
 sections for context.
 
 ```sdd
@@ -668,7 +729,8 @@ Accepts:
 
 ### Returns
 
-Outputs returned by this unit.
+Outputs produced by this unit, such as returned values, responses, result states, generated artifacts, output files, exit
+values, or other observable results.
 
 ```sdd
 Returns:
@@ -1113,11 +1175,14 @@ Use for rules that decide whether something is allowed.
 
 ## Minimum viable spec
 
-The minimum viable spec contains exactly 2 sections - Spec and Purpose, with all other sections being optional. SpecDD
-itself does not prescribe how detailed (or not) your specs have to be. You can use as many, or as few sections as needed
-to describe the subject of the spec.
+The smallest useful spec can contain only `Spec` and `Purpose`, with all other sections being optional. SpecDD itself
+does not prescribe how detailed your specs have to be. Use as many or as few sections as needed to describe the subject
+of the spec.
 
-Following example is valid minimal spec.
+Most implementation specs become more useful once they define ownership, key `Must` and `Must not` rules, and at least
+one scenario.
+
+The following example is a valid minimal spec.
 
 ```sdd
 Spec: Math service
@@ -1126,11 +1191,9 @@ Purpose:
   Simple service that exposes methods to add and subtract two numbers.
 ```
 
-## Working with SpecDD manually
+## Working with SpecDD files
 
-You can use SpecDD without any special tooling.
-
-A normal manual workflow:
+After a project has been initialized, the normal workflow is:
 
 1. Create or update the relevant `.sdd` spec.
 2. Define purpose, ownership, rules, scenarios, and tasks.
@@ -1174,10 +1237,31 @@ In a correct coding environment, the agent should:
 7. update tests
 8. update task status only when complete
 
+For implementation work, the agent should follow this loop:
+
+```text
+Resolve -> Read -> Authorize -> Change -> Verify -> Report
+```
+
+That means it should identify the target, read the applicable bootstrap and specs, confirm write authority before
+editing, make the smallest correct change, run or explain verification, and report the specs used, files changed, checks,
+and any remaining uncertainty.
+
+The agent should stop before editing when:
+
+- no applicable spec exists
+- write authority is unclear
+- the request cannot be completed without violating `Must not` or `Forbids`
+- the change would touch files outside `Can modify` or `Owns`
+- requirements affect security, destructive behavior, or public contracts and are ambiguous
+
 Best practice: prompt implementation in small chunks. Depending on spec complexity, ask for at most one to three specs
 at a time. Prefer one spec at a time for best results.
 
 ## Creating a new SpecDD project
+
+Use the setup instructions at the top of this README to initialize SpecDD first. For additional CLI options, run
+`specdd init --help` or see https://github.com/specdd/cli.
 
 A minimal setup example:
 
@@ -1258,7 +1342,7 @@ Scenario: add todo
 
 ### Start small and iterate
 
-Begin with minimal specs. Just `Spec`, `Purpose`, and a few `Must not` rules and `Scenario` or two . Run the workflow,
+Begin with minimal specs. Just `Spec`, `Purpose`, and a few `Must not` rules and a `Scenario` or two. Run the workflow,
 observe what the agent gets right and wrong, then add sections to address gaps. A spec that is too thin will produce
 unfocused output; a spec that is too detailed will become hard to maintain and slow to write. Iterate toward the level
 of detail that produces reliable results without becoming a burden in your specific scenario. Most specs settle into a
@@ -1274,11 +1358,11 @@ many small specs over one large spec. Local specs preserve context and reduce pr
 Prompt implementation in small chunks. One spec at a time gives the best results. One to three related specs can work
 when the task is simple and the boundaries are clear.
 
-### Use automated spec generation
+### Draft specs automatically with AI
 
-It might be overwhelming to start writing all these specs by hand. The magic of SpecDD is that, you can use AI to
-generate specs and effectively use SpecDD specs as planning stage of your projects. Just make sure to review your specs
-thoroughly!
+It can be overwhelming to start writing specs by hand. You can ask an AI agent to draft initial SpecDD specs, then
+review and edit them before implementation. Treat generated specs as a planning aid, not as final authority until you
+have reviewed them.
 
 ### Be explicit
 
@@ -1455,30 +1539,10 @@ Use SpecDD tasks for:
 
 - local implementation steps
 - AI-agent work packets
-- unfinished work inside a spec boundary (TODO!)
+- unfinished work inside a spec boundary
 - keeping code and spec progress aligned
 
 A good SpecDD task should be small enough to implement locally.
-
-## Tooling status
-
-SpecDD is currently an informal language and convention.
-
-At present, there is no official:
-
-- validator
-- parser
-- formatter
-- highlighter
-- language server
-- dependency checker
-- task-state checker
-- spec-chain resolver
-
-This is intentional for the early stage. SpecDD should work with plain files and ordinary AI agents.
-
-Future tooling could add validation, highlighting, chain resolution, forbidden-import checks, prompt generation, task
-tracking, and editor support. Contributions are welcome.
 
 ## What is in the SpecDD repository
 
@@ -1544,13 +1608,6 @@ improve the quality of your outcomes and any future technical contributors will 
 
 No. SpecDD is a framework and reference format for source-adjacent software specifications.
 
-### Is SpecDD a formal language?
-
-No. It is currently informal. There is no official parser, validator, or highlighter yet.
-
-It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
-may rely on the current conventions.
-
 ### Is SpecDD a testing framework?
 
 No. Specs can guide tests, but they are not tests.
@@ -1561,7 +1618,8 @@ No. Humans can use it directly. It is designed to be especially useful with AI c
 
 ### Do I need tools?
 
-No. SpecDD can work with plain text files and any LLM that can read repository files.
+Use the SpecDD CLI to set up and update the framework files. After that, SpecDD specs are plain text files and can work
+with any LLM that can read repository files.
 
 ### Can SpecDD work with my language or framework?
 
@@ -1592,6 +1650,8 @@ No. SpecDD works well for both greenfield and existing projects. For existing co
 the parts you are actively modifying, then expand coverage as needed.
 
 ## Legal
+
+Copyright (c) 2026 Matīss Treinis and SpecDD contributors
 
 SpecDD is licensed under the Apache License 2.0. SpecDD™ is a trademark of Matīss Treinis.
 
