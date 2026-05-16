@@ -80,6 +80,9 @@ specdd init path/to/project
 Or run the CLI with Docker by mounting your project at `/workspace`:
 
 ```bash
+# From DockerHub
+docker run --rm -v "$PWD:/workspace" specdd/cli:latest init
+# From Github Container Registry
 docker run --rm -v "$PWD:/workspace" ghcr.io/specdd/cli:latest init
 ```
 
