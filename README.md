@@ -18,6 +18,16 @@ After initialization, place small `.sdd` specs beside the code they describe. If
 read the SpecDD bootstrap, tell it to read `.specdd/bootstrap.md` before it starts working. The agent then uses those
 specs as local source-of-truth context for implementation.
 
+## Agent compatibility
+
+SpecDD is agent-agnostic. It works with all major file-aware coding agents, including OpenAI Codex, Claude Code,
+GitHub Copilot cloud agent and Copilot agent mode, Cursor Agent, Windsurf Cascade, Gemini CLI, Google Jules, JetBrains
+Junie, Amazon Q Developer, Replit Agent, Sourcegraph Amp, Augment Code, Cline, Zed Agent, OpenCode and others.
+
+If an agent can read repository files and follow project instructions, it can use SpecDD. There is
+no plugin lock-in, hosted memory silo, or vendor-specific format. Specs live in Git, beside the code, where both humans
+and agents can use them.
+
 ## Official project and community
 
 The official SpecDD project is published at:
