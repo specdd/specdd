@@ -1,7 +1,7 @@
 ---
 title: "SpecDD as the Interface Between Product and Development Teams"
 date: 2026-05-14
-description: "How SpecDD gives product owners, QA, and development teams a shared structured language for turning loose requirements into implementation-ready contracts."
+seoDescription: "How SpecDD gives product owners, QA, and development teams a shared structured language for turning loose requirements into implementation-ready contracts."
 excerpt: "Product owners already write requirements, edge cases, acceptance behavior, and rules about what must not happen. SpecDD gives that work a simple structured form that development teams and AI agents can use, without forcing product stakeholders to pretend they own the architecture."
 author: "Matīss Treinis"
 ---

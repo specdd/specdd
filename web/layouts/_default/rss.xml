@@ -1,0 +1,21 @@
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+{{- $pages := first 20 (where .Site.RegularPages "Section" .Section) -}}
+{{- $feedURL := "" -}}
+{{- with .OutputFormats.Get "RSS" }}{{ $feedURL = .Permalink }}{{ end -}}
+{{- $shortTitle := .Site.Params.shortTitle | default .Site.Title -}}
+{{- $feedDescription := .Params.seoDescription | default .Site.Params.description -}}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ printf "%s | %s" .Title $shortTitle | transform.XMLEscape | safeHTML }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ $feedDescription | transform.XMLEscape | safeHTML }}</description>
+    <generator>Hugo</generator>
+    <language>{{ .Site.LanguageCode }}</language>
+    {{- with $feedURL }}
+    <atom:link href="{{ . }}" rel="self" type="application/rss+xml" />
+    {{- end }}
+    {{- range $pages }}
+    {{ partial "rss-item.xml" . }}
+    {{- end }}
+  </channel>
+</rss>

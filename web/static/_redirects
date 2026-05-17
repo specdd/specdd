@@ -1,0 +1,7 @@
+# Cloudflare Pages path redirects.
+# Host canonical redirects are configured in the Cloudflare dashboard:
+# apex HTTP host -> canonical HTTPS apex
+# www HTTPS host -> canonical HTTPS apex
+# Pages deployment host -> canonical HTTPS apex
+
+/articles/page/1/ /articles/ 301

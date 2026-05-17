@@ -1,7 +1,7 @@
 ---
 title: "Is SpecDD Too Verbose? Only If You Measure It Against Toy Code"
 date: 2026-05-06
-description: "A practical answer to the objection that SpecDD adds too much text, explaining why the spec-to-code ratio looks worse in tiny examples and drops sharply in real systems."
+seoDescription: "A practical answer to the objection that SpecDD adds too much text, explaining why the spec-to-code ratio looks worse in tiny examples and drops sharply in real systems."
 excerpt: "SpecDD can look verbose when the implementation is tiny, and our own example repo has that problem because it is designed to show the mechanics clearly. In real systems, the ratio changes. A small local spec can govern a much larger body of code, tests, edge cases, boundaries, and future changes."
 author: "Matīss Treinis"
 ---

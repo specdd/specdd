@@ -1,0 +1,14 @@
+{{- $page := . -}}
+{{- $description := $page.Params.seoDescription | default $page.Params.excerpt -}}
+{{- if not $description -}}
+  {{- $description = $page.Summary | plainify | htmlUnescape | truncate 280 -}}
+{{- end -}}
+<item>
+  <title>{{ $page.Title | transform.XMLEscape | safeHTML }}</title>
+  <link>{{ $page.Permalink }}</link>
+  {{- with $page.Date }}
+  <pubDate>{{ .Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+  {{- end }}
+  <guid>{{ $page.Permalink }}</guid>
+  <description>{{ $description | plainify | htmlUnescape | transform.XMLEscape | safeHTML }}</description>
+</item>

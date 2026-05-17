@@ -1,7 +1,8 @@
 ---
 title: "I Built SpecDD Because AI Kept Forgetting What We Were Building - and Between the Two of Us, We Couldn't Spec-ify a Thing"
+seoTitle: "I Built SpecDD Because AI Kept Forgetting What We Were Building"
 date: 2026-04-29
-description: "Discover how SpecDD was born from years of frustration with AI agents that forget, violate boundaries, and lose context. Learn why specification-driven development is the missing layer between intent and reliable implementation in AI-assisted software projects."
+seoDescription: "Discover how SpecDD was born from years of frustration with AI agents that forget, violate boundaries, and lose context. Learn why specification-driven development is the missing layer between intent and reliable implementation in AI-assisted software projects."
 excerpt: "AI agents are not failing because they are not quite smart enough. They are failing because no one gave them the right context at the right time. This is the origin story of SpecDD - a specification-driven development framework built to solve exactly that problem. Small, local, human-readable specs that live beside your code, giving both humans and AI the precise context they need, exactly where they need it."
 author: "Matīss Treinis"
 ---

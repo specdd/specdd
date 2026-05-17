@@ -1,7 +1,7 @@
 ---
 title: "Hacking SpecDD: Generating Specs from Prompts, for Fun and Profit"
 date: 2026-05-09
-description: "A practical guide to using AI agents to generate SpecDD specs from rough prompts, then reviewing and tightening those specs before implementation."
+seoDescription: "A practical guide to using AI agents to generate SpecDD specs from rough prompts, then reviewing and tightening those specs before implementation."
 excerpt: "You do not have to write every SpecDD spec from scratch. A rough prompt can become a useful first draft, the draft can become a reviewed contract, and the contract can guide implementation. The trick is using AI to make intent cheaper to structure without handing it ownership of the decisions."
 author: "Matīss Treinis"
 ---

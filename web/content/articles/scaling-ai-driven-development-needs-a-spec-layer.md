@@ -1,7 +1,7 @@
 ---
 title: "Scaling AI-Assisted Development Needs A Spec Layer"
 date: 2026-05-12
-description: "Why scaling AI-assisted software development beyond prototypes requires durable local context, explicit boundaries, and reviewable intent that agents and humans can share."
+seoDescription: "Why scaling AI-assisted software development beyond prototypes requires durable local context, explicit boundaries, and reviewable intent that agents and humans can share."
 excerpt: "AI-assisted development scales poorly when implementation speed grows faster than shared understanding. SpecDD gives teams a local context layer for agents, reviewers, and developers, so AI-driven work can move beyond prototype-level prompting without turning review into the real bottleneck."
 author: "Matīss Treinis"
 ---

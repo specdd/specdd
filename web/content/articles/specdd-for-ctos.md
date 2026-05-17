@@ -1,7 +1,7 @@
 ---
 title: "SpecDD for CTOs"
 date: 2026-05-01
-description: "A CTO-focused introduction to SpecDD, explaining how local specifications help engineering teams adopt AI coding agents without losing architectural control, domain knowledge, or review quality."
+seoDescription: "A CTO-focused introduction to SpecDD, explaining how local specifications help engineering teams adopt AI coding agents without losing architectural control, domain knowledge, or review quality."
 excerpt: "AI coding agents can move quickly, but speed is not the same as controlled delivery. SpecDD gives CTOs a practical way to make engineering intent local, versioned, and usable by both humans and AI agents, so teams can scale AI-assisted development without turning the codebase into an unmanaged experiment."
 author: "Matīss Treinis"
 ---

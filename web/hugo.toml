@@ -2,10 +2,38 @@ baseURL = 'https://specdd.ai/'
 ignoreFiles = ['\.draft\.', '\.note\.']
 disableKinds = ['taxonomy', 'term']
 languageCode = 'en-us'
-title = 'SpecDD - Specification-Driven Development framework'
+enableGitInfo = true
+title = 'SpecDD – Specification-Driven Development framework'
 
 [params]
+shortTitle = 'SpecDD'
 description = 'SpecDD is a Specification-Driven Development framework that enables humans and AI agents to build better software'
+socialImage = '/social.png'
+socialImageWidth = 1200
+socialImageHeight = 630
+socialImageAlt = 'SpecDD - Specification-Driven Development framework'
+
+[params.schema]
+name = 'SpecDD'
+url = 'https://specdd.ai/'
+logo = '/logo-sm.png'
+image = '/social.png'
+author = 'Matīss Treinis'
+author_id = 'matiss-treinis'
+same_as = [
+  'https://github.com/specdd/specdd',
+  'https://github.com/specdd/cli',
+]
+code_repository = 'https://github.com/specdd/specdd'
+application_category = 'DeveloperApplication'
+operating_system = 'Cross-platform'
+license = 'https://www.apache.org/licenses/LICENSE-2.0'
+
+[params.pageDescriptions]
+'/changelog/' = 'SpecDD release notes, framework updates, and changes to the specification-driven development workflow.'
+
+[frontmatter]
+lastmod = [':git', 'lastmod', 'modified', 'date', 'publishDate']
 
 [markup.tableOfContents]
 startLevel = 2

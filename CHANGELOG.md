@@ -1,5 +1,5 @@
 ---
-title: Changelog
+title: Framework changelog
 ---
 
 ## 1.2 - 2026-05-16

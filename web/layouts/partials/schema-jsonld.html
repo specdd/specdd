@@ -1,0 +1,104 @@
+{{- $page := .Page -}}
+{{- $site := $page.Site -}}
+{{- $schema := $site.Params.schema | default (dict) -}}
+{{- $shortTitle := .ShortTitle | default ($site.Params.shortTitle | default $site.Title) -}}
+{{- $pageTitle := .PageTitle | default $page.Title -}}
+{{- $metaDescription := .MetaDescription | default $site.Params.description -}}
+{{- $isArticle := .IsArticle | default false -}}
+{{- $isNews := .IsNews | default false -}}
+{{- $isEditorialPage := or $isArticle $isNews -}}
+{{- $siteURL := (index $schema "url" | default $site.BaseURL | absURL) -}}
+{{- $siteName := index $schema "name" | default $shortTitle -}}
+{{- $siteDescription := $site.Params.description | default $metaDescription -}}
+{{- $logo := index $schema "logo" | default "/logo.png" -}}
+{{- $schemaImage := index $schema "image" | default ($site.Params.socialImage | default "/social.png") -}}
+{{- $socialImage := .SocialImage | default $schemaImage -}}
+{{- $sameAs := index $schema "same_as" | default (slice) -}}
+{{- $authorName := index $schema "author" | default "Matiss Treinis" -}}
+{{- $authorID := index $schema "author_id" | default "author" -}}
+{{- $personID := printf "%s#%s" $siteURL $authorID -}}
+{{- $websiteID := printf "%s#website" $siteURL -}}
+{{- $softwareID := printf "%s#software" $siteURL -}}
+{{- $lang := $site.LanguageCode | default "en" -}}
+
+{{- $person := dict
+  "@type" "Person"
+  "@id" $personID
+  "name" $authorName
+  "url" $siteURL
+-}}
+
+{{- $software := dict
+  "@type" "SoftwareApplication"
+  "@id" $softwareID
+  "name" $siteName
+  "url" $siteURL
+  "description" $siteDescription
+  "applicationCategory" (index $schema "application_category" | default "DeveloperApplication")
+  "operatingSystem" (index $schema "operating_system" | default "Cross-platform")
+  "image" (absURL $schemaImage)
+  "logo" (absURL $logo)
+  "author" (dict "@id" $personID)
+  "publisher" (dict "@id" $personID)
+-}}
+{{- with index $schema "code_repository" }}{{ $software = merge $software (dict "codeRepository" .) }}{{ end -}}
+{{- with index $schema "license" }}{{ $software = merge $software (dict "license" .) }}{{ end -}}
+{{- if gt (len $sameAs) 0 }}{{ $software = merge $software (dict "sameAs" $sameAs) }}{{ end -}}
+
+{{- $website := dict
+  "@type" "WebSite"
+  "@id" $websiteID
+  "url" $siteURL
+  "name" $siteName
+  "description" $siteDescription
+  "inLanguage" $lang
+  "publisher" (dict "@id" $personID)
+  "about" (dict "@id" $softwareID)
+-}}
+{{- if gt (len $sameAs) 0 }}{{ $website = merge $website (dict "sameAs" $sameAs) }}{{ end -}}
+
+{{- $graph := slice $website $software $person -}}
+
+{{- if $isEditorialPage -}}
+  {{- $articleAuthor := $page.Params.author | default $authorName -}}
+  {{- $articleAuthorRef := dict "@type" "Person" "name" $articleAuthor -}}
+  {{- if eq $articleAuthor $authorName }}{{ $articleAuthorRef = dict "@id" $personID }}{{ end -}}
+  {{- $schemaType := cond $isNews "NewsArticle" "BlogPosting" -}}
+  {{- $schemaID := cond $isNews "#news" "#article" -}}
+  {{- $sectionName := cond $isNews "News" "Articles" -}}
+  {{- $sectionURL := cond $isNews (absURL "/news/") (absURL "/articles/") -}}
+
+  {{- $article := dict
+    "@type" $schemaType
+    "@id" (printf "%s%s" $page.Permalink $schemaID)
+    "mainEntityOfPage" (dict "@type" "WebPage" "@id" $page.Permalink)
+    "headline" $pageTitle
+    "name" $pageTitle
+    "description" $metaDescription
+    "url" $page.Permalink
+    "inLanguage" $lang
+    "publisher" (dict "@id" $personID)
+    "image" (absURL $socialImage)
+    "isPartOf" (dict "@id" $websiteID)
+    "about" (dict "@id" $softwareID)
+  -}}
+  {{- if $isArticle }}{{ $article = merge $article (dict "author" $articleAuthorRef) }}{{ end -}}
+  {{- if not $page.Date.IsZero }}{{ $article = merge $article (dict "datePublished" ($page.Date.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
+  {{- if not $page.Lastmod.IsZero }}{{ $article = merge $article (dict "dateModified" ($page.Lastmod.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
+  {{- $graph = $graph | append $article -}}
+
+  {{- $breadcrumbItems := slice
+    (dict "@type" "ListItem" "position" 1 "name" "Home" "item" $siteURL)
+    (dict "@type" "ListItem" "position" 2 "name" $sectionName "item" $sectionURL)
+    (dict "@type" "ListItem" "position" 3 "name" $pageTitle "item" $page.Permalink)
+  -}}
+  {{- $breadcrumb := dict
+    "@type" "BreadcrumbList"
+    "@id" (printf "%s#breadcrumb" $page.Permalink)
+    "itemListElement" $breadcrumbItems
+  -}}
+  {{- $graph = $graph | append $breadcrumb -}}
+{{- end -}}
+
+{{- $jsonld := dict "@context" "https://schema.org" "@graph" $graph -}}
+<script type="application/ld+json">{{ $jsonld | jsonify | safeJS }}</script>

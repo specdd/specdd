@@ -1,7 +1,7 @@
 ---
 title: "SpecDD for Non-Technical Users: Can You Vibe-Spec? Yes"
 date: 2026-05-05
-description: "A plain-language introduction to SpecDD for product managers, founders, QA, support, operations, and other non-technical contributors who want to describe software behavior clearly before implementation."
+seoDescription: "A plain-language introduction to SpecDD for product managers, founders, QA, support, operations, and other non-technical contributors who want to describe software behavior clearly before implementation."
 excerpt: "SpecDD is not only for developers. If you can describe what a feature should do, what it should avoid, and how you would know it worked, you can write a useful spec. It does not need to be deeply technical to help an AI agent or engineering team build the right thing."
 author: "Matīss Treinis"
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Hacking SpecDD: Iterative Development Using Specs as Planning Checkpoints"
 date: 2026-05-10
-description: "A practical guide to using SpecDD specs as iterative planning checkpoints, so AI agents can expose ambiguities, contradictions, and bad assumptions before implementation runs too far."
+seoDescription: "A practical guide to using SpecDD specs as iterative planning checkpoints, so AI agents can expose ambiguities, contradictions, and bad assumptions before implementation runs too far."
 excerpt: "SpecDD specs are not only starting instructions. They can become planning checkpoints between intent, agent interpretation, implementation, review, and the next slice of work. The useful trick is asking the agent to plan against the spec, then using that plan to correct the agent, the spec, or your own assumptions before they become code."
 author: "Matīss Treinis"
 ---

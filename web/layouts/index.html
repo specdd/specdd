@@ -3,24 +3,32 @@
 <head>
   {{ partial "site-head.html" . }}
 </head>
-<body class="has-toc">
+{{ $hasToc := strings.Contains .TableOfContents "<li>" }}
+<body{{ if $hasToc }} class="has-toc"{{ end }}>
 
-{{ partial "site-header.html" . }}
+<a class="skip-link" href="#content">Skip to content</a>
 
+{{ partial "site-header.html" (dict "Page" . "HasToc" $hasToc) }}
+
+{{ if $hasToc }}
 <div id="toc-overlay"></div>
 
-<aside id="toc">
+<aside id="toc" aria-labelledby="toc-label">
+  {{ partial "toc-mobile-nav.html" . }}
   <span id="toc-label">Contents</span>
-  <nav>{{ .TableOfContents }}</nav>
+  {{ .TableOfContents }}
 </aside>
+{{ end }}
 
-<main id="content">
+<main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
   {{ .Content }}
 </main>
 
 {{ partial "site-footer.html" . }}
 
+{{ if $hasToc }}
 {{ partial "toc-scripts.html" . }}
+{{ end }}
 
 </body>
 </html>

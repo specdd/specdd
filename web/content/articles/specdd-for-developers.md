@@ -1,7 +1,7 @@
 ---
 title: "SpecDD for Developers"
 date: 2026-05-03
-description: "A developer-focused introduction to SpecDD, showing how local .sdd files make AI-assisted implementation easier to scope, review, test, and keep aligned with real project constraints."
+seoDescription: "A developer-focused introduction to SpecDD, showing how local .sdd files make AI-assisted implementation easier to scope, review, test, and keep aligned with real project constraints."
 excerpt: "AI coding agents are good at producing plausible code. SpecDD helps make that code right for your project by putting small, local implementation contracts beside the files they govern. For developers, that means less re-explaining, fewer boundary violations, clearer reviews, and a workflow that gives agents the context they need before they start guessing."
 author: "Matīss Treinis"
 ---

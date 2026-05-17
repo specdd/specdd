@@ -1,11 +1,87 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} – {{ .Site.Title }}{{ end }}</title>
+{{ $shortTitle := .Site.Params.shortTitle | default "SpecDD" }}
+{{ $pageTitle := .Title }}
+{{ with .Params.seoTitle }}{{ $pageTitle = . }}{{ end }}
+{{ $metaTitle := cond .IsHome .Site.Title (printf "%s | %s" $pageTitle $shortTitle) }}
+{{ $isArticle := and .IsPage (eq .Section "articles") }}
+{{ $isNews := and .IsPage (eq .Section "news") }}
+{{ $isEditorialPage := or $isArticle $isNews }}
+{{ $metaDescription := .Site.Params.description }}
+{{ $socialImage := .Site.Params.socialImage | default "/social.png" }}
+{{ with .Params.socialImage }}{{ $socialImage = . }}{{ end }}
+{{ $socialImageWidth := .Site.Params.socialImageWidth | default 1200 }}
+{{ with .Params.socialImageWidth }}{{ $socialImageWidth = . }}{{ end }}
+{{ $socialImageHeight := .Site.Params.socialImageHeight | default 630 }}
+{{ with .Params.socialImageHeight }}{{ $socialImageHeight = . }}{{ end }}
+{{ $socialImageAlt := .Site.Params.socialImageAlt | default $metaTitle }}
+{{ with .Params.socialImageAlt }}{{ $socialImageAlt = . }}{{ end }}
+{{ with index .Site.Params.pageDescriptions .RelPermalink }}{{ $metaDescription = . }}{{ end }}
+{{ with .Description }}{{ $metaDescription = . }}{{ end }}
+{{ with .Params.seoDescription }}{{ $metaDescription = . }}{{ end }}
+<title>{{ $metaTitle }}</title>
+<link rel="canonical" href="{{ .Permalink }}">
 <link rel="icon" type="image/png" href="/favicon.png">
-<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171514">
+<meta name="description" content="{{ $metaDescription }}">
+<meta property="og:title" content="{{ cond .IsHome .Site.Title $pageTitle }}">
+<meta property="og:description" content="{{ $metaDescription }}">
+<meta property="og:type" content="{{ if $isEditorialPage }}article{{ else }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ $shortTitle }}">
+<meta property="og:image" content="{{ absURL $socialImage }}">
+<meta property="og:image:width" content="{{ $socialImageWidth }}">
+<meta property="og:image:height" content="{{ $socialImageHeight }}">
+<meta property="og:image:alt" content="{{ $socialImageAlt }}">
+{{ if $isEditorialPage }}
+{{ with .Date }}<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
+{{ with .Lastmod }}<meta property="article:modified_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
+{{ if $isArticle }}
+{{ with .Params.author }}<meta property="article:author" content="{{ . }}">{{ end }}
+{{ end }}
+{{ with .PrevInSection }}<link rel="prev" href="{{ .Permalink }}">{{ end }}
+{{ with .NextInSection }}<link rel="next" href="{{ .Permalink }}">{{ end }}
+{{ end }}
+{{ partial "schema-jsonld.html" (dict
+  "Page" .
+  "ShortTitle" $shortTitle
+  "PageTitle" $pageTitle
+  "MetaTitle" $metaTitle
+  "MetaDescription" $metaDescription
+  "IsArticle" $isArticle
+  "IsNews" $isNews
+  "SocialImage" $socialImage
+) }}
+{{ with .OutputFormats.Get "RSS" }}
+<link rel="alternate" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $metaTitle }}">
+{{ end }}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+<script>
+  (function () {
+    var root = document.documentElement;
+    var storedTheme = null;
+
+    try {
+      storedTheme = localStorage.getItem("specdd-theme");
+    } catch (error) {
+      storedTheme = null;
+    }
+
+    var explicitTheme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
+    var systemTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var resolvedTheme = explicitTheme || systemTheme;
+
+    if (explicitTheme) root.dataset.theme = explicitTheme;
+    root.dataset.resolvedTheme = resolvedTheme;
+    root.style.colorScheme = resolvedTheme;
+  })();
+</script>
 {{ $css := resources.Get "main.css" | fingerprint }}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 {{ $specddHighlight := resources.Get "js/specdd-highlight.js" | fingerprint }}
 <script defer src="{{ $specddHighlight.RelPermalink }}" integrity="{{ $specddHighlight.Data.Integrity }}" crossorigin="anonymous"></script>
+{{ $themeToggle := resources.Get "js/theme-toggle.js" | fingerprint }}
+<script defer src="{{ $themeToggle.RelPermalink }}" integrity="{{ $themeToggle.Data.Integrity }}" crossorigin="anonymous"></script>

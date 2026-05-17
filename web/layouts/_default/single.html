@@ -4,30 +4,57 @@
   {{ partial "site-head.html" . }}
 </head>
 {{ $hasToc := strings.Contains .TableOfContents "<li>" }}
+{{ $isPostSection := or (eq .Section "articles") (eq .Section "news") }}
+{{ $sectionListLabel := cond (eq .Section "news") "news" "articles" }}
+{{ $sectionItemLabel := cond (eq .Section "news") "news item" "article" }}
+{{ $sectionURL := printf "/%s/" .Section }}
 <body{{ if $hasToc }} class="has-toc"{{ end }}>
 
-{{ partial "site-header.html" . }}
+<a class="skip-link" href="#content">Skip to content</a>
+
+{{ partial "site-header.html" (dict "Page" . "HasToc" $hasToc) }}
 
 {{ if $hasToc }}
 <div id="toc-overlay"></div>
 
-<aside id="toc">
+<aside id="toc" aria-labelledby="toc-label">
+  {{ partial "toc-mobile-nav.html" . }}
   <span id="toc-label">Contents</span>
-  <nav>{{ .TableOfContents }}</nav>
+  {{ .TableOfContents }}
 </aside>
 {{ end }}
 
 <main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
-  {{ if eq .Section "articles" }}<p class="post-back"><a href="/articles/">← All articles</a></p>{{ end }}
+  {{ if $isPostSection }}<p class="post-back"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
   <h1>{{ .Title }}</h1>
-  <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}</p>
+  <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ if ne .Section "news" }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}{{ end }}</p>
   {{ .Content }}
-  {{ if eq .Section "articles" }}<p class="post-back post-back-end"><a href="/articles/">← All articles</a></p>{{ end }}
+  {{ if $isPostSection }}
+    {{ if or .PrevInSection .NextInSection }}
+    <nav class="article-nav" aria-label="{{ title $sectionItemLabel }} navigation">
+      {{ with .PrevInSection }}
+      <a class="article-nav-link" href="{{ .RelPermalink }}">
+        <span>Previous {{ $sectionItemLabel }}</span>
+        <strong>{{ .Title }}</strong>
+      </a>
+      {{ end }}
+      {{ with .NextInSection }}
+      <a class="article-nav-link article-nav-next" href="{{ .RelPermalink }}">
+        <span>Next {{ $sectionItemLabel }}</span>
+        <strong>{{ .Title }}</strong>
+      </a>
+      {{ end }}
+    </nav>
+    {{ end }}
+    <p class="post-back post-back-end"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>
+  {{ end }}
 </main>
 
 {{ partial "site-footer.html" . }}
 
+{{ if $hasToc }}
 {{ partial "toc-scripts.html" . }}
+{{ end }}
 
 </body>
 </html>
