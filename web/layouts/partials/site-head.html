@@ -21,6 +21,8 @@
 {{ with .Params.seoDescription }}{{ $metaDescription = . }}{{ end }}
 <title>{{ $metaTitle }}</title>
 <link rel="canonical" href="{{ .Permalink }}">
+<link rel="alternate llms-txt" type="text/plain" href="/llms.txt" title="SpecDD llms.txt">
+<meta name="ai-agent-hint" content="Additional structured information about SpecDD and canonical references is available at /llms.txt.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f8">

@@ -58,3 +58,19 @@ target = "content/_index.md"
 [[module.mounts]]
 source = "../CHANGELOG.md"
 target = "content/changelog.md"
+
+[[module.mounts]]
+source = "static"
+target = "static"
+
+[[module.mounts]]
+source = "../README.md"
+target = "static/reference/README.md"
+
+[[module.mounts]]
+source = "../CHANGELOG.md"
+target = "static/reference/CHANGELOG.md"
+
+[[module.mounts]]
+source = "../src"
+target = "static/reference/src"

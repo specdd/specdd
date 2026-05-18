@@ -1,10 +1,15 @@
 # SpecDD
 
-SpecDD™ is an open-source framework for **specification-driven development** in AI-assisted software projects.
+SpecDD™ is an open-source framework for **specification-driven development** in software, infrastructure, automation,
+and documentation projects. It gives humans and AI agents a shared source of truth for intent, requirements, boundaries,
+and completion criteria.
 
-The SpecDD framework uses small, local, human-readable `.sdd` files that live beside the code they describe. These specs
-document intent, architecture, behavior, boundaries, and implementation tasks in a way that both human developers and AI
-coding agents can follow.
+The SpecDD framework uses small, local, human-readable `.sdd` files that live beside the code, infrastructure,
+workflows, or documentation they describe. These specs document intent, architecture, behavior, boundaries, and
+implementation tasks in a way that both human developers and AI coding agents can follow.
+
+SpecDD gives development, product, QA, support, operations, and engineering teams a shared way to preserve intent before
+AI tools or developers turn incomplete requirements into plausible but wrong software.
 
 SpecDD works for both greenfield and existing projects. In new projects, specs can define structure before
 implementation starts. In existing projects, specs can be introduced gradually around modules, services, features, or
@@ -14,9 +19,9 @@ files that are actively changing.
 
 SpecDD is deliberately simple. Use the CLI to add the framework bootstrap files to your project.
 
-After initialization, place small `.sdd` specs beside the code they describe. If your AI agent does not automatically
-read the SpecDD bootstrap, tell it to read `.specdd/bootstrap.md` before it starts working. The agent then uses those
-specs as local source-of-truth context for implementation.
+After initialization, place small `.sdd` specs beside the files or project areas they describe. If your AI agent does
+not automatically read the SpecDD bootstrap, tell it to read `.specdd/bootstrap.md` before it starts working. The agent
+then uses those specs as local source-of-truth context for implementation.
 
 ## Agent compatibility
 
@@ -25,8 +30,8 @@ GitHub Copilot cloud agent and Copilot agent mode, Cursor Agent, Windsurf Cascad
 Junie, Amazon Q Developer, Replit Agent, Sourcegraph Amp, Augment Code, Cline, Zed Agent, OpenCode and others.
 
 If an agent can read repository files and follow project instructions, it can use SpecDD. There is
-no plugin lock-in, hosted memory silo, or vendor-specific format. Specs live in Git, beside the code, where both humans
-and agents can use them.
+no plugin lock-in, hosted memory silo, or vendor-specific format. Specs live in Git, beside the project files they
+describe, where both humans and agents can use them.
 
 ## Official project and community
 
@@ -51,12 +56,6 @@ contributions are welcome.
 
 It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
 may rely on the current conventions.
-
-## Current status
-
-SpecDD has been tested and experimented with extensively, and results are generally very good. Still, it is
-experimental technology. Expect unexpected behavior from AI agents, review all outputs, and verify code, tests, specs,
-and generated changes before relying on them. SpecDD is changing rapidly, so check back often for updates.
 
 ## Set up a project
 
@@ -133,28 +132,49 @@ Scenario: add numbers
 
 ## The problem SpecDD solves
 
-Software projects are hard for AI agents to reason about because the relevant context is usually quite large, scattered,
-stale, or implicit. This is very similar to a problem humans have faced for a long time and understand well: operating
-inside massive project contexts where the important decisions, constraints, and assumptions are spread across code,
-docs, tickets, conversations, and individual memory.
+Technical projects are hard to reason about because the relevant context is usually large, scattered, stale, or
+implicit. Important decisions, constraints, and assumptions are spread across code, docs, tickets, conversations, and
+individual memory. Humans feel this during handoffs, onboarding, review, maintenance, and incident response. AI agents
+expose the same problem faster because they can produce implementation quickly without the project memory a human team
+has built up.
 
-SpecDD solves this by chunking a project into small, local specification units. Each spec gives the agent a concrete
-source of truth for one part of the system. Instead of stuffing a huge architecture document into every prompt, the
-agent resolves the relevant spec chain and works inside that bounded context.
+SpecDD is built around a simple shift: stop treating the prompt as the source of truth. The prompt is temporary, narrow,
+and easy to lose. In AI-assisted delivery, the source of truth needs to survive across sessions, tools, contributors,
+reviews, and product changes.
+
+SpecDD solves this by chunking a project into small, local specification units. Each spec gives humans and agents a
+concrete source of truth for one part of the system. Instead of stuffing a huge architecture document into every prompt,
+the agent resolves the relevant spec chain and works inside that bounded context.
+
+At a business level, SpecDD turns scattered intent into a durable project asset. Reviewers can compare a patch against a
+local contract instead of reconstructing the contract from memory, new contributors can learn the area they are touching
+without reading every historical discussion, and teams can preserve the reasoning behind important behavior in the
+repository itself.
 
 SpecDD helps with:
 
 - breaking large projects into small implementation areas
-- giving agents durable project context inside the repository
-- augmenting prompts with concrete local source of truth
+- giving agents and teams durable project context inside the repository
+- giving AI prompts concrete local source of truth
 - structuring otherwise loose design documents
 - preserving architecture and ownership boundaries
 - capturing business behavior near implementation
 - recording implementation tasks where the work happens
 - improving consistency between code, tests, and intent
 
-While experimenting with SpecDD, software quality has generally remained high and at times improved as specs were
-adopted, largely because important rules, boundaries, and expectations became explicit.
+In private internal testing:
+
+- SpecDD reduced observed correction loops from roughly 10-20 prompt-and-correction cycles to 1-2 cycles for comparable
+  feature and service-class work on commercial code.
+- Some comparable work moved from multi-day iteration to same-afternoon completion.
+- In out-of-domain experiments, SpecDD reduced observed time to live by 75%-89% compared with unstructured AI-assisted
+  coding workflows.
+- Compared with root-level documentation workflows, SpecDD reduced observed time to deliver by 55%-67% in the same
+  out-of-domain test pattern.
+
+These are internal observations, not guarantees. While experimenting with SpecDD, software quality has generally
+remained high and at times improved as specs were adopted, largely because important rules, boundaries, and expectations
+became explicit.
 
 SpecDD also tends to encourage better software design by its mere presence. To write useful specs, developers must name
 responsibilities, define boundaries, state non-goals, and decide where behavior belongs.
@@ -177,7 +197,7 @@ A SpecDD spec describes a part of a system:
 - what tasks remain
 - when implementation is complete
 
-Specs live near the code they describe.
+Specs live near the files or project areas they describe.
 
 Example:
 
@@ -194,8 +214,13 @@ src/
 The goal is not to create large requirements documents. The goal is to create many small, useful contracts that guide
 implementation.
 
-SpecDD is language-agnostic. It can be used with JavaScript, TypeScript, Python, Go, PHP, Java, C#, Rust, Ruby, or other
-platforms. It can be used with object-oriented, functional, procedural, service-oriented, or mixed styles. The main
+SpecDD is useful without AI because it gives humans a shared, local, reviewable contract for intent, behavior, and
+boundaries. It is especially useful with AI agents because the same contract gives them durable local context inside the
+repository.
+
+SpecDD is language-agnostic. It can be used with JavaScript, TypeScript, Python, Go, PHP, Java, C#, Rust, Ruby, shell,
+Ansible, Terraform, CI pipelines, documentation projects, or other file-based technical systems. It can be used with
+object-oriented, functional, procedural, service-oriented, infrastructure-as-code, automation, or mixed styles. The main
 assumption is that project work is organized in files.
 
 ## Workflow
@@ -742,7 +767,8 @@ Accepts:
 
 ### Returns
 
-Outputs produced by this unit, such as returned values, responses, result states, generated artifacts, output files, exit
+Outputs produced by this unit, such as returned values, responses, result states, generated artifacts, output files,
+exit
 values, or other observable results.
 
 ```sdd
@@ -1231,7 +1257,7 @@ Tasks:
 
 Do not mark a task done just because code was written. Mark it done when the behavior is implemented and checked.
 
-## Working with AI agents
+## Working with AI agents and specs
 
 A good agent prompt is short:
 
@@ -1257,7 +1283,8 @@ Resolve -> Read -> Authorize -> Change -> Verify -> Report
 ```
 
 That means it should identify the target, read the applicable bootstrap and specs, confirm write authority before
-editing, make the smallest correct change, run or explain verification, and report the specs used, files changed, checks,
+editing, make the smallest correct change, run or explain verification, and report the specs used, files changed,
+checks,
 and any remaining uncertainty.
 
 The agent should stop before editing when:
@@ -1349,6 +1376,75 @@ Scenario: add todo
   Given an empty todo store
   When a todo is added
   Then the todo appears in the list
+```
+
+## Adding SpecDD to an existing project
+
+For an existing codebase, start with one high-change, high-risk, or high-confusion area rather than trying to specify
+the whole project at once. Good starting points include a module under active change, a service with repeated review
+comments, a workflow with subtle business rules, or an automation path where operational constraints matter.
+
+Typical flow:
+
+1. Install the SpecDD CLI and run `specdd init`.
+2. Pick one area where missing context already costs time.
+3. Draft a local spec from the current code or intended behavior.
+4. Mark uncertain assumptions clearly.
+5. Review the spec so old bugs, accidental behavior, and unclear assumptions do not become permanent contracts.
+6. Tighten `Purpose`, `Owns`, `Can modify`, `Must`, `Must not`, `Depends on`, `Forbids`, `Scenario`, `Tasks`, and
+   `Done when` sections as needed.
+7. Implement a small slice against the reviewed spec.
+8. Run relevant checks and update task status only after verification.
+9. Expand SpecDD coverage incrementally around the areas where context matters most.
+
+Useful prompt:
+
+```text
+Read this module and draft a SpecDD spec that describes what it currently does.
+Mark uncertain assumptions clearly.
+Do not change code.
+```
+
+## Useful prompts
+
+Plan adoption:
+
+```text
+Read .specdd/bootstrap.md and inspect this repository.
+Propose a small SpecDD adoption plan.
+Do not change files yet.
+```
+
+Turn an idea into a spec:
+
+```text
+Turn this feature idea into a SpecDD spec.
+Keep it implementation-neutral.
+Do not invent technical architecture.
+Call out ambiguity instead of resolving it silently.
+```
+
+Challenge a draft spec:
+
+```text
+Review this SpecDD spec for ambiguity, missing edge cases, and assumptions.
+List only issues that would affect implementation, tests, security, ownership, or architecture.
+Do not implement anything.
+```
+
+Plan before editing:
+
+```text
+Read .specdd/bootstrap.md, resolve the relevant SpecDD chain, and explain the implementation plan.
+Name the files you expect to modify and the checks you expect to run.
+Do not change files yet.
+```
+
+Review a change against specs:
+
+```text
+Review this change against the applicable SpecDD specs.
+Focus on Must, Must not, Forbids, write authority, scenarios, tests, and Done when.
 ```
 
 ## Best practices and observations
@@ -1607,11 +1703,6 @@ development contracts, not optional documentation.
 
 ## FAQ
 
-### Is SpecDD production-ready?
-
-SpecDD is experimental. Results are generally very good, but you should expect surprises and always verify agent
-outputs.
-
 ### I am not technical, can I use SpecDD too?
 
 Yes. Follow the SpecDD structure and focus on non-technical descriptions of features and purpose. It will greatly
@@ -1619,7 +1710,7 @@ improve the quality of your outcomes and any future technical contributors will 
 
 ### Is SpecDD a programming language?
 
-No. SpecDD is a framework and reference format for source-adjacent software specifications.
+No. SpecDD is a framework and reference format for source-adjacent technical specifications.
 
 ### Is SpecDD a testing framework?
 
@@ -1637,7 +1728,7 @@ with any LLM that can read repository files.
 ### Can SpecDD work with my language or framework?
 
 Yes. SpecDD is designed to adapt to any language, platform, framework, project structure, or programming style as long
-as the code is organized in files.
+as the project work is organized in files.
 
 ### Why not just use tests?
 

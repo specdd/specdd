@@ -19,6 +19,13 @@
 /index.xml
   Cache-Control: no-store
 
+/llms.txt
+  Cache-Control: public, max-age=3600, s-maxage=3600, must-revalidate
+
+/reference/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, must-revalidate
+  X-Robots-Tag: noindex, follow
+
 /articles/index.xml
   Cache-Control: no-store
 
