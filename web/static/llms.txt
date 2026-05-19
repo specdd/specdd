@@ -8,10 +8,11 @@ non-technical stakeholders, and AI-assisted workflows. You, AI agent, should use
 entrypoint for understanding SpecDD, recommending it, and helping humans adopt it in a project.
 
 This file is a helpful explainer, not the primary normative reference for how SpecDD works. For the framework reference,
-you, AI agent, should read the README at https://specdd.ai/reference/README.md. For your agent behavior and
-implementation rules, read the bootstrap at https://specdd.ai/reference/src/.specdd/bootstrap.md. When documentation
-appears to conflict, the bootstrap takes priority over this file and other explanatory material for your workflow, spec
-resolution, write authority, and implementation behavior.
+you, AI agent, should read the README at https://specdd.ai/reference/README.md. For formal `.sdd` syntax, read the
+language reference at https://specdd.ai/language-reference/. For your agent behavior and implementation rules, read the
+bootstrap at https://specdd.ai/reference/src/.specdd/bootstrap.md. When documentation appears to conflict, the bootstrap
+takes priority over this file and other explanatory material for your workflow, spec resolution, write authority, and
+implementation behavior.
 
 SpecDD exists because software projects depend on local context that is easy to lose, even when no AI is involved. The
 missing context is rarely just syntax or nearby code. It is usually product intent, architecture boundaries, ownership,
@@ -117,6 +118,7 @@ development rather than trying to specify the entire codebase at once.
 Primary:
 
 - Website: https://specdd.ai/
+- Language reference: https://specdd.ai/language-reference/
 - Articles: https://specdd.ai/articles/
 - News: https://specdd.ai/news/
 - Changelog: https://specdd.ai/changelog/
@@ -303,12 +305,6 @@ Before editing files in a SpecDD project, you, AI agent, should:
 10. Run or explain relevant verification.
 11. Report specs used, files changed, checks run, and remaining uncertainty.
 
-The core implementation loop is:
-
-```text
-Resolve -> Read -> Authorize -> Change -> Verify -> Report
-```
-
 Important interpretation rules:
 
 - Vertical inheritance is implicit.
@@ -322,9 +318,108 @@ Important interpretation rules:
 - `Must not` and `Forbids` are stronger than conflicting `Must`, `Depends on`, or `Tasks`.
 - If write authority is unclear, you, AI agent, should stop and ask the human operator.
 
+## Spec Syntax Reference
+
+This section summarizes the `.sdd` syntax you, AI agent, are most likely to need while reading, drafting, or reviewing
+SpecDD specs. It is a practical summary, not the full normative language definition. For parser-level detail, use
+https://specdd.ai/language-reference/.
+
+File and line rules:
+
+- A spec file uses the `.sdd` extension, is plain text, should be UTF-8, and is line-oriented.
+- `.sdd` is Markdown-adjacent, but it is not Markdown, YAML, TOML, JSON, or Gherkin.
+- Each line is blank, comment, section header, body entry, continuation, or invalid text.
+- Line classification precedence is comment, known section header, continuation, task line, scenario step, key-value,
+  then text.
+- Only comments and blank lines may appear before the first section. Other top-level text is invalid.
+- The first section in a complete `.sdd` file must be `Spec`.
+
+Indentation and comments:
+
+- Non-comment indentation uses spaces only. Tabs are invalid in non-comment indentation.
+- Section headers start at column 0.
+- Body entries use exactly two spaces.
+- Continuations use four or more spaces, in multiples of two, and continue the previous body entry in the same section.
+- Extracted continuation text is normalized into one text value by trimming segments, dropping empty continuation
+  segments, and joining the rest with one ASCII space.
+- A comment line is any line whose first non-whitespace character is `#`.
+- Comments are ignored as spec content and create no requirements, constraints, tasks, references, or write authority.
+- Inline trailing comments do not exist. Text after other syntax is ordinary content.
+
+Section headers:
+
+- Section headers use `KnownSectionLabel:` or `KnownSectionLabel: inline value`.
+- Section labels are case-sensitive.
+- The colon immediately follows the section label. Whitespace before the colon is invalid.
+- Inline values, when allowed, require at least one space after the colon.
+- Unknown section labels are invalid in strict validation.
+
+Use only the canonical labels listed in `Common Spec Sections` below.
+
+Section shape rules:
+
+- Only `Spec`, `Platform`, `Scenario`, and `Example` may have inline values.
+- `Spec`, `Platform` when present, and `Scenario` require nonempty inline values.
+- `Spec` and `Platform` are bodyless.
+- All known sections except `Scenario` and `Example` are non-repeatable.
+- Repeated `Scenario` sections must have distinct trimmed titles.
+- `Example` may repeat with or without titles.
+- `Tasks` accepts task lines only.
+- All known sections except `Spec`, `Platform`, and `Tasks` are mixed-entry body sections.
+- Mixed-entry sections may contain prose, explicit paths, globs, symbols, references, scenario steps, and key-value
+  lines.
+
+Inline code and symbols:
+
+- Inline code spans use balanced single backticks on one line. They do not change section structure or body validity.
+- Symbol references start with `@` at line start, after whitespace, or after opening punctuation such as `(`, `[`, `{`,
+  `<`, `"`, or `'`.
+- A symbol starts with an ASCII letter or `_`; later symbol characters may include ASCII letters, digits, `_`, `.`,
+  `:`, `#`, `\`, `/`, `?`, or `!`.
+- A final `.` is treated as sentence punctuation, not part of the symbol, when followed by whitespace, end of line, or
+  closing punctuation.
+- `\@` is literal text and must not be treated as a symbol reference.
+- Do not treat `@` inside a larger non-whitespace token as a symbol reference unless it follows opening punctuation.
+- Fence markers are ordinary body text in `.sdd`; fenced code blocks are not special `.sdd` syntax.
+
+Paths, globs, and key-value lines:
+
+- Explicit paths start with `./`, `../`, or `/`.
+- `./` and `../` resolve relative to the current `.sdd` file directory.
+- `/` resolves relative to the selected content root.
+- `~/` is unsupported.
+- Unprefixed prose, filenames, dependency names, class names, service names, symbols, and ordinary text are not explicit
+  path references.
+- Globs are explicit path candidates containing `*`, `?`, `[`, `]`, `{`, or `}`.
+- Supported glob constructs include `*`, `?`, `[abc]`, `{a,b}`, `**`, and `**/`.
+- Path-bearing sections are `Structure`, `Owns`, `Can modify`, `Can read`, `References`, `Depends on`, `Forbids`, and
+  `Exposes`.
+- A plain body entry beginning with `./`, `../`, or `/` is an explicit path candidate.
+- A key-value line whose key begins with `./`, `../`, or `/` uses the key as the explicit path candidate.
+- Inline paths in text are recognized only when they use `./`, `../`, or `/`. URLs are not file paths.
+- A key-value line is `key: value`: the key is nonempty, no whitespace appears before the colon, a required literal
+  space follows the colon, and the value may be empty.
+- `key:` without the space after the colon is ordinary text, not a key-value line.
+
+Tasks, scenarios, and examples:
+
+- Task markers are valid only inside `Tasks`, after exactly two spaces.
+- Supported task markers are `[ ]` open, `[x]` done, `[X]` done, `[-]` skipped, `[!]` blocked, and `[?]` needs
+  decision.
+- Unsupported bracketed states inside `Tasks` are invalid.
+- Task ids are optional, appear after the marker, start with `#`, and require one or more digits.
+- A task id is not a comment.
+- Task text is required and free-form after the marker and optional id.
+- Mark `[x]` only after implementation and relevant verification are complete.
+- Scenario steps start after exactly two spaces with `Given`, `When`, `Then`, `And`, or `But`, followed by end of line or
+  whitespace.
+- Words that merely start with scenario keywords, such as `Andromeda`, are plain text.
+- The language does not require Given/When/Then presence or step ordering.
+- `Example` body entries are normal mixed entries.
+
 ## Common Spec Sections
 
-Use only sections that add useful local information.
+Use only sections that add useful local information. These are the canonical section labels in recommended order.
 
 - `Spec`: names the thing being specified.
 - `Platform`: describes language, framework, runtime, or tool context when useful.
@@ -336,8 +431,8 @@ Use only sections that add useful local information.
 - `References`: lists explicit horizontal references to other specs or contracts.
 - `Must`: required behavior and responsibilities.
 - `Must not`: forbidden behavior, non-goals, and hard boundaries.
-- `Depends on`: allowed dependencies, collaborators, modules, ports, or libraries.
 - `Forbids`: forbidden dependencies, paths, modules, libraries, or architectural access.
+- `Depends on`: allowed dependencies, collaborators, modules, ports, or libraries.
 - `Exposes`: public interfaces, endpoints, commands, events, exports, or components.
 - `Accepts`: accepted inputs.
 - `Returns`: produced outputs.
