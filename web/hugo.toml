@@ -31,6 +31,7 @@ license = 'https://www.apache.org/licenses/LICENSE-2.0'
 
 [params.pageDescriptions]
 '/changelog/' = 'SpecDD release notes, framework updates, and changes to the specification-driven development workflow.'
+'/language-reference/' = 'SpecDD language reference for the .sdd file format, syntax, sections, task markers, comments, and parsing rules.'
 
 [frontmatter]
 lastmod = [':git', 'lastmod', 'modified', 'date', 'publishDate']
@@ -58,6 +59,10 @@ target = "content/_index.md"
 [[module.mounts]]
 source = "../CHANGELOG.md"
 target = "content/changelog.md"
+
+[[module.mounts]]
+source = "../LANGUAGE.md"
+target = "content/language-reference.md"
 
 [[module.mounts]]
 source = "static"

@@ -231,10 +231,10 @@ constraints, and I hoped agents to understand them. They did, mostly. But prose 
 interpretation. Prose allows an agent to decide that a constraint was probably aspirational rather than mandatory, or
 that a prohibition was context-dependent in a way the original author did not intend.
 
-The shift to a semi-formal, section-based language changed the reliability of outcomes dramatically. When a spec says
-`Must not: Call Stripe directly`, there is no interpretive wiggle room. When it says `Owns: invoice.ts`, the agent knows
-exactly what it is authorized to modify. When it says `Forbids: ../../api/*`, the dependency boundary is explicit and
-enforceable without any reasoning about intent.
+The shift to a semi-formal, section-based language changed the reliability of outcomes dramatically. When a spec puts
+"Call Stripe directly" under `Must not`, there is no interpretive wiggle room. When `./invoice.ts` appears under `Owns`,
+the agent knows exactly what it is authorized to modify. When `../../api/*` appears under `Forbids`, the dependency
+boundary is explicit and enforceable without any reasoning about intent.
 
 The sections of the SpecDD language - `Must`, `Must not`, `Owns`, `Depends on`, `Forbids`, `Done when` - are not
 arbitrary choices. They map directly to the categories of information an agent actually needs to make correct

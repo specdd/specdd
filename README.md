@@ -111,10 +111,7 @@ Purpose:
   Add two finite numbers.
 
 Owns:
-  calculator.js
-
-Exposes:
-  Calculator.add(a, b)
+  ./calculator.js
 
 Must:
   Return a + b.
@@ -122,6 +119,9 @@ Must:
 
 Must not:
   Round results.
+
+Exposes:
+  Calculator.add(a, b)
 
 Scenario: add numbers
   Given a is 2
@@ -394,13 +394,16 @@ stripe.adapter.ts
 SpecDD resolution is path-based. Applicable specs come from ancestor specs, explicit `References`, and same-directory
 basename matches.
 
+The selected content root is the highest relevant project boundary used for `/` paths, spec indexing, and resolution.
+It is usually the repository or workspace root unless the project configures a different SpecDD root.
+
 When working on a target path, agents should:
 
 1. Start at the target path.
 2. Include the same-directory basename spec when the target is a file and such a spec exists.
-3. Walk upward through parent directories to the repository root or configured project root.
+3. Walk upward through parent directories to the selected content root.
 4. Collect specs whose declared governing scope applies to the target.
-5. Read the inherited chain from root to target.
+5. Read the inherited chain from the selected content root to target.
 6. Include explicit `References` declared by included specs when they affect the task or context.
 
 Example:
@@ -517,8 +520,8 @@ Example:
 Spec: Invoice Service
 
 Owns:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
 ```
 
 If `Can modify` is absent, `Owns` acts as the modification boundary.
@@ -534,46 +537,32 @@ before making changes.
 
 All specs use the same basic language. Not every section is required for every spec.
 
-Currently, the defined sections are:
-
-```sdd
-# Identity
-Spec:
-Platform:
-Purpose:
-
-# Scope / ownership
-Structure:
-Owns:
-Can modify:
-Can read:
-References:
-
-# Positive requirements
-Must:
-
-# Negative constraints
-Must not:
-Forbids:
-
-# Interface / contract
-Depends on:
-Exposes:
-Accepts:
-Returns:
-Raises:
-Handles:
-
-# Workflow
-Tasks:
-Done when:
-
-# Behavior / examples
-Scenario:
-Example:
-```
+The defined sections are grouped by purpose. Identity sections are `Spec`, `Platform`, and `Purpose`. Scope and
+ownership sections are `Structure`, `Owns`, `Can modify`, `Can read`, and `References`. Requirement sections are `Must`,
+`Must not`, and `Forbids`. Contract sections are `Depends on`, `Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles`.
+Workflow and behavior sections are `Tasks`, `Scenario`, `Example`, and `Done when`.
 
 A spec should include only sections that add useful local information.
+
+### Core syntax rules
+
+- A complete `.sdd` file starts with `Spec: Name`.
+- Section labels are exact and case-sensitive.
+- Section headers start at column 0.
+- Body entries use two spaces. Continuation lines use four or more spaces.
+- Use spaces for indentation, not tabs.
+- Only `Spec`, `Platform`, `Scenario`, and `Example` may put text after the colon.
+- `Spec` and `Platform` are inline-only sections.
+- `Tasks` accepts task lines only.
+
+### Paths, symbols, and body entries
+
+- Explicit paths start with `./`, `../`, or `/`.
+- Unprefixed filenames are treated as text, not path references.
+- Globs use the same explicit path prefixes, for example `./src/**/*.ts`.
+- Symbol references use `@Name`.
+- Body sections may mix prose, paths, symbols, and key-value lines.
+- Key-value lines use `key: value` with a literal space after `:`. A line like `key:` is text.
 
 ### Comments
 
@@ -588,7 +577,7 @@ Comment rules:
 - A comment line begins with optional whitespace followed by `#`.
 - Comments are ignored as spec content.
 - Comments do not create requirements, constraints, tasks, or write authority.
-- Inline trailing comments are not supported.
+- Inline trailing comments are not recognized as comments. Text after other syntax is ordinary line content.
 
 Use comments sparingly. If a line affects implementation behavior, express it as `Must`, `Must not`, `Tasks`,
 `Scenario`, or `Done when` instead.
@@ -616,7 +605,7 @@ language[/qualifier[/qualifier]]
 
 Examples:
 
-```sdd
+```text
 Platform: JavaScript/ES6
 Platform: Python/Django/5.2
 Platform: TypeScript/Node/Express
@@ -635,20 +624,22 @@ Purpose:
 
 Describes file and directory structure for the current and descendant scope.
 
-Format:
+Common forms:
 
 ```text
-path-or-glob: description
+explicit-path-or-glob
+explicit-path-or-glob: description
+prose text
 ```
 
 Example:
 
 ```sdd
 Structure:
-  lib: Libraries
-  models: Models
-  templates: Project templates
-  templates/email: Email templates
+  ./lib: Libraries
+  ./models: Models
+  ./templates: Project templates
+  ./templates/email: Email templates
 ```
 
 This section helps humans and agents understand local organization without reading the whole tree.
@@ -660,8 +651,8 @@ at any given time.
 
 ```sdd
 Owns:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
 ```
 
 ### Can modify
@@ -670,8 +661,8 @@ Files or paths that may be changed when working under this spec.
 
 ```sdd
 Can modify:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
 ```
 
 Use this when writable scope should be narrower or different from ownership.
@@ -723,6 +714,17 @@ Must not:
   Import HTTP request or response objects.
 ```
 
+### Forbids
+
+Forbidden dependencies, paths, modules, libraries, or architectural access.
+
+```sdd
+Forbids:
+  stripe
+  ../../api/*
+  ../../ui/*
+```
+
 ### Depends on
 
 Allowed dependencies, collaborators, modules, ports, libraries, or abstractions.
@@ -735,17 +737,6 @@ Depends on:
 ```
 
 `Depends on` does not override inherited `Forbids` or `Must not`.
-
-### Forbids
-
-Forbidden dependencies, paths, modules, libraries, or architectural access.
-
-```sdd
-Forbids:
-  stripe
-  ../../api/*
-  ../../ui/*
-```
 
 ### Exposes
 
@@ -861,6 +852,7 @@ Allowed task states:
 ```text
 [ ] open
 [x] done
+[X] done
 [-] skipped
 [!] blocked
 [?] needs decision
@@ -961,7 +953,7 @@ Purpose:
   Own invoice creation, billing customer state, payment attempts, and provider interaction.
 
 Owns:
-  src/billing/*
+  ./src/billing/*
 
 Must:
   Expose billing behavior through BillingService.
@@ -1030,8 +1022,8 @@ Purpose:
   Coordinate invoice creation.
 
 Owns:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
 
 Must:
   Validate input before provider calls.
@@ -1214,7 +1206,7 @@ Use for rules that decide whether something is allowed.
 
 ## Minimum viable spec
 
-The smallest useful spec can contain only `Spec` and `Purpose`, with all other sections being optional. SpecDD itself
+A minimal complete spec can contain only `Spec`. A useful minimal spec usually also contains `Purpose`. SpecDD itself
 does not prescribe how detailed your specs have to be. Use as many or as few sections as needed to describe the subject
 of the spec.
 
@@ -1335,8 +1327,8 @@ Purpose:
   Demonstrate SpecDD using a small todo application.
 
 Structure:
-  src: Source code and colocated specs
-  tests: Test suite
+  ./src: Source code and colocated specs
+  ./tests: Test suite
 
 Must:
   Keep implementation simple.
@@ -1356,7 +1348,7 @@ Purpose:
   Manage todo items in memory.
 
 Owns:
-  todo.js
+  ./todo.js
 
 Must:
   Add todos with unique ids.
@@ -1606,7 +1598,7 @@ Specs are not tests, but they should guide tests.
 
 Scenarios are especially useful as test inputs.
 
-Spec:
+Example spec fragment:
 
 ```sdd
 Scenario: invalid invoice

@@ -60,7 +60,7 @@ Resolve -> Read -> Authorize -> Change -> Verify -> Report
 
 `Resolve` means you identify the target path or task and determine which specs apply. Spec resolution is path-based.
 You start at the target file or directory, include a same-directory basename spec when one exists, walk upward through
-ancestor directories, collect applicable parent specs, read them from root to target, and include explicit `References`
+ancestor directories, collect applicable parent specs, read them from the selected content root to target, and include explicit `References`
 when they affect the task. Parent specs provide inherited context and constraints. Sibling specs are not loaded
 automatically. The core rule is: vertical inheritance is implicit, horizontal references are explicit.
 
@@ -295,7 +295,7 @@ Before editing files in a SpecDD project, you, AI agent, should:
 2. Read `.specdd/bootstrap.project.md` and `.specdd/bootstrap.local.md` when they exist.
 3. Identify the target path or task.
 4. Resolve the applicable spec chain.
-5. Read parent specs from root to target.
+5. Read parent specs from the selected content root to target.
 6. Read the nearest relevant local spec.
 7. Read explicit `References` when relevant.
 8. Confirm write authority from `Can modify` or `Owns`.
@@ -357,8 +357,8 @@ Purpose:
   Issue and verify short-lived password reset tokens.
 
 Owns:
-  password-reset-token.service.ts
-  password-reset-token.repository.ts
+  ./password-reset-token.service.ts
+  ./password-reset-token.repository.ts
 
 Must:
   Store only a hash of the reset token.
@@ -506,31 +506,30 @@ SpecDD sections fit together in a realistic service-level contract.
 ```sdd
 Spec: Scheduled Report Delivery Service
 
-Platform:
-  TypeScript/Node.js/PostgreSQL
+Platform: TypeScript/Node.js/PostgreSQL
 
 Purpose:
   Coordinate scheduled email delivery for saved reports while preserving account permissions, delivery auditability,
   and separation between reporting, authorization, and email infrastructure.
 
 Structure:
-  scheduled-report-delivery.service.ts: Service implementation
-  scheduled-report-delivery.service.test.ts: Service unit tests
-  fixtures: Test fixtures for schedules, reports, permissions, and delivery attempts
-  __snapshots__: Stable rendered delivery metadata snapshots
+  ./scheduled-report-delivery.service.ts: Service implementation
+  ./scheduled-report-delivery.service.test.ts: Service unit tests
+  ./fixtures: Test fixtures for schedules, reports, permissions, and delivery attempts
+  ./__snapshots__: Stable rendered delivery metadata snapshots
 
 Owns:
-  scheduled-report-delivery.service.ts
-  scheduled-report-delivery.service.test.ts
-  fixtures/*
+  ./scheduled-report-delivery.service.ts
+  ./scheduled-report-delivery.service.test.ts
+  ./fixtures/*
   ScheduledReportDeliveryService
   ScheduledReportDeliveryResult
   ScheduledReportDeliveryFailure
 
 Can modify:
-  scheduled-report-delivery.service.ts
-  scheduled-report-delivery.service.test.ts
-  fixtures/*
+  ./scheduled-report-delivery.service.ts
+  ./scheduled-report-delivery.service.test.ts
+  ./fixtures/*
 
 Can read:
   ../models/scheduled-report.sdd
@@ -571,7 +570,7 @@ Must not:
 
 Forbids:
   nodemailer
-  @sendgrid/*
+  \@sendgrid/*
   ../../api/*
   ../../ui/*
   ../../billing/*

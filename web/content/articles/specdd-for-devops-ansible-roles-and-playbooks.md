@@ -97,9 +97,9 @@ Purpose:
   Provision and maintain application hosts through repeatable Ansible automation.
 
 Structure:
-  inventories: Environment inventories and group variables
-  playbooks: Entry-point playbooks
-  roles: Reusable host configuration roles
+  ./inventories: Environment inventories and group variables
+  ./playbooks: Entry-point playbooks
+  ./roles: Reusable host configuration roles
 
 Must:
   Keep playbooks thin and orchestration-focused.
@@ -150,7 +150,7 @@ Purpose:
   Apply baseline, web server, application runtime, and monitoring roles to web hosts.
 
 Owns:
-  site.yml
+  ./site.yml
 
 References:
   ../roles/baseline/role.sdd
@@ -197,11 +197,11 @@ Purpose:
   Install nginx, manage virtual host configuration, and keep the service running.
 
 Owns:
-  defaults/main.yml
-  tasks/main.yml
-  handlers/main.yml
-  templates/site.conf.j2
-  molecule/default/*
+  ./defaults/main.yml
+  ./tasks/main.yml
+  ./handlers/main.yml
+  ./templates/site.conf.j2
+  ./molecule/default/*
 
 Must:
   Install nginx through the platform package manager.
@@ -275,7 +275,7 @@ Purpose:
   Define the public variable contract for the nginx role.
 
 Owns:
-  defaults/main.yml
+  ./defaults/main.yml
 
 Must:
   Provide safe defaults for local and test environments.
@@ -412,8 +412,8 @@ Purpose:
   Define production host groups and production-only operational constraints.
 
 Owns:
-  hosts.yml
-  group_vars/*
+  ./hosts.yml
+  ./group_vars/*
 
 Must:
   Keep production-only values inside production inventory files.

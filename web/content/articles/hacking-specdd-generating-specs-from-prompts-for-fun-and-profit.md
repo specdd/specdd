@@ -297,9 +297,9 @@ the agent to expand it, make it more detailed, add more context, or explain the 
 helps, but very often it just produces a longer document with the same uncertainty spread across more words.
 
 With specs, less is often more. A short rule in the right section usually does more useful work than a paragraph of
-general guidance. `Must not: Send report data to users who no longer have access` gives the agent a boundary. "Be
-careful with permissions and make sure users only see appropriate data" gives the agent something to nod at and then
-interpret.
+general guidance. A `Must not` entry that says "Send report data to users who no longer have access" gives the agent a
+boundary. "Be careful with permissions and make sure users only see appropriate data" gives the agent something to nod
+at and then interpret.
 
 The goal is not to make generated specs more literary. The goal is to make them more directional. Move vague prose into
 `Must`, `Must not`, `Scenario`, and `Done when` where the meaning is clear enough to implement and review. If a sentence

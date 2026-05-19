@@ -1,5 +1,5 @@
 ---
-Version: 1.2
+Version: 1.3
 Website: https://specdd.ai
 Changelog: https://specdd.ai/changelog/
 Copyright: Copyright (c) 2026 Matiss Treinis and SpecDD contributors
@@ -140,7 +140,7 @@ Good specs are:
 
 ## Spec Files
 
-Spec files use a lightweight Gherkin-like format and the `.sdd` extension.
+Spec files use a line-oriented, section-based format and the `.sdd` extension.
 
 Common spec names include:
 
@@ -223,14 +223,14 @@ and same-directory basename matches. Do not infer the applicable spec, ownership
 in other directories, symbols, programming languages, module names, test names, or tool-specific conventions unless a
 project-specific spec or configuration explicitly defines that mapping.
 
-When working on a target path, start at that target and walk upward to the repository root or configured project root.
+When working on a target path, start at that target and walk upward to the selected content root.
 There can be multiple spec hierarchies in a codebase; only the target path's ancestor tree is relevant.
 
 Resolution algorithm:
 
 - Start at the target path.
 - If the target is a file, include the same-directory basename spec when it exists.
-- Walk upward through parent directories until the repository root or configured project root.
+- Walk upward through parent directories until the selected content root.
 - At each directory, collect specs whose declared governing scope applies to the target.
 - Reverse the collected inherited specs so they are read from root to target.
 - Include explicit `References` declared by included specs when they affect the task or when building context.
@@ -311,159 +311,197 @@ By default:
 
 ## Universal Spec Language
 
-All specs use the same basic language. Not every section is required for every spec.
+This section is authoritative for `.sdd` syntax. If examples, project prose, or conventions conflict with these rules,
+these rules win. Project rules may add meaning to entries, but must not redefine syntax.
 
-Defined sections:
+### File And Line Rules
 
-```sdd
-# Identity
-Spec:
-Platform:
-Purpose:
+- A spec file uses the `.sdd` extension, is plain text, should be UTF-8, may use LF, CRLF, or CR line endings, and is
+  line-oriented.
+- `.sdd` is Markdown-adjacent, but it is not Markdown, YAML, TOML, JSON, or Gherkin.
+- Each line is blank, comment, section header, body entry, continuation, or invalid text.
+- Line classification precedence is: comment, known section header, continuation, task line, scenario step, key-value,
+  text.
+- Comments, blank lines, and section headers may appear before the first section. Other top-level text is invalid.
 
-# Scope / ownership
-Structure:
-Owns:
-Can modify:
-Can read:
-References:
+### Indentation And Comments
 
-# Positive requirements
-Must:
+- Non-comment indentation uses spaces only. Tabs are invalid.
+- Non-comment indentation width must be a multiple of two spaces.
+- Section headers start at column 0.
+- Body entries use exactly two spaces.
+- Continuations use four or more spaces, in multiples of two, and require a preceding body entry in the same section.
+- Extracted continuation text is normalized by trimming each segment, dropping empty continuation segments, and joining
+  remaining segments with one ASCII space.
+- A comment line is any line whose first non-whitespace character is `#`.
+- Comments are ignored as spec content and create no requirements, constraints, tasks, references, or write authority.
+- Inline trailing comments do not exist. Text after other syntax is ordinary content.
 
-# Negative constraints
-Must not:
-Forbids:
+### Sections
 
-# Interface / contract
-Depends on:
-Exposes:
-Accepts:
-Returns:
-Raises:
-Handles:
+Section headers use `KnownSectionLabel:` or `KnownSectionLabel: inline value`. Labels are case-sensitive. The colon must
+immediately follow the label. Whitespace before the colon is invalid. If an inline value exists, at least one space must
+follow the colon. Unknown section labels are invalid in strict validation.
 
-# Workflow
-Tasks:
-Done when:
+Canonical labels and recommended order:
 
-# Behavior / examples
-Scenario:
-Example:
+```text
+Spec
+Platform
+Purpose
+Structure
+Owns
+Can modify
+Can read
+References
+Must
+Must not
+Forbids
+Depends on
+Exposes
+Accepts
+Returns
+Raises
+Handles
+Tasks
+Scenario
+Example
+Done when
 ```
 
-Prefer `Spec` and `Purpose` in every non-empty spec. Use other sections only when they add useful local information.
+Section rules:
 
+- A complete `.sdd` file starts with `Spec`.
+- Only `Spec`, `Platform`, `Scenario`, and `Example` may have inline values.
+- `Spec`, `Platform` when present, and `Scenario` require nonempty inline values.
+- Empty or whitespace-only required inline values are invalid.
+- `Example` may have an inline value, body entries, or both.
+- `Spec` and `Platform` are bodyless.
+- All known sections except `Scenario` and `Example` are non-repeatable.
+- Repeated `Scenario` sections must have distinct trimmed titles.
+- `Example` may repeat with or without titles.
 
-## Section Meanings
+### Body Entries
 
-`Spec` names the thing being specified.
+- `Tasks` accepts task lines only. Continuations may follow task lines.
+- Body entries and continuations require a current section.
+- All known sections except `Spec`, `Platform`, and `Tasks` are mixed-entry body sections.
+- Mixed-entry sections may contain prose, explicit paths, globs, symbols, references, scenario steps, and key-value
+  lines.
+- Section names give entries their semantic role; path-bearing section names do not make the body path-only.
+- Blank lines and comments are valid anywhere.
 
-`Platform` describes implementation language or platform when useful. It is free-form and optional.
+### Inline Code And Symbols
 
-`Purpose` states why this part exists. It should describe the purpose of the implementation, contract, workflow, or
-area being specified.
+- Inline code spans use balanced single backticks on one line. They do not change section structure or body validity.
+- Paths and symbol references may still be extracted inside inline code spans.
+- Symbol references start with `@` at line start, after whitespace, or after opening punctuation `(`, `[`, `{`, `<`,
+  `"`, or `'`.
+- The first symbol character after `@` must be an ASCII letter or `_`.
+- Later symbol characters may be ASCII letters, digits, `_`, `.`, `:`, `#`, `\`, `/`, `?`, or `!`.
+- A symbol ends at the first character outside that set.
+- If captured symbol text ends with `.`, and the next source character is whitespace, end of line, or closing punctuation
+  `)`, `]`, `}`, `>`, `"`, or `'`, the final `.` is sentence punctuation and is excluded.
+- `\@` is literal text and must not be recognized as a symbol reference.
+- Do not recognize `@` inside a larger non-whitespace token unless the immediately preceding character is allowed
+  opening punctuation.
+- Fence markers are ordinary body text in `.sdd`; fenced code blocks are not special `.sdd` syntax.
 
-`Structure` describes files and directories for the current and descendant scope.
+### Paths, Globs, And Key-Value Lines
 
-`Owns` lists files, directories, concepts, or responsibilities owned by this spec. Only one spec should own a specific
-item at a given time.
+- Explicit paths start with `./`, `../`, or `/`.
+- `./` and `../` resolve relative to the current `.sdd` file directory.
+- `/` resolves relative to the selected content root.
+- `~/` is unsupported.
+- Unprefixed prose, filenames, dependency names, class names, service names, symbols, and ordinary text are not explicit
+  path references.
+- Globs are explicit path candidates containing `*`, `?`, `[`, `]`, `{`, or `}`.
+- Supported glob constructs are `*`, `?`, `[abc]`, `{a,b}`, `**`, and `**/`.
+- Malformed glob patterns are unresolved references, not `.sdd` syntax errors.
+- Path-bearing sections are `Structure`, `Owns`, `Can modify`, `Can read`, `References`, `Depends on`, `Forbids`, and
+  `Exposes`.
+- A plain body entry beginning with `./`, `../`, or `/` is an explicit path candidate.
+- A key-value line whose key begins with `./`, `../`, or `/` uses the key as the explicit path candidate.
+- Inline paths in text are recognized only when they use `./`, `../`, or `/`. URLs are not file paths.
+- A key-value line is `key: value`: first qualifying colon, nonempty key, no whitespace before the colon, one literal
+  space after it, and any value including empty. Key case has no language meaning. `key:` is text.
 
-`Can modify` lists files or paths that may be changed when working under this spec.
+### Section Meanings
 
-`Can read` lists files, paths, or specs that may be read for context.
+- `Spec`: required first section for a complete file; names the subject; inline nonempty; no body.
+- `Platform`: optional implementation language, runtime, framework, or environment; inline nonempty; no body.
+- `Purpose`: why the specified unit exists; body entries only.
+- `Structure`: files and directories in current or descendant scope; mixed entries.
+- `Owns`: files, directories, symbols, concepts, or responsibilities owned by the spec; mixed entries.
+- `Can modify`: files or paths that may be changed under the spec; mixed entries.
+- `Can read`: files, paths, specs, or prose context that may be read; mixed entries.
+- `References`: explicit horizontal references to specs, contracts, symbols, or context; mixed entries. References are
+  context, not write authority.
+- `Must`: positive requirements; mixed entries.
+- `Must not`: forbidden behavior, non-goals, and boundaries; mixed entries.
+- `Forbids`: forbidden dependencies, paths, modules, libraries, or architectural access; mixed entries.
+- `Depends on`: dependencies, collaborators, contracts, symbols, paths, or required context; mixed entries.
+- `Exposes`: public entry points, exported symbols, APIs, contracts, or observable capabilities; mixed entries.
+- `Accepts`: accepted inputs, request shapes, parameters, or preconditions; mixed entries.
+- `Returns`: return values, output types, response shapes, or result states; mixed entries.
+- `Raises`: errors, exceptions, rejected states, or failure conditions; mixed entries.
+- `Handles`: cases, events, states, branches, or conditions handled by the spec; mixed entries.
+- `Tasks`: local implementation checklist; task lines only.
+- `Scenario`: behavioral example; inline nonempty title; mixed body entries, commonly scenario steps.
+- `Example`: concrete examples, payloads, usage snippets, or expected transformations; repeatable mixed entries.
+- `Done when`: completion criteria; mixed entries; no inline value.
 
-`References` lists explicit horizontal references to other SpecDD specs or contracts.
+### Tasks, Scenarios, And Examples
 
-`Must` lists responsibilities, rules, and required behavior.
-
-`Must not` lists forbidden behavior, non-goals, and architectural boundaries.
-
-`Depends on` lists allowed dependencies, collaborators, modules, ports, libraries, or abstractions. It never overrides
-inherited `Forbids` or `Must not`.
-
-`Forbids` lists forbidden dependencies, paths, modules, libraries, or architectural access.
-
-`Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles` describe public contracts and handled cases when relevant.
-
-`Tasks` is a lightweight local implementation checklist.
-
-`Scenario` defines behavior in Gherkin-like form. Scenarios should be implemented and tested when relevant.
-
-`Example` provides small concrete examples, payloads, usage snippets, or expected transformations. Use sparingly.
-
-`Done when` describes local completion criteria when the spec needs them.
-
-Examples for sections that commonly need shape:
-
-```sdd
-Structure:
-  lib: Libraries
-  models: Models
-  templates: Project templates
-
-References:
-  ../models/invoice.sdd
-  ../ports/billing-provider.sdd
-
-Scenario: invalid invoice amount
-  Given an invoice input with amount less than or equal to zero
-  When createInvoice is called
-  Then the invoice is rejected
-  And the billing provider is not called
-
-Done when:
-  All scenarios have tests.
-  No forbidden dependencies are used.
-  Public contract is preserved.
-```
-
-
-## References
-
-Use `References` to include sibling or cross-cutting context. Do not infer sideways inheritance.
-
-Reference paths are resolved relative to the spec file that declares them.
-
-Referenced specs provide context and contracts, but they do not grant write authority unless the active spec's
-`Can modify` or `Owns` allows it.
-
-A referenced spec is horizontal context, not an inherited parent. Its parent chain may be read when needed to understand
-that referenced contract, but it does not become inherited authority for the active target.
-
-Missing references should be reported by validation. Strict validation should treat missing references as errors.
-
-
-## Comments
-
-Specs may include whole-line comments prefixed with `#`.
-
-Comment rules:
-
-- A comment line begins with optional whitespace followed by `#`.
-- Comments are ignored as spec content.
-- Comments do not create requirements, constraints, tasks, or write authority.
-- Inline trailing comments are not supported.
-
-Use comments sparingly. If a line affects implementation behavior, express it as `Must`, `Must not`, `Tasks`,
-`Scenario`, or `Done when` instead.
-
-
-## Tasks
-
-Specs may include lightweight implementation tasks.
-
-Allowed task states:
+Task markers are valid only inside `Tasks`, after exactly two spaces:
 
 ```text
 [ ] open
 [x] done
+[X] done
 [-] skipped
 [!] blocked
 [?] needs decision
 ```
 
-Task rules:
+- Unsupported bracketed states inside `Tasks` are invalid.
+- Non-task body entries inside `Tasks` are invalid.
+- Task ids are optional, appear after the marker, start with `#`, and require one or more digits.
+- Empty hash ids such as `# blocked` are not task ids. A task id is not a comment.
+- Task text is required and free-form after the marker and optional id.
+- Mark `[x]` only when implementation and relevant checks are complete.
+- Use `[!]` for blocked work and `[?]` for unresolved design decisions.
+
+Scenario steps start after exactly two spaces with `Given`, `When`, `Then`, `And`, or `But`, followed by end of line or
+whitespace. Words that merely start with these keywords are plain text. The language does not require Given/When/Then
+presence or step ordering.
+
+`Example` body entries are normal mixed entries. Multiple `Example` sections may appear in one file.
+
+### Minimal Complete File
+
+```sdd
+Spec: Math Service
+```
+
+
+## Spec Guidance
+
+This section is guidance for writing and using specs. It does not redefine `.sdd` syntax.
+
+- Prefer `Spec` and `Purpose` in every non-empty spec.
+- Use other sections only when they add useful local authority, constraints, behavior, or context.
+- Only one spec should own a specific item at a given time.
+- `Depends on` never overrides inherited `Forbids` or `Must not`.
+- `Scenario` entries should be implemented and checked when relevant.
+- Use `Example` sparingly.
+- Use comments sparingly. If a line affects implementation behavior, express it as `Must`, `Must not`, `Tasks`,
+  `Scenario`, or `Done when` instead.
+- Missing exact reference targets should be reported as unresolved references, not malformed `.sdd` syntax.
+- A referenced spec is horizontal context, not inherited authority. Its parent chain may be read when needed to
+  understand that referenced contract, but it does not become inherited authority for the active target.
+
+Task guidance:
 
 - Tasks are local to the spec where they appear.
 - Tasks are implementation guidance, not architecture overrides.
@@ -472,18 +510,6 @@ Task rules:
 - Only update task status in the currently targeted spec unless instructed otherwise.
 - Prefer completing one task or a small related group of tasks at a time.
 - Do not complete unrelated tasks opportunistically.
-- Update `[ ]` to `[x]` only when implementation and relevant checks are complete.
-- Use `[!]` for blocked work and `[?]` for unresolved design decisions.
-
-Optional task IDs may be used:
-
-```sdd
-Tasks:
-  [ ] #1 Document required release inputs.
-  [ ] #2 Add verification for missing configuration.
-```
-
-If asked to implement a specific task, implement only that task unless required by direct dependencies.
 
 
 ## Working Procedure
@@ -497,12 +523,13 @@ Before implementation:
 - Read explicit `References` declared by included specs when they affect the task or when building context.
 - Identify the nearest relevant local spec.
 - Determine modification scope from `Can modify` or `Owns`.
-- Identify applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenarios`, and `Done when`.
+- Identify applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenario`, and `Done when`.
 
 During implementation:
 
 - Prefer local changes.
 - Implement the smallest change satisfying the target task or behavior.
+- If asked to implement a specific task, implement only that task unless required by direct dependencies.
 - Preserve public contracts unless the spec asks to change them.
 - Do not widen architecture boundaries.
 - Do not add forbidden dependencies.
@@ -527,8 +554,9 @@ After implementation:
 
 When asked to work on a path, mentally construct the effective spec.
 
-Effective spec resolution is path-based. Do not use filename similarity, symbol names, language conventions, module
-names, or test names to decide which specs apply unless a project-specific rule explicitly says to do so.
+Effective spec resolution is path-based. Use same-directory basename matching when it applies, but do not use other
+filename similarity, symbol names, language conventions, module names, or test names to decide which specs apply unless
+a project-specific rule explicitly says to do so.
 
 Example tree:
 
@@ -570,11 +598,13 @@ Tools and agents that build context for a path should use the same path-based re
 By default, include:
 
 - Bootstrap files in load order.
-- Ancestor specs from the relevant project root to the target path.
+- Ancestor specs from the selected content root to the target path.
+- The same-directory basename spec for the target file when it exists.
 - Explicit `References` declared by included specs.
 
-Do not include sibling specs, nearby files, or same-named files by default. Include them only when they are explicitly
-referenced, requested, or selected by a project-specific rule.
+Do not include sibling specs, nearby files, or same-named files by default, except for same-directory basename spec
+matches. Include other files only when they are explicitly referenced, requested, or selected by a project-specific
+rule.
 
 When a tool reports context, it should identify why each file was included. Useful reasons include:
 
@@ -655,8 +685,8 @@ Purpose:
   Coordinate invoice creation.
 
 Owns:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
 
 Must:
   Validate input before provider calls.
@@ -687,27 +717,26 @@ Done when:
 
 Spec: Invoice Service
 
-Platform:
-  TypeScript/Node.js
+Platform: TypeScript/Node.js
 
 Purpose:
   Coordinate invoice creation for the billing module.
 
 Structure:
-  invoice.ts: Service implementation
-  invoice.test.ts: Service tests
-  fixtures: Test fixtures
+  ./invoice.ts: Service implementation
+  ./invoice.test.ts: Service tests
+  ./fixtures: Test fixtures
 
 Owns:
-  invoice.ts
-  invoice.test.ts
+  ./invoice.ts
+  ./invoice.test.ts
   InvoiceService
   InvoiceCreationResult
 
 Can modify:
-  invoice.ts
-  invoice.test.ts
-  fixtures/*
+  ./invoice.ts
+  ./invoice.test.ts
+  ./fixtures/*
 
 Can read:
   ../models/invoice.sdd
@@ -811,7 +840,7 @@ When working in a SpecDD project:
 - Implement the smallest correct change.
 - Do not violate `Must not` or `Forbids`.
 - Use `Tasks` to guide implementation.
-- Use `Scenarios` to guide behavior and checks.
+- Use `Scenario` to guide behavior and checks.
 - Keep specs and changed assets aligned.
 
 Specs are the project's durable prompt. Follow them.

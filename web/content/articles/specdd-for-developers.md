@@ -86,17 +86,8 @@ Purpose:
   Issue and verify short-lived password reset tokens.
 
 Owns:
-  password-reset-token.service.ts
-  password-reset-token.repository.ts
-
-Exposes:
-  PasswordResetTokenService.issue(userId)
-  PasswordResetTokenService.verify(token)
-
-Depends on:
-  ../users/user.repository.ts
-  ../../shared/clock.ts
-  ../../shared/random.ts
+  ./password-reset-token.service.ts
+  ./password-reset-token.repository.ts
 
 Must:
   Store only a hash of the reset token.
@@ -108,6 +99,15 @@ Must not:
   Store the raw reset token.
   Reveal whether an account exists.
   Send email directly.
+
+Depends on:
+  ../users/user.repository.ts
+  ../../shared/clock.ts
+  ../../shared/random.ts
+
+Exposes:
+  PasswordResetTokenService.issue(userId)
+  PasswordResetTokenService.verify(token)
 
 Scenario: issue token
   Given a user exists
@@ -266,10 +266,10 @@ cover the rest. The important part is that the rule exists somewhere explicit be
 A useful SpecDD file is not a long essay about the module, but a compact contract for the work that happens there. That
 means the writing style matters, even though the format is plain text.
 
-Prefer concrete rules over general guidance. `Must not: Send email directly` is better than "try to keep notification
-concerns separate," and `Owns: password-reset-token.service.ts` is better than a vague note that the service is related
-to password reset. Allowed dependencies should be named, boundaries should be written as boundaries, and edge cases
-should become scenarios when they clarify the behavior.
+Prefer concrete rules over general guidance. A `Must not` entry saying "Send email directly" is better than "try to keep
+notification concerns separate," and an `Owns` entry for `./password-reset-token.service.ts` is better than a vague note
+that the service is related to password reset. Allowed dependencies should be named, boundaries should be written as
+boundaries, and edge cases should become scenarios when they clarify the behavior.
 
 Avoid turning one spec into a dumping ground for the entire subsystem. Once a file grows large enough that an agent has
 to hunt through it for the part that matters, you have recreated the big-doc problem at a smaller scale. Split specs

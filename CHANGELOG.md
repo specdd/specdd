@@ -2,6 +2,11 @@
 title: Framework changelog
 ---
 
+## 1.3 - 2026-05-19
+
+- Formalized the SpecDD language rules in the bootstrap, making `.sdd` syntax, section bodies, continuation lines,
+  tasks, comments, inline code, paths, and `@` references explicit.
+
 ## 1.2 - 2026-05-16
 
 - Improved agent bootstrap instructions for resolving relevant specs before editing.

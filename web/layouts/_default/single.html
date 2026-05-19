@@ -8,6 +8,10 @@
 {{ $sectionListLabel := cond (eq .Section "news") "news" "articles" }}
 {{ $sectionItemLabel := cond (eq .Section "news") "news item" "article" }}
 {{ $sectionURL := printf "/%s/" .Section }}
+{{ $hasExplicitTitle := ne .Title "" }}
+{{ $hasDate := false }}
+{{ with .Date }}{{ $hasDate = true }}{{ end }}
+{{ $hasAuthor := and (ne .Section "news") .Params.author }}
 <body{{ if $hasToc }} class="has-toc"{{ end }}>
 
 <a class="skip-link" href="#content">Skip to content</a>
@@ -26,8 +30,10 @@
 
 <main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
   {{ if $isPostSection }}<p class="post-back"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
-  <h1>{{ .Title }}</h1>
+  {{ if $hasExplicitTitle }}<h1>{{ .Title }}</h1>{{ end }}
+  {{ if or $hasDate $hasAuthor }}
   <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ if ne .Section "news" }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}{{ end }}</p>
+  {{ end }}
   {{ .Content }}
   {{ if $isPostSection }}
     {{ if or .PrevInSection .NextInSection }}

@@ -123,12 +123,8 @@ The same spec can now be tightened with implementation context.
 
 ```sdd
 Owns:
-  trial-signup.flow.ts
-  trial-signup.service.ts
-
-Depends on:
-  ../accounts/account.repository.ts
-  ../notifications/support-notifier.ts
+  ./trial-signup.flow.ts
+  ./trial-signup.service.ts
 
 Must:
   Use the existing account creation service for new trial accounts.
@@ -137,6 +133,10 @@ Must:
 Must not:
   Call billing provider APIs during signup.
   Send support notifications directly from UI components.
+
+Depends on:
+  ../accounts/account.repository.ts
+  ../notifications/support-notifier.ts
 ```
 
 That is a much better collaboration model than asking product to write technical details up front, or asking developers

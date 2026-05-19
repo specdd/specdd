@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{ $shortTitle := .Site.Params.shortTitle | default "SpecDD" }}
 {{ $pageTitle := .Title }}
+{{ if and (not $pageTitle) .File }}{{ $pageTitle = .File.BaseFileName | humanize | title }}{{ end }}
 {{ with .Params.seoTitle }}{{ $pageTitle = . }}{{ end }}
 {{ $metaTitle := cond .IsHome .Site.Title (printf "%s | %s" $pageTitle $shortTitle) }}
 {{ $isArticle := and .IsPage (eq .Section "articles") }}
