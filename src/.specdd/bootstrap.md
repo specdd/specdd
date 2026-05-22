@@ -9,8 +9,10 @@ Copyright: Copyright (c) 2026 Matiss Treinis and SpecDD contributors
 
 You are working in a SpecDD project.
 
-SpecDD means Specification-Driven Development. The project is guided by small `.sdd` spec files that live near the
-files, directories, workflows, or contracts they describe.
+SpecDD is a framework for Specification-Driven Development.
+
+The project is guided by small `.sdd` spec files that live near the files, directories, workflows, or contracts they
+describe.
 
 Specs are source-adjacent development contracts. Treat them as binding instructions, not optional documentation.
 
@@ -43,7 +45,6 @@ Before editing any file, identify:
 
 If you cannot identify write authority, stop and ask the Operator.
 
-
 ## Execution Contract
 
 For implementation work, follow this loop:
@@ -60,7 +61,6 @@ Do not skip directly to `Change`.
 - `Change`: make the smallest correct change inside that authority.
 - `Verify`: run relevant checks when available, or explain why they were not run.
 - `Report`: summarize specs used, files changed, verification, and any remaining uncertainty.
-
 
 ## Operating Rules
 
@@ -90,7 +90,6 @@ Stop and ask the Operator before editing when:
 - The change would touch files outside `Can modify` or `Owns`.
 - Requirements affect security, destructive behavior, or public contracts and are ambiguous.
 
-
 ## Planning Mode
 
 If the Operator asks for a plan, do not edit files.
@@ -105,7 +104,6 @@ Instead:
 - Wait for the Operator to approve or revise the plan.
 
 Use planning mode especially when the request is to apply framework or spec changes.
-
 
 ## Core Model
 
@@ -136,7 +134,6 @@ Good specs are:
 - Constraint-oriented.
 - Easy for humans to review.
 - Easy for agents to follow.
-
 
 ## Spec Files
 
@@ -196,7 +193,6 @@ invoice.service.sdd
 stripe.adapter.sdd
 ```
 
-
 ## Common Spec Roles
 
 Spec names and roles are project conventions, not framework requirements. Common roles include:
@@ -212,7 +208,6 @@ Spec names and roles are project conventions, not framework requirements. Common
 - `job.sdd`: background, scheduled, or automated work.
 - `event.sdd`: emitted or consumed event/message contract.
 - `policy.sdd`: authorization, permission, or decision rules.
-
 
 ## Path-Based Resolution
 
@@ -269,7 +264,6 @@ them, or when directly necessary to understand a contract being implemented.
 Do not infer context from symbols or nearby files. Use path inheritance, same-directory basename matching, and explicit
 `References`. Nearby files are optional context, not authority.
 
-
 ## Constraint Inheritance
 
 Parent constraints remain active in child specs.
@@ -292,7 +286,6 @@ A child spec must not silently:
 
 If a local task or rule appears to conflict with a parent spec, prefer the stricter interpretation.
 
-
 ## Write Authority
 
 Inherited specs provide context and constraints. The nearest relevant local spec provides write authority.
@@ -307,7 +300,6 @@ By default:
 - Do not perform broad refactors unless the spec or Operator explicitly asks for them.
 - If no local spec exists, use the nearest parent spec and modify only the smallest necessary set of files.
 - If no applicable spec can be found, ask the Operator to identify or create the relevant spec before making changes.
-
 
 ## Universal Spec Language
 
@@ -400,7 +392,8 @@ Section rules:
 - The first symbol character after `@` must be an ASCII letter or `_`.
 - Later symbol characters may be ASCII letters, digits, `_`, `.`, `:`, `#`, `\`, `/`, `?`, or `!`.
 - A symbol ends at the first character outside that set.
-- If captured symbol text ends with `.`, and the next source character is whitespace, end of line, or closing punctuation
+- If captured symbol text ends with `.`, and the next source character is whitespace, end of line, or closing
+  punctuation
   `)`, `]`, `}`, `>`, `"`, or `'`, the final `.` is sentence punctuation and is excluded.
 - `\@` is literal text and must not be recognized as a symbol reference.
 - Do not recognize `@` inside a larger non-whitespace token unless the immediately preceding character is allowed
@@ -484,7 +477,6 @@ presence or step ordering.
 Spec: Math Service
 ```
 
-
 ## Spec Guidance
 
 This section is guidance for writing and using specs. It does not redefine `.sdd` syntax.
@@ -510,7 +502,6 @@ Task guidance:
 - Only update task status in the currently targeted spec unless instructed otherwise.
 - Prefer completing one task or a small related group of tasks at a time.
 - Do not complete unrelated tasks opportunistically.
-
 
 ## Working Procedure
 
@@ -548,7 +539,6 @@ After implementation:
 - Check that modified files are within allowed scope.
 - Check that tests or validation steps pass when available.
 - Update completed tasks only after implementation and verification are complete.
-
 
 ## Effective Spec Resolution
 
@@ -590,7 +580,6 @@ src/billing/features/invoicing/services/invoice.sdd
 
 Use all parent rules as active constraints. Use the nearest local spec for concrete implementation authority.
 
-
 ## Tool Context Discovery
 
 Tools and agents that build context for a path should use the same path-based resolution model as humans.
@@ -621,7 +610,6 @@ requested nearby file
 Context discovery must not expand write authority. Referenced or nearby files remain read context unless the active
 spec grants modification scope through `Can modify` or `Owns`.
 
-
 ## Report And Compliance Check
 
 Before final response, check:
@@ -640,7 +628,6 @@ When reporting completed work, include:
 - Verification run, or why verification was not run.
 - Any SpecDD uncertainty, skipped check, or remaining risk.
 
-
 ## Conflict Handling
 
 If specs conflict:
@@ -652,7 +639,6 @@ If specs conflict:
 - Do not use a task as justification to violate a rule.
 - If safe partial implementation is possible, do the safe subset.
 - If implementation cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
-
 
 ## Compactness Rules
 
@@ -674,7 +660,6 @@ Avoid:
 - Large exhaustive documents.
 - Vague tasks.
 - Broad refactor instructions.
-
 
 ## Minimal Valuable Spec
 
@@ -708,7 +693,6 @@ Done when:
   All scenarios have tests.
   No forbidden imports exist.
 ```
-
 
 ## Complete Spec
 
@@ -827,7 +811,6 @@ Done when:
   Public contract is preserved.
   Relevant tasks are updated only after checks pass.
 ```
-
 
 ## Prime Directive
 
