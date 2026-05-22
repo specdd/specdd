@@ -1,0 +1,20 @@
+{
+  "name": "specdd",
+  "owner": {
+    "name": "SpecDD"
+  },
+  "description": "SpecDD agent plugins for Claude Code.",
+  "plugins": [
+    {
+      "name": "specdd",
+      "source": {
+        "source": "github",
+        "repo": "specdd/plugin-claude"
+      },
+      "description": "SpecDD-guided skills for working inside specification-driven projects.",
+      "repository": "https://github.com/specdd/plugin-claude",
+      "homepage": "https://github.com/specdd/agent-plugins",
+      "license": "Apache-2.0"
+    }
+  ]
+}

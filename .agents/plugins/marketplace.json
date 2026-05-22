@@ -1,0 +1,21 @@
+{
+  "name": "specdd",
+  "interface": {
+    "displayName": "SpecDD Plugins"
+  },
+  "plugins": [
+    {
+      "name": "specdd",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/specdd/plugin-codex.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
