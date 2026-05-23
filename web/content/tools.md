@@ -1,11 +1,11 @@
 ---
 title: Tools
-seoDescription: "SpecDD tools, CLI setup, agent plugin and skill installation, and JetBrains IDE plugin setup."
+seoDescription: "SpecDD tools, CLI setup, agent plugin setup, Agent Skills installation, and JetBrains IDE plugin setup."
 ---
 
-SpecDD works as plain files first. The CLI handles project setup and framework updates. The agent plugins help Codex,
-Claude Code, GitHub Copilot, Antigravity, Junie, and Cline follow the same SpecDD project-contract workflows. The
-JetBrains plugin adds editor support for `.sdd` files.
+SpecDD works as plain files first. The CLI handles project setup and framework updates. Agents & Skills covers two paths
+for AI coding agents: named integrations for specific agents, and universal Agent Skills for clients that support the
+open Agent Skills standard. The JetBrains plugin adds editor support for `.sdd` files.
 
 ## SpecDD CLI
 
@@ -67,11 +67,17 @@ specdd check-update
 The npm and Yarn installs require Node.js 22 or newer. For all command options, run `specdd --help` or
 `specdd <command> --help`.
 
-## Agent Plugins
+## Agents & Skills
 
-Use the agent plugins and skill packages when you want an AI coding agent to apply SpecDD-specific workflows inside
-SpecDD-enabled projects. The Codex, Claude Code, GitHub Copilot, Antigravity, Junie, and Cline integrations are
-generated from the same shared source repository and expose the same SpecDD skills.
+SpecDD can give your AI coding assistant the same project rules a human reads in `.sdd` files. If you use Codex,
+Claude Code, GitHub Copilot, Antigravity, Junie, or Cline, start with the dedicated plugin below. If you use another
+tool that supports [Agent Skills](https://agentskills.io/home), install the universal Agent Skills package instead.
+
+### Dedicated Agent Plugins
+
+These plugins package the SpecDD skills for each supported agent's own install system. The Codex, Claude Code,
+GitHub Copilot, Antigravity, Junie, and Cline integrations are generated from the same shared source repository and
+expose the same SpecDD skills.
 
 Source repository: [github.com/specdd/agent-plugins](https://github.com/specdd/agent-plugins)
 
@@ -92,7 +98,7 @@ The shared skills help agents:
 - Turn specs into user or developer documentation.
 - Classify change risk before work starts.
 
-### Codex
+#### Codex
 
 Source and install details: [github.com/specdd/plugin-codex](https://github.com/specdd/plugin-codex)
 
@@ -103,7 +109,7 @@ codex plugin marketplace add specdd/specdd --ref main
 codex plugin add specdd@specdd
 ```
 
-### Claude Code
+#### Claude Code
 
 Source and install details: [github.com/specdd/plugin-claude](https://github.com/specdd/plugin-claude)
 
@@ -114,13 +120,13 @@ claude plugin marketplace add specdd/specdd
 claude plugin install specdd@specdd
 ```
 
-### GitHub Copilot
+#### GitHub Copilot
 
 Source and install details: [github.com/specdd/plugin-copilot](https://github.com/specdd/plugin-copilot)
 
 Install each desired SpecDD skill separately with GitHub CLI.
 
-#### GitHub CLI Skill Installs
+##### GitHub CLI Skill Installs
 
 GitHub CLI installs one skill at a time. Replace `specdd-orient` with any skill ID from the list below. See the
 [gh skill install manual](https://cli.github.com/manual/gh_skill_install) for command options.
@@ -145,7 +151,10 @@ Available skill IDs:
 gh skill install specdd/plugin-copilot specdd-orient
 ```
 
-### Antigravity
+**Alternative - universal Agent Skills:** You can use [universal Agent Skills](#universal-agent-skills) as an alternative
+installation method.
+
+#### Antigravity
 
 Source and install details: [github.com/specdd/plugin-antigravity](https://github.com/specdd/plugin-antigravity)
 
@@ -155,7 +164,7 @@ Install from the plugin repository:
 agy plugin install https://github.com/specdd/plugin-antigravity.git
 ```
 
-### Junie
+#### Junie
 
 Source and install details: [github.com/specdd/plugin-junie](https://github.com/specdd/plugin-junie)
 
@@ -169,10 +178,13 @@ cp -R /tmp/specdd-plugin-junie/skills/* ~/.junie/skills/
 
 For a project-local install, copy the skills into `.junie/skills/` instead.
 
-Alternatively, use `gh skill install` with `--agent junie --scope user`; see the
+**Alternative - GitHub CLI:** Use `gh skill install` with `--agent junie --scope user`; see the
 [gh skill install manual](https://cli.github.com/manual/gh_skill_install).
 
-### Cline
+**Alternative - universal Agent Skills:** You can use [universal Agent Skills](#universal-agent-skills) as an alternative
+installation method.
+
+#### Cline
 
 Source and install details: [github.com/specdd/plugin-cline](https://github.com/specdd/plugin-cline)
 
@@ -186,8 +198,59 @@ cp -R /tmp/specdd-plugin-cline/skills/* ~/.cline/skills/
 
 For a project-local install, copy the skills into `.cline/skills/` instead.
 
-Alternatively, use `gh skill install` with `--agent cline --scope user`; see the
+**Alternative - GitHub CLI:** Use `gh skill install` with `--agent cline --scope user`; see the
 [gh skill install manual](https://cli.github.com/manual/gh_skill_install).
+
+**Alternative - universal Agent Skills:** You can use [universal Agent Skills](#universal-agent-skills) as an alternative
+installation method.
+
+### Universal Agent Skills
+
+SpecDD also publishes an [Agent Skills](https://agentskills.io/home)-standard package for clients that support the
+portable skills format. Agent Skills package procedural knowledge as version-controlled folders that compatible agents
+can discover and load when a task calls for them. This is the universal path for Agent Skills-compatible agents,
+including clients that do not have a SpecDD-specific plugin yet.
+
+SpecDD Agent Skills source and install details: [github.com/specdd/agentskills](https://github.com/specdd/agentskills)
+
+Agent Skills are currently supported by a wide variety of agents and clients: VS Code, Claude, Cursor, Gemini CLI,
+OpenCode, OpenHands, Roo Code, Kiro, Goose, Amp, Agentman, Autohand Code CLI, bub, Command Code,
+Databricks Genie Code, Emdash, Factory, fast-agent, Firebender, Google AI Edge Gallery, Laravel Boost, Letta,
+Mistral AI Vibe, Mux, nanobot, Ona, pi, Piebald, Qodo, Snowflake Cortex Code, Spring AI, Superconductor, Tabnine,
+TRAE, Vita, VT Code, and Workshop.
+
+The recommended install path uses the SpecDD CLI:
+
+```bash
+specdd agentskills deploy
+```
+
+That installs the skills into the current project's Agent Skills directory:
+
+```text
+<cwd>/.agents/skills
+```
+
+Install into another project directory:
+
+```bash
+specdd agentskills deploy path/to/project
+```
+
+Install globally for clients that read the user Agent Skills directory:
+
+```bash
+specdd agentskills deploy --user
+```
+
+That installs into:
+
+```text
+~/.agents/skills
+```
+
+For manual installation, clone the package and copy the `specdd-*` skill directories into the target client's skills
+directory.
 
 ## JetBrains Plugin
 

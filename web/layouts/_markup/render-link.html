@@ -1,0 +1,4 @@
+{{- $destination := .Destination -}}
+{{- $isExternal := or (strings.HasPrefix $destination "http://") (strings.HasPrefix $destination "https://") -}}
+{{- $newTab := and $isExternal (eq .Page.RelPermalink "/tools/") -}}
+<a href="{{ $destination | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $newTab }} target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>

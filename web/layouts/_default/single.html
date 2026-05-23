@@ -20,7 +20,10 @@
 
 {{ partial "site-drawer.html" (dict "Page" . "HasToc" $hasToc) }}
 
-<main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
+{{ $contentClasses := slice }}
+{{ if not $hasToc }}{{ $contentClasses = $contentClasses | append "wide" }}{{ end }}
+{{ if eq .Section "news" }}{{ $contentClasses = $contentClasses | append "news-single" }}{{ end }}
+<main id="content"{{ with $contentClasses }} class="{{ delimit . " " }}"{{ end }}>
   {{ if $isPostSection }}<p class="post-back"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
   {{ if $hasExplicitTitle }}<h1>{{ .Title }}</h1>{{ end }}
   {{ if or $hasDate $hasAuthor }}
