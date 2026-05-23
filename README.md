@@ -38,6 +38,7 @@ describe, where both humans and agents can use them.
 The official SpecDD project is published at:
 
 - Website: https://specdd.ai/
+- Tools and setup guide: https://specdd.ai/tools/
 - Source repository: https://github.com/specdd/specdd
 - CLI source and help: https://github.com/specdd/cli
 - Release downloads: https://github.com/specdd/specdd/releases
@@ -50,16 +51,18 @@ Community links:
 ## Tooling
 
 The SpecDD CLI manages setup and framework updates. The core workflow still uses plain files and should work with any
-editor, any repository, and any AI coding agent that can read project files. Future tooling could help validate specs,
-resolve inheritance chains, check forbidden dependencies, highlight syntax, or enforce task status rules. Tooling
-contributions are welcome.
+editor, any repository, and any AI coding agent that can read project files.
+
+Official tools and setup instructions are published at https://specdd.ai/tools/. That page is the current inventory for
+the SpecDD CLI, agent plugins, editor integrations, and any additional tooling as it becomes available.
 
 It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
 may rely on the current conventions.
 
 ## Set up a project
 
-To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer.
+To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer. For CLI, agent plugin, and editor
+setup options, see https://specdd.ai/tools/.
 
 ```bash
 npm install --global specdd
@@ -1715,7 +1718,8 @@ No. Humans can use it directly. It is designed to be especially useful with AI c
 ### Do I need tools?
 
 Use the SpecDD CLI to set up and update the framework files. After that, SpecDD specs are plain text files and can work
-with any LLM that can read repository files.
+with any LLM that can read repository files. Official tool setup instructions are available at
+https://specdd.ai/tools/.
 
 ### Can SpecDD work with my language or framework?
 

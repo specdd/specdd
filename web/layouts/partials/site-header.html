@@ -1,17 +1,15 @@
 {{ $page := .Page }}
-{{ $hasToc := .HasToc | default false }}
 <header id="site-header">
-  {{ if $hasToc }}
   <button id="toc-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="toc">
     <span></span><span></span><span></span>
   </button>
-  {{ end }}
   <div id="site-masthead">
     <div id="site-title"><a href="/"><img src="/logo-sm.png" alt="" width="34" height="34" id="site-logo">SpecDD</a></div>
     <p id="site-subtitle">{{ $page.Site.Params.description }}</p>
   </div>
   <nav id="site-nav">
     <a href="/articles/" class="nav-primary">Articles</a>
+    <a href="/tools/">Tools</a>
     <a href="/news/">News</a>
     <a href="https://github.com/specdd/specdd" target="_blank" rel="noopener">GitHub</a>
     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme" aria-pressed="false">

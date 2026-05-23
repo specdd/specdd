@@ -9,6 +9,8 @@
 
 {{ partial "site-header.html" (dict "Page" . "HasToc" false) }}
 
+{{ partial "site-drawer.html" (dict "Page" . "HasToc" false) }}
+
 <main id="content" class="wide article-index">
   <h1>Articles</h1>
 
@@ -43,6 +45,8 @@
 </main>
 
 {{ partial "site-footer.html" . }}
+
+{{ partial "toc-scripts.html" . }}
 
 </body>
 </html>

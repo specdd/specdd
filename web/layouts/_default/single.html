@@ -18,15 +18,7 @@
 
 {{ partial "site-header.html" (dict "Page" . "HasToc" $hasToc) }}
 
-{{ if $hasToc }}
-<div id="toc-overlay"></div>
-
-<aside id="toc" aria-labelledby="toc-label">
-  {{ partial "toc-mobile-nav.html" . }}
-  <span id="toc-label">Contents</span>
-  {{ .TableOfContents }}
-</aside>
-{{ end }}
+{{ partial "site-drawer.html" (dict "Page" . "HasToc" $hasToc) }}
 
 <main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
   {{ if $isPostSection }}<p class="post-back"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
@@ -58,9 +50,7 @@
 
 {{ partial "site-footer.html" . }}
 
-{{ if $hasToc }}
 {{ partial "toc-scripts.html" . }}
-{{ end }}
 
 </body>
 </html>

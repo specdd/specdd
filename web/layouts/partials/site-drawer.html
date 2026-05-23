@@ -1,0 +1,11 @@
+{{ $page := .Page }}
+{{ $hasToc := .HasToc | default false }}
+<div id="toc-overlay"></div>
+
+<aside id="toc"{{ if not $hasToc }} class="site-drawer-only" aria-label="Site navigation"{{ else }} aria-labelledby="toc-label"{{ end }}>
+  {{ partial "toc-mobile-nav.html" $page }}
+  {{ if $hasToc }}
+  <span id="toc-label">Contents</span>
+  {{ $page.TableOfContents }}
+  {{ end }}
+</aside>
