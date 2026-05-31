@@ -2,9 +2,9 @@
 
 This document defines the `.sdd` file format used by SpecDD specifications.
 
-It describes syntax and format only. It does not define the SpecDD workflow,
-agent behavior, inheritance algorithm, editor behavior, or project adoption
-guidance.
+It describes syntax, format, implementation guidance, and notes for tools that
+parse, validate, index, highlight, or otherwise interpret `.sdd` files. It does
+not define agent behavior or project adoption guidance.
 
 The terms MUST, MUST NOT, SHOULD, SHOULD NOT, and MAY are used in their usual
 normative sense.
@@ -130,16 +130,16 @@ Rules:
 Valid:
 
 ```sdd
-Spec: Invoice Service
-Scenario: invalid invoice amount
+Spec: Itinerary
+Scenario: missing place name
 Purpose:
 ```
 
 Invalid:
 
 ```sdd
-Spec : Invoice Service
-Spec:Invoice Service
+Spec : Itinerary
+Spec:Itinerary
 Purpose: inline text is not allowed here
 ```
 
@@ -191,10 +191,10 @@ Inline value rules:
 Examples:
 
 ```sdd
-Spec: Invoice Service
-Platform: TypeScript/Node
-Scenario: invalid invoice amount
-Example: unsupported currency
+Spec: Itinerary
+Platform: JavaScript/ES6
+Scenario: missing place name
+Example: missing trip date
 Example:
 ```
 
@@ -214,15 +214,15 @@ Bodyless sections:
 Valid:
 
 ```sdd
-Spec: Invoice Service
-Platform: TypeScript/Node
+Spec: Itinerary
+Platform: JavaScript/ES6
 ```
 
 Invalid:
 
 ```sdd
 Platform:
-  TypeScript
+  JavaScript
 ```
 
 ### Repeatability
@@ -273,9 +273,9 @@ Returns
 Raises
 Handles
 Tasks
+Done when
 Scenario
 Example
-Done when
 ```
 
 Tools SHOULD preserve source order unless explicitly formatting a file.
@@ -302,14 +302,14 @@ Example:
 
 ```sdd
 Must:
-  Validate invoice input before provider calls
-    and before persistence.
+  Validate itinerary input before saving
+    and before updating trip days.
 ```
 
 Extracted `Must` text:
 
 ```text
-Validate invoice input before provider calls and before persistence.
+Validate itinerary input before saving and before updating trip days.
 ```
 
 Accepted body entry kinds depend on the current section.
@@ -350,7 +350,7 @@ spans do not cross LF, CRLF, or CR line endings.
 
 ```sdd
 Must:
-  Use `FetchClient` and `./src/main.kt`.
+  Use `TripStorage` and `./src/trips/itinerary.js`.
 ```
 
 Inline code spans are code text. They do not change the section structure, body
@@ -387,23 +387,23 @@ Examples:
 
 ```sdd
 Depends on:
-  @InvoiceRepository
-  @Billing.Provider
+  @TripStorage
+  @TravelPlanner.DestinationSearch
 
 Must:
-  Call @InvoiceService.createInvoice before returning.
-  See (@InvoiceService.createInvoice).
+  Call @Itinerary.addPlace before returning.
+  See (@Itinerary.addPlace).
   Use `@dataclass` as a symbol reference inside code text.
-  Treat `InvoiceService.createInvoice` as code text, not a symbol reference.
+  Treat `Itinerary.addPlace` as code text, not a symbol reference.
   Use \@decorator as literal text.
 ```
 
 In the first `Must` line above, the symbol reference is
-`@InvoiceService.createInvoice`; the final sentence period is not part of the
+`@Itinerary.addPlace`; the final sentence period is not part of the
 reference.
 
 Because symbol references use an explicit `@` prefix, plain text such as
-`InvoiceService.createInvoice` is not a symbol reference.
+`Itinerary.addPlace` is not a symbol reference.
 
 `\@` escapes a literal `@` and MUST NOT be recognized as a symbol reference.
 
@@ -436,7 +436,7 @@ Prefix meaning:
   file.
 - `../` denotes a path relative to the directory containing the current `.sdd`
   file.
-- `/` denotes a path relative to the project root.
+- `/` denotes a path relative to the selected content root.
 
 Unsupported path prefix:
 
@@ -450,16 +450,16 @@ Example:
 
 ```sdd
 Structure:
-  ./src/main: implementation sources
+  ./src/trips: trip planning sources
   Generated files are not committed.
 Owns:
   /README.md
   ./fixtures/*.sdd
 Depends on:
-  FetchClient
+  TripStorage
 ```
 
-In the example above, `FetchClient` is dependency text, not a path reference.
+In the example above, `TripStorage` is dependency text, not a path reference.
 
 ### Glob Syntax
 
@@ -492,9 +492,9 @@ Rules:
 
 - `./` and `../` glob patterns are relative to the current `.sdd` file
   directory.
-- `/` glob patterns are relative to the project root.
-- Malformed glob patterns are implementation errors, not separate `.sdd`
-  syntax.
+- `/` glob patterns are relative to the selected content root.
+- Malformed glob patterns are valid `.sdd` text and are warning-level unresolved
+  glob issues.
 
 ### Key-Value Lines
 
@@ -561,7 +561,7 @@ so.
 Canonical form:
 
 ```sdd
-Spec: Invoice Service
+Spec: Itinerary
 ```
 
 `Spec` is required for a complete `.sdd` file. It MUST be the first
@@ -575,7 +575,7 @@ or environment when useful.
 Canonical form:
 
 ```sdd
-Platform: TypeScript/Node
+Platform: JavaScript/ES6
 ```
 
 `Platform` is optional. When present, it MUST have a nonempty inline value and
@@ -589,7 +589,7 @@ Canonical form:
 
 ```sdd
 Purpose:
-  Coordinate invoice creation.
+  Keep a trip itinerary organized by day.
 ```
 
 `Purpose` is a body-capable block section and MUST NOT have an inline value.
@@ -627,10 +627,10 @@ Example:
 
 ```sdd
 Owns:
-  invoice.ts
-  invoice.test.ts
-  InvoiceService
-  Billing behavior for invoice creation.
+  ./itinerary.js
+  ./itinerary.test.js
+  Itinerary
+  Itinerary behavior for trip planning.
 ```
 
 #### Can modify
@@ -642,10 +642,10 @@ Example:
 
 ```sdd
 Can modify:
-  ./invoice.ts
-  ./invoice.test.ts
+  ./itinerary.js
+  ./itinerary.test.js
   ./fixtures/*
-  Generated fixtures for invoice service tests.
+  Generated fixtures for itinerary tests.
 ```
 
 #### Can read
@@ -657,23 +657,23 @@ Example:
 
 ```sdd
 Can read:
-  ../models/*
-  ../ports/*
-  Review repository contracts before editing.
+  ../storage/*
+  ../destinations/*
+  Review trip storage contracts before editing.
 ```
 
 #### References
 
-`References` lists explicit horizontal references to other specs, contracts, or
-context. It is a mixed-entry section.
+`References` lists explicit references to other specs, contracts, or context.
+It is a mixed-entry section.
 
 Example:
 
 ```sdd
 References:
-  ../models/invoice.sdd
-  ../ports/billing-provider.sdd
-  @InvoiceRepository
+  ../storage/trip-storage.sdd
+  ../destinations/destination-search.sdd
+  @TripStorage
 ```
 
 Reference paths SHOULD use explicit path prefixes. See "Path Syntax" and
@@ -693,8 +693,8 @@ Example:
 
 ```sdd
 Must:
-  Validate input before provider calls.
-  Persist invoice after provider success.
+  Reject itinerary items without a place name.
+  Save itinerary changes after adding a place.
 ```
 
 #### Must not
@@ -705,8 +705,8 @@ Example:
 
 ```sdd
 Must not:
-  Call Stripe directly.
-  Send emails.
+  Purchase bookings or tickets.
+  Change destination search behavior.
 ```
 
 #### Forbids
@@ -718,10 +718,9 @@ Example:
 
 ```sdd
 Forbids:
-  stripe
-  ../../api/*
-  ../../ui/*
-  Direct provider SDK access from domain models.
+  ../booking/*
+  ../destinations/editor/*
+  Direct booking API access from itinerary behavior.
 ```
 
 ### Contract Sections
@@ -740,9 +739,9 @@ required context.
 
 ```sdd
 Depends on:
-  InvoiceRepository
-  BillingProviderPort
-  @BillingLogger
+  TripStorage
+  DestinationSearch
+  @ItineraryLogger
 ```
 
 #### Exposes
@@ -752,8 +751,8 @@ observable capabilities.
 
 ```sdd
 Exposes:
-  InvoiceService.createInvoice(input)
-  @InvoiceCreationResult
+  Itinerary.addPlace(input)
+  @ItineraryUpdateResult
 ```
 
 #### Accepts
@@ -763,7 +762,7 @@ preconditions.
 
 ```sdd
 Accepts:
-  CreateInvoiceInput
+  AddItineraryPlaceInput
 ```
 
 #### Returns
@@ -772,7 +771,7 @@ Accepts:
 
 ```sdd
 Returns:
-  InvoiceCreationResult
+  ItineraryUpdateResult
 ```
 
 #### Raises
@@ -781,8 +780,8 @@ Returns:
 
 ```sdd
 Raises:
-  InvalidInvoiceInputError
-  BillingProviderError
+  ItineraryPlaceRequired
+  ItinerarySaveFailed
 ```
 
 #### Handles
@@ -792,8 +791,9 @@ spec.
 
 ```sdd
 Handles:
-  provider timeout
-  unsupported currency
+  missing place name
+  missing trip date
+  save failure
 ```
 
 ### Tasks
@@ -874,18 +874,18 @@ The keyword MUST be followed by end of line or whitespace.
 Example:
 
 ```sdd
-Scenario: invalid invoice amount
-  Given invoice amount is zero
-  When createInvoice is called
+Scenario: missing place name
+  Given the place name is empty
+  When the person adds a place
   Then validation fails
-  And provider is not called
+  And no itinerary item is stored
 ```
 
 Words that merely start with a scenario keyword are not scenario steps:
 
 ```sdd
 Scenario: plain text line
-  Andromeda is plain text.
+  Andorra is plain text.
 ```
 
 The language does not enforce that scenario bodies contain `Given`, `When`, or
@@ -900,15 +900,15 @@ Both forms are valid:
 
 ```sdd
 Example:
-  input currency: EUR
-  input amount minor units: 1250
-  result invoice status: created
+  input place name: Louvre Museum
+  input trip date: 2026-06-12
+  result itinerary status: updated
 ```
 
 ```sdd
-Example: unsupported currency
-  input currency: BTC
-  result error: unsupported currency
+Example: missing trip date
+  input place name: Louvre Museum
+  result error: missing trip date
 ```
 
 Example body entries are normal mixed-entry body entries.
@@ -940,10 +940,10 @@ directory, the `.sdd` file is the local spec for that source file.
 Examples:
 
 ```text
-invoice.ts       -> invoice.sdd
-main.test.ts     -> main.test.sdd
-Dockerfile       -> Dockerfile.sdd
-bootstrap.md     -> bootstrap.sdd
+itinerary.js    -> itinerary.sdd
+main.test.js    -> main.test.sdd
+Dockerfile      -> Dockerfile.sdd
+bootstrap.md    -> bootstrap.sdd
 ```
 
 This rule does not create additional syntax inside the `.sdd` file.
@@ -953,16 +953,16 @@ This rule does not create additional syntax inside the `.sdd` file.
 A minimal complete `.sdd` file contains a `Spec` section.
 
 ```sdd
-Spec: Math Service
+Spec: Itinerary
 ```
 
 A useful minimal spec usually also contains `Purpose`:
 
 ```sdd
-Spec: Math Service
+Spec: Itinerary
 
 Purpose:
-  Add and subtract two numbers.
+  Keep a trip itinerary organized by day.
 ```
 
 Other sections are optional and should be included only when they add useful
@@ -1114,6 +1114,48 @@ opened or configured as an independent project.
 Tools SHOULD make the selected content root visible or inspectable and SHOULD
 allow projects to override it.
 
+### Directory Context And Target Resolution Guidance
+
+Tools that resolve nearby specs SHOULD classify a requested target as one of:
+
+- a directory
+- a `.sdd` spec file
+- an ordinary file
+
+Targets SHOULD exist before related-spec resolution begins. A `.sdd` target is
+itself the target spec. An ordinary file target may have a same-directory
+same-basename `.sdd` spec. Same-basename matching is case-insensitive, but an
+exact filename match is preferred when present. If multiple case-insensitive
+matches exist and no exact match exists, tools SHOULD report ambiguity. If no
+same-basename spec exists for an ordinary file, tools SHOULD continue resolving
+upward directory context from the file's containing directory.
+
+Directory-level specs are specs whose basename matches the directory they
+govern. Matching is case-insensitive, but exact basename matches are preferred.
+If multiple case-insensitive matches exist for the same placement and no exact
+match exists, tools SHOULD report ambiguity.
+
+For a directory path, two directory-level spec placements are recognized:
+
+- local: a spec inside the governed directory with the same basename as that
+  directory, such as `src/trips/trips.sdd` for `src/trips/`
+- parent-held: a spec in the parent directory with the same basename as the
+  governed child directory, such as `src/trips.sdd` for `src/trips/`
+
+Parent-held specs SHOULD be considered only when the governed child path exists
+as a directory. Parent-held and local specs for the same directory are
+cumulative context, not ambiguity. When both exist, tools SHOULD order
+parent-held context before local context for that directory.
+
+The same basename rule applies at the selected content root. A content root
+whose basename is `travel-planner` uses `travel-planner.sdd` as its root
+directory context spec. This is a convention, not new `.sdd` syntax.
+
+Related-spec tools SHOULD resolve vertical directory context from the content
+root down to the target directory, using the directory-level rules above. A tool
+that scans a directory target may also include specs recursively under that
+target according to that tool's command semantics.
+
 ### Reference Extraction And Resolution Guidance
 
 Tools that extract references SHOULD treat only explicit syntax as references.
@@ -1161,7 +1203,35 @@ Path resolution guidance:
 - Missing exact paths are unresolved references, not syntax errors.
 - Glob resolution returns matching existing files and directories.
 - Glob resolution MAY be capped by implementations.
-- Malformed glob patterns are unresolved references, not syntax errors.
+- Malformed glob patterns are warning-level unresolved glob issues, not syntax errors.
+
+Related-spec relevance resolution may be narrower than generic reference
+indexing. A relevance resolver SHOULD follow explicit path references from:
+
+- `Structure`
+- `Owns`
+- `Can modify`
+- `Can read`
+- `References`
+- `Depends on`
+
+A relevance resolver SHOULD NOT follow links from `Forbids` or `Exposes`,
+although a generic reference index MAY still extract and index paths from those
+sections.
+
+When a relevance resolver follows an exact path:
+
+- a linked `.sdd` file resolves to that spec
+- a linked ordinary file resolves to its same-basename `.sdd` spec when present
+- a linked directory resolves to directory-level specs for that directory only
+
+Non-glob directory links such as `./` or `../shared` SHOULD NOT recursively
+include every descendant `.sdd` file. Recursive descendant inclusion SHOULD
+require an explicit glob such as `./**` or `./**/*.sdd`.
+
+Relevance resolvers SHOULD deduplicate resolved specs by normalized path
+relative to the selected content root, protect recursive expansion against
+cycles, and expose or document any depth limit used for soft-link expansion.
 
 ### Validation Guidance
 
@@ -1206,6 +1276,31 @@ normalize blank lines, section spacing, and indentation.
 
 ## Language Changelog
 
-### 1.0 - 2026-05-19
+### [1.1] - 2026-05-30
 
-- Initial formal version of the SpecDD `.sdd` language specification.
+#### Added
+
+- Add implementation guidance for target classification, same-basename file
+  specs, directory-level spec matching, parent-held directory specs, and
+  cumulative directory context.
+- Add relevance resolution guidance for followed sections, non-glob directory
+  links, glob-based recursive inclusion, and soft-link expansion safety.
+
+#### Changed
+
+- Expand the language specification scope to include implementation guidance and
+  notes for parsers, validators, indexers, highlighters, and related tools.
+- Move `Done when` before `Scenario` and `Example` in the canonical section
+  order.
+- Clarify that `/` paths and globs resolve from the selected content root, not a
+  generic project root.
+- Clarify that malformed glob patterns are valid `.sdd` text and should be
+  reported as warning-level unresolved glob issues.
+- Rename `References` guidance from horizontal references to explicit
+  references.
+
+### [1.0] - 2026-05-19
+
+#### Added
+
+- Add the initial formal version of the SpecDD `.sdd` language specification.

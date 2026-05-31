@@ -6,7 +6,7 @@ and completion criteria.
 
 The SpecDD framework uses small, local, human-readable `.sdd` files that live beside the code, infrastructure,
 workflows, or documentation they describe. These specs document intent, architecture, behavior, boundaries, and
-implementation tasks in a way that both human developers and AI coding agents can follow.
+local work tasks in a way that both human developers and AI coding agents can follow.
 
 SpecDD gives development, product, QA, support, operations, and engineering teams a shared way to preserve intent before
 AI tools or developers turn incomplete requirements into plausible but wrong software.
@@ -40,6 +40,7 @@ The official SpecDD project is published at:
 - Website: https://specdd.ai/
 - Tools and setup guide: https://specdd.ai/tools/
 - Source repository: https://github.com/specdd/specdd
+- Language specification: [LANGUAGE.md](LANGUAGE.md)
 - CLI source and help: https://github.com/specdd/cli
 - Release downloads: https://github.com/specdd/specdd/releases
 
@@ -48,21 +49,29 @@ Community links:
 - Reddit: https://www.reddit.com/r/specdd/
 - IRC: `#specdd` on Libera.Chat
 
+## Quickstart
+
+Start with the [guided quickstart](https://specdd.ai/quickstart/) for the shortest setup path.
+
+It walks through installing the CLI, initializing a project, adding a root spec, adding a local same-basename spec, and
+giving an agent a focused change request.
+
 ## Tooling
 
 The SpecDD CLI manages setup and framework updates. The core workflow still uses plain files and should work with any
 editor, any repository, and any AI coding agent that can read project files.
 
-Official tools and setup instructions are published at https://specdd.ai/tools/. That page is the current inventory for
-the SpecDD CLI, agent plugins, editor integrations, and any additional tooling as it becomes available.
+Official [tools and setup instructions](https://specdd.ai/tools/) are the current inventory for the SpecDD CLI, agent
+plugins, editor integrations, and any additional tooling as it becomes available.
 
-It is strongly recommended to follow the documented language closely and avoid inventing custom syntax. Future tooling
-may rely on the current conventions.
+The formal `.sdd` language specification is maintained in [LANGUAGE.md](LANGUAGE.md). It is strongly recommended to
+follow the documented language closely and avoid inventing custom syntax. Future tooling will rely on the current
+conventions.
 
 ## Set up a project
 
-To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer. For CLI, agent plugin, and editor
-setup options, see https://specdd.ai/tools/.
+To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer. The
+[tools and setup guide](https://specdd.ai/tools/) covers CLI, agent plugin, and editor setup options.
 
 ```bash
 npm install --global specdd
@@ -104,33 +113,32 @@ For CLI update commands, version options, file-safety details, and other command
 ## Example
 
 A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
-demonstrates a small TODO application with SpecDD bootstrap files, colocated .sdd specs, source code, tests, and agent
+demonstrates a small Travel Planner with SpecDD bootstrap files, colocated .sdd specs, source code, tests, and agent
 entrypoint files.
 
 ```sdd
-Spec: Calculator Add
+Spec: Itinerary
 
 Purpose:
-  Add two finite numbers.
+  Keep a trip itinerary organized by day.
 
 Owns:
-  ./calculator.js
+  ./itinerary.js
 
 Must:
-  Return a + b.
-  Reject non-number inputs.
+  When the place name and date are present, an itinerary item exists.
+  Itinerary items appear grouped by trip day.
 
 Must not:
-  Round results.
+  Manage destination search results.
 
 Exposes:
-  Calculator.add(a, b)
+  Itinerary.addPlace(input)
 
-Scenario: add numbers
-  Given a is 2
-  And b is 3
-  When add is called
-  Then 5 is returned
+Scenario: add place to itinerary
+  Given the Paris trip has no itinerary items
+  When "Louvre Museum" is added for "2026-06-12"
+  Then "Louvre Museum" appears on the June 12 itinerary
 ```
 
 ## The problem SpecDD solves
@@ -162,7 +170,7 @@ SpecDD helps with:
 - structuring otherwise loose design documents
 - preserving architecture and ownership boundaries
 - capturing business behavior near implementation
-- recording implementation tasks where the work happens
+- recording local work tasks where the work happens
 - improving consistency between code, tests, and intent
 
 In private internal testing:
@@ -189,29 +197,40 @@ specification files.
 
 A SpecDD spec describes a part of a system:
 
-- what it is for
+- what stable outcome or responsibility it provides
 - what it owns
 - what it may modify
 - what it may read
-- what it must do
-- what it must not do
+- what outcomes, invariants, or behaviors must hold
+- what nearby boundaries, non-goals, or forbidden behavior might otherwise be confused with it
 - what it may depend on
 - what behavior it must support
-- what tasks remain
-- when implementation is complete
+- what local tasks remain to satisfy its contract
+- what completion criteria show the contract holds
 
 Specs live near the files or project areas they describe.
 
 Example:
 
 ```text
-src/
-  billing/
-    module.sdd
-    invoice.sdd
-    invoice.js
-    stripe.adapter.sdd
-    stripe.adapter.js
+travel-planner/
+  travel-planner.sdd              # Project-wide intent and rules
+  src/
+    trips/
+      trips.sdd             # Rules for the trip planning area
+      itinerary.sdd         # Rules for itinerary.js
+      itinerary.js
+      itinerary.test.js
+      trip-storage.sdd      # Rules for saving trips
+      trip-storage.js
+      trip-storage.test.js
+    destinations/
+      destinations.sdd      # Rules for destination search
+      destination-search.sdd
+      destination-search.js
+    ui/
+      itinerary-view.sdd    # Rules for the itinerary screen
+      itinerary-view.js
 ```
 
 The goal is not to create large requirements documents. The goal is to create many small, useful contracts that guide
@@ -249,13 +268,13 @@ Read .specdd/bootstrap.md, resolve the relevant SpecDD chain, and implement it.
 Second, a developer can ask an agent to draft specs, review them, edit them as needed, and then ask for implementation:
 
 ```text
-Create SpecDD specs for the billing module. Do not implement code yet.
+Create SpecDD specs for the trip planning area. Do not implement code yet.
 ```
 
 After review:
 
 ```text
-Implement the invoice service spec only.
+Implement the itinerary spec only.
 ```
 
 Both workflows work well. The important part is that implementation should be driven by reviewed specs, not by vague
@@ -263,13 +282,27 @@ prompts alone.
 
 ## Basic project layout
 
-SpecDD bootstrap instructions live in `.specdd`.
+SpecDD bootstrap instructions live in `.specdd`. The root spec must live at the selected content root and must be named
+after that root directory.
+
+Example: if the selected content root is `/home/bob/Projects/travel-planner/`, the root spec is:
 
 ```text
-.specdd/
-  bootstrap.md              # Global SpecDD behavior
-  bootstrap.project.md      # Project-specific rules
-  bootstrap.local.md        # Local operator or environment overrides (git-ignored)
+/home/bob/Projects/travel-planner/travel-planner.sdd
+```
+
+The examples use `Travel Planner` for human-facing names, `TravelPlanner` for code identifiers, and `travel-planner`
+for directories and root spec filenames.
+
+For a project named `travel-planner`, a minimal layout is:
+
+```text
+travel-planner/
+  .specdd/
+    bootstrap.md              # Global SpecDD behavior
+    bootstrap.project.md      # Project-specific rules
+    bootstrap.local.md        # Local operator or environment overrides (git-ignored)
+  travel-planner.sdd                # Root project spec
 ```
 
 Load order:
@@ -321,16 +354,16 @@ SpecDD specs use the `.sdd` extension.
 Named specs are allowed when multiple specs exist in one directory and unsuffixed names would collide or be ambiguous.
 
 ```text
-stripe.adapter.sdd
-stripe.service.sdd
-invoice.model.sdd
-invoice.service.sdd
+itinerary.sdd
+trip-storage.sdd
+itinerary-filter.sdd
+itinerary.component.sdd
 ```
 
-Common spec names include - adapt these to your platform's naming conventions as needed (including capitalization):
+Common non-root spec names include - adapt these to your platform's naming conventions as needed, including
+capitalization:
 
 ```text
-app.sdd
 module.sdd
 feature.sdd
 service.sdd
@@ -341,26 +374,36 @@ component.sdd
 job.sdd
 event.sdd
 policy.sdd
+workflow.sdd
+operation.sdd
+interface.sdd
+dataset.sdd
+schema.sdd
+runbook.sdd
 ```
 
 A good default is to omit the suffix when the directory already makes the role clear. For example:
 
 ```text
-src/billing/services/invoice.sdd
-src/billing/services/invoice.ts
+src/trips/itinerary.sdd
+src/trips/itinerary.js
 ```
 
 A suffix is useful when the folder does not disambiguate. For example:
 
 ```text
-src/billing/invoice.service.sdd
-src/billing/invoice.service.ts
+src/trips/itinerary.component.sdd
+src/trips/itinerary.component.js
 ```
 
 Spec names and locations help humans and agents navigate, but they do not create authority by themselves.
 Same-directory basename matching is an explicit SpecDD rule: when a target file and a `.sdd` file live in the same
-directory and share the same basename, the `.sdd` file is the matching local spec for that target. Other naming
-conventions are project conventions unless a spec or project rule defines them.
+directory and share the same basename, the `.sdd` file is the matching local spec for that target. Matching is
+case-insensitive, but an exact filename match is preferred when present. If several case-insensitive matches exist and
+none is exact, tools should report ambiguity instead of guessing.
+
+Directory-level specs can also use a same-basename relationship with the directory they govern. This is described in
+more detail in [Directory and target resolution](#directory-and-target-resolution).
 
 ## Naming conventions for project files
 
@@ -379,67 +422,64 @@ Prefer option 2 when project naming is not defined.
 Examples:
 
 ```text
-models/invoice.ts
-services/invoice.ts
-adapters/stripe.ts
+models/trip.js
+views/itinerary.js
+storage/trip-storage.js
 ```
 
 Use suffixes when needed:
 
 ```text
-invoice.model.ts
-invoice.service.ts
-stripe.adapter.ts
+trip.model.js
+itinerary.component.js
+trip-storage.adapter.js
 ```
 
 ## Path-based resolution
 
-SpecDD resolution is path-based. Applicable specs come from ancestor specs, explicit `References`, and same-directory
-basename matches.
+SpecDD resolution is path-based. Applicable specs come from ancestor specs, directory-level specs, explicit `References`,
+and same-directory basename matches.
 
 The selected content root is the highest relevant project boundary used for `/` paths, spec indexing, and resolution.
 It is usually the repository or workspace root unless the project configures a different SpecDD root.
 
 When working on a target path, agents should:
 
-1. Start at the target path.
-2. Include the same-directory basename spec when the target is a file and such a spec exists.
-3. Walk upward through parent directories to the selected content root.
-4. Collect specs whose declared governing scope applies to the target.
-5. Read the inherited chain from the selected content root to target.
-6. Include explicit `References` declared by included specs when they affect the task or context.
+1. Classify the target as a directory, a `.sdd` spec file, or an ordinary file.
+2. Treat a `.sdd` target as the target spec itself.
+3. Include the same-directory basename spec when the target is an ordinary file and such a spec exists.
+4. Walk upward through parent directories to the selected content root.
+5. Collect specs whose declared governing scope applies to the target.
+6. Read the inherited chain from the selected content root to target.
+7. Include explicit `References` declared by included specs when they affect the task or context.
 
 Example:
 
 ```text
-app.sdd
-src/
-  billing/
-    module.sdd
-    features/
-      invoicing/
-        feature.sdd
-        services/
-          invoice.sdd
-          invoice.ts
+travel-planner/
+  travel-planner.sdd              # Project-wide rules
+  src/
+    trips/
+      trips.sdd             # Rules for the trip planning area
+      itinerary.sdd         # Rules for itinerary.js
+      itinerary.js
 ```
 
-For work on:
+For work on this target inside `travel-planner/`:
 
 ```text
-src/billing/features/invoicing/services/invoice.ts
+src/trips/itinerary.js
 ```
 
 the effective spec context is:
 
 ```text
-app.sdd
-src/billing/module.sdd
-src/billing/features/invoicing/feature.sdd
-src/billing/features/invoicing/services/invoice.sdd
+travel-planner.sdd
+src/trips/trips.sdd
+src/trips/itinerary.sdd
 ```
 
-This means the service spec inherits constraints from the feature spec, module spec, and app spec.
+This means the itinerary spec inherits rules from the trip-planning spec and the root project spec.
 
 Do not infer the applicable spec, ownership, or write authority from similar names in other directories, symbols,
 programming languages, module names, test names, or tool-specific conventions unless a project-specific spec or
@@ -449,10 +489,56 @@ The core rule is:
 
 ```text
 Vertical inheritance is implicit.
-Horizontal references are explicit.
+Other context, including horizontal references, are explicit.
 ```
 
 Parent specs are automatically inherited. Sibling specs are not.
+
+## Directory and target resolution
+
+Most SpecDD work starts from a requested target. That target might be a directory, a `.sdd` file, or an ordinary project
+file. Classifying it first keeps tools and agents from treating nearby files as authority just because they look related.
+
+If the target is already a `.sdd` file, that file is the target spec. If the target is an ordinary file, a same-directory
+same-basename `.sdd` file is the local spec when one exists. Matching is case-insensitive so projects can follow
+platform conventions such as `Trip.ts` and `Trip.sdd`, but exact filename matches should win. If two case-only
+matches compete and neither is exact, the correct result is ambiguity, not a guess.
+
+Directory targets have their own convention. A directory can be described by a same-basename spec inside the directory,
+or by a same-basename spec held by its parent directory.
+
+```text
+src/
+  trips.sdd          # Parent-held rules for src/trips/
+  trips/
+    trips.sdd        # Local rules for src/trips/
+    itinerary.js
+    itinerary.sdd    # Rules for itinerary.js
+```
+
+For work on `src/trips/itinerary.js`, both `src/trips.sdd` and `src/trips/trips.sdd` may contribute directory
+context, and `src/trips/itinerary.sdd` may be the file-level local spec. Parent-held and local directory specs are
+cumulative context, not ambiguity. When both exist, read parent-held context before local context for that directory.
+
+The same rule applies at the selected content root. If the content root directory is named `travel-planner`, the root spec
+must be `travel-planner.sdd` in that directory. This is the project root spec, not a separate syntax feature.
+
+When following explicit path references to find related specs, tools should follow links from these sections:
+
+- `Structure`
+- `Owns`
+- `Can modify`
+- `Can read`
+- `References`
+- `Depends on`
+
+They should not use `Forbids` or `Exposes` to expand related-spec context, even though those sections may still contain
+paths that generic indexes can record.
+
+An exact path to a `.sdd` file resolves to that spec. An exact path to an ordinary file resolves to its same-basename
+spec when present. An exact path to a directory resolves only to directory-level specs for that directory. A non-glob
+directory path such as `../tags` should not recursively include every descendant `.sdd` file; recursive inclusion should
+use an explicit glob such as `../tags/**/*.sdd`.
 
 ## Multiple hierarchies
 
@@ -464,19 +550,19 @@ Example:
 
 ```text
 src/
-  billing/
+  trips/
     module.sdd
-  support/
+  tags/
     module.sdd
 ```
 
-When working inside `src/billing`, do not automatically load `src/support/module.sdd`.
+When working inside `src/trips`, do not automatically load `src/tags/module.sdd`.
 
 Use explicit references when one area needs another area’s contract.
 
 ```sdd
 References:
-  ../../support/customer-support.sdd
+  ../tags/tag.sdd
 ```
 
 ## Constraint inheritance
@@ -520,11 +606,11 @@ Owns:
 Example:
 
 ```sdd
-Spec: Invoice Service
+Spec: Itinerary
 
 Owns:
-  ./invoice.ts
-  ./invoice.test.ts
+  ./itinerary.js
+  ./itinerary.test.js
 ```
 
 If `Can modify` is absent, `Owns` acts as the modification boundary.
@@ -543,7 +629,7 @@ All specs use the same basic language. Not every section is required for every s
 The defined sections are grouped by purpose. Identity sections are `Spec`, `Platform`, and `Purpose`. Scope and
 ownership sections are `Structure`, `Owns`, `Can modify`, `Can read`, and `References`. Requirement sections are `Must`,
 `Must not`, and `Forbids`. Contract sections are `Depends on`, `Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles`.
-Workflow and behavior sections are `Tasks`, `Scenario`, `Example`, and `Done when`.
+Workflow and behavior sections are `Tasks`, `Done when`, `Scenario`, and `Example`.
 
 A spec should include only sections that add useful local information.
 
@@ -582,7 +668,7 @@ Comment rules:
 - Comments do not create requirements, constraints, tasks, or write authority.
 - Inline trailing comments are not recognized as comments. Text after other syntax is ordinary line content.
 
-Use comments sparingly. If a line affects implementation behavior, express it as `Must`, `Must not`, `Tasks`,
+Use comments sparingly. If a line affects required behavior, express it as `Must`, `Must not`, `Tasks`,
 `Scenario`, or `Done when` instead.
 
 ## Section reference
@@ -592,15 +678,15 @@ Use comments sparingly. If a line affects implementation behavior, express it as
 Names the thing being specified.
 
 ```sdd
-Spec: Invoice Service
+Spec: Itinerary
 ```
 
 ### Platform
 
-Describes implementation language and platform. It can be present in any level of any spec, though for single language
-projects it should generally live in the app level spec.
+Describes technical platform, runtime, framework, or tool stack. Use it sparingly at the root or major area where it
+adds inheritable technical context.
 
-Format is free-form, but usually:
+Labels should be concise, stack-like, and slash-separated when multiple terms are present:
 
 ```text
 language[/qualifier[/qualifier]]
@@ -620,7 +706,7 @@ A short statement of why this part exists.
 
 ```sdd
 Purpose:
-  Coordinate invoice validation, provider creation, and persistence.
+  Let someone add places to a trip and review the itinerary.
 ```
 
 ### Structure
@@ -639,10 +725,10 @@ Example:
 
 ```sdd
 Structure:
-  ./lib: Libraries
-  ./models: Models
-  ./templates: Project templates
-  ./templates/email: Email templates
+  ./src: Source code
+  ./src/trips: Trip planning behavior
+  ./src/trips/itinerary.js: Main itinerary code
+  ./tests: Test suite
 ```
 
 This section helps humans and agents understand local organization without reading the whole tree.
@@ -654,8 +740,8 @@ at any given time.
 
 ```sdd
 Owns:
-  ./invoice.ts
-  ./invoice.test.ts
+  ./itinerary.js
+  ./itinerary.test.js
 ```
 
 ### Can modify
@@ -664,35 +750,33 @@ Files or paths that may be changed when working under this spec.
 
 ```sdd
 Can modify:
-  ./invoice.ts
-  ./invoice.test.ts
+  ./itinerary.js
+  ./itinerary.test.js
 ```
 
 Use this when writable scope should be narrower or different from ownership.
 
 ### Can read
 
-Files, paths, or specs that may be read to improve context. It serves as a recommendation for agents to read relevant
-sections for context.
+Files, paths, specs, or prose context that may be read for context.
 
 ```sdd
 Can read:
-  ../models/*
-  ../ports/*
-  ../repositories/*
+  ../storage/trip-storage.sdd
+  ../destinations/destination.sdd
 ```
 
 ### References
 
-Explicit horizontal references to other specs or contracts.
+Explicit references to other specs, contracts, or context.
 
 ```sdd
 References:
-  ../models/invoice.sdd
-  ../ports/billing-provider.sdd
+  ../storage/trip-storage.sdd
+  ../destinations/destination.sdd
 ```
 
-Use references for sibling or cross-cutting context. Do not infer sideways inheritance.
+Use references for context outside the inherited chain. References do not create inherited authority.
 
 ### Must
 
@@ -700,9 +784,9 @@ Responsibilities, rules, and required behavior.
 
 ```sdd
 Must:
-  Validate invoice input before provider calls.
-  Persist invoice records after successful provider creation.
-  Normalize provider errors before returning them.
+  When the place and date are present, an itinerary item exists.
+  Each itinerary item remains assigned to a trip day.
+  Itinerary items appear in chronological order.
 ```
 
 ### Must not
@@ -711,10 +795,9 @@ Forbidden behavior, non-goals, and architectural boundaries.
 
 ```sdd
 Must not:
-  Call Stripe directly.
-  Calculate tax.
-  Send emails.
-  Import HTTP request or response objects.
+  Delete itinerary items when trip dates change.
+  Change destination search behavior.
+  Mix booking purchase behavior into the itinerary.
 ```
 
 ### Forbids
@@ -723,9 +806,9 @@ Forbidden dependencies, paths, modules, libraries, or architectural access.
 
 ```sdd
 Forbids:
-  stripe
-  ../../api/*
-  ../../ui/*
+  localStorage direct writes
+  ../booking/*
+  ../destinations/editor/*
 ```
 
 ### Depends on
@@ -734,9 +817,8 @@ Allowed dependencies, collaborators, modules, ports, libraries, or abstractions.
 
 ```sdd
 Depends on:
-  InvoiceRepository
-  BillingCustomerRepository
-  BillingProviderPort
+  TripStorage
+  DestinationSearch
 ```
 
 `Depends on` does not override inherited `Forbids` or `Must not`.
@@ -747,7 +829,8 @@ Public exports, endpoints, commands, components, events, or interfaces.
 
 ```sdd
 Exposes:
-  InvoiceService.createInvoice(input)
+  Itinerary.addPlace(input)
+  Itinerary.movePlace(id, date)
 ```
 
 ### Accepts
@@ -756,7 +839,8 @@ Inputs accepted by this unit.
 
 ```sdd
 Accepts:
-  CreateInvoiceInput
+  place name
+  trip date
 ```
 
 ### Returns
@@ -767,7 +851,8 @@ values, or other observable results.
 
 ```sdd
 Returns:
-  InvoiceResult
+  updated itinerary
+  validation message when an itinerary item cannot be added
 ```
 
 ### Raises
@@ -776,8 +861,8 @@ Errors this unit may raise or return.
 
 ```sdd
 Raises:
-  InvalidInvoiceError
-  BillingProviderError
+  ItineraryPlaceRequired
+  ItinerarySaveFailed
 ```
 
 ### Handles
@@ -786,9 +871,10 @@ Errors, events, messages, states, or cases this unit must handle.
 
 ```sdd
 Handles:
-  provider timeout
-  unsupported currency
-  missing customer id
+  missing place name
+  missing trip date
+  save failure
+  moving a missing itinerary item
 ```
 
 ### Tasks
@@ -797,31 +883,11 @@ A lightweight local implementation checklist.
 
 ```sdd
 Tasks:
-  [ ] Add validation for unsupported currency.
-  [ ] Add unit tests for invalid input.
+  [ ] Show a clear message for a missing place name.
+  [ ] Keep itinerary items sorted after moving a place.
 ```
 
 Tasks are described in more detail below.
-
-### Scenario
-
-A behavioral example written in a Gherkin-like style.
-
-```sdd
-Scenario: invalid invoice amount
-  Given an invoice input with amount less than or equal to zero
-  When createInvoice is called
-  Then the invoice is rejected
-  And the billing provider is not called
-```
-
-Scenarios define behavior that should be implemented and tested when relevant.
-
-### Example
-
-Small concrete examples, payloads, usage snippets, or expected transformations.
-
-Use examples sparingly.
 
 ### Done when
 
@@ -829,14 +895,34 @@ Completion criteria.
 
 ```sdd
 Done when:
-  All scenarios have tests.
-  No forbidden dependencies are imported.
-  Public contract is preserved.
+  Adding a place has a test.
+  Moving a place to another day has a test.
+  The itinerary does not change destination search or booking behavior.
 ```
+
+### Scenario
+
+A behavioral example written in a Gherkin-like style.
+
+```sdd
+Scenario: add a place
+  Given the Paris trip has no itinerary items
+  When "Louvre Museum" is added for "2026-06-12"
+  Then "Louvre Museum" appears on the June 12 itinerary
+  And the itinerary remains assigned to the Paris trip
+```
+
+Scenarios define behavior that should be satisfied and checked when relevant.
+
+### Example
+
+Small concrete examples, payloads, usage snippets, or expected transformations.
+
+Use examples sparingly.
 
 ## Tasks
 
-Specs may include lightweight implementation tasks.
+Specs may include lightweight local work tasks.
 
 Tasks let developers control implementation order without using a separate project-management system.
 
@@ -844,10 +930,10 @@ Example:
 
 ```sdd
 Tasks:
-  [ ] Add validation for zero or negative amount.
-  [ ] Persist provider invoice id after successful provider call.
-  [ ] Map provider timeout to retryable BillingProviderError.
-  [ ] Add unit tests for invalid input.
+  [ ] Show a clear message for a missing place name.
+  [ ] Keep itinerary items sorted after a date change.
+  [ ] Save the itinerary after adding a place.
+  [ ] Add tests for adding and moving itinerary items.
 ```
 
 Allowed task states:
@@ -865,32 +951,32 @@ Examples:
 
 ```sdd
 Tasks:
-  [x] Define createInvoice public method.
-  [ ] Add validation for unsupported currency.
-  [!] Decide whether provider timeout should retry automatically.
-  [?] Confirm whether draft invoices can be deleted.
-  [-] Skip PDF rendering; owned by invoice-pdf feature.
+  [x] Add a place to the itinerary.
+  [ ] Show a clear message for a missing place name.
+  [!] Decide what to show when saving fails.
+  [?] Confirm whether the same place can appear on more than one day.
+  [-] Skip hotel booking; owned by trip-booking feature.
 ```
 
 Optional task IDs may be used:
 
 ```sdd
 Tasks:
-  [ ] #1 Add validation for zero or negative amount.
-  [ ] #2 Persist provider invoice id after success.
-  [ ] #3 Add tests for provider failure.
+  [ ] #1 Show a clear message for a missing place name.
+  [ ] #2 Keep itinerary items sorted after a date change.
+  [ ] #3 Add tests for saving failure.
 ```
 
 Task rules:
 
 - Tasks are local to the spec where they appear.
-- Tasks are implementation guidance, not architecture overrides.
+- Tasks are work guidance, not architecture overrides.
 - Tasks must not contradict `Must`, `Must not`, `Forbids`, or inherited constraints.
 - Parent tasks are planning context, not automatically actionable in child specs.
 - Only update task status in the currently targeted spec unless instructed otherwise.
 - Prefer completing one task or a small related group of tasks at a time.
 - Do not complete unrelated tasks opportunistically.
-- Mark `[x]` only when implementation and relevant tests/checks are complete.
+- Mark `[x]` only when the relevant change and checks are complete.
 - Use `[!]` for blocked work.
 - Use `[?]` for unresolved design decisions.
 
@@ -906,35 +992,34 @@ illustrative, not prescriptive. Use specs and bootstrap overrides to adapt SpecD
 Important: remember that suffixes for the spec names are OPTIONAL and should be skipped when spec location implies
 the spec level or component already.
 
-### App spec
+### Root project spec
 
 Defines global application context and architecture.
 
-Typical file:
+The filename must match the selected content root directory basename.
 
 ```text
-app.sdd
+travel-planner/
+  travel-planner.sdd
 ```
 
 Example:
 
 ```sdd
-Spec: Billing Platform
+Spec: Travel Planner
 
 Purpose:
-  Internal platform for creating invoices, collecting payments, and tracking billing state.
+  Small application for planning trips and organizing itinerary items.
 
 Must:
-  Use a modular monolith architecture.
-  Keep domain logic out of controllers.
-  Represent money as integer minor units.
-  Access persistence only through repositories.
-  Keep provider SDKs inside adapters.
+  Trips can be created by a person.
+  Places can be added to an itinerary.
+  Keep itinerary items grouped by trip day.
+  Keep trip planning behavior under `./src/trips`.
 
 Must not:
-  Put business logic in UI components.
-  Import external provider types into domain models.
-  Use floating point numbers for money.
+  Purchase bookings or tickets.
+  Store trip data outside the configured storage code.
 ```
 
 ### Module spec
@@ -950,23 +1035,23 @@ module.sdd
 Example:
 
 ```sdd
-Spec: Billing Module
+Spec: Trips Area
 
 Purpose:
-  Own invoice creation, billing customer state, payment attempts, and provider interaction.
+  Provide the part of the app where people plan trips.
 
 Owns:
-  ./src/billing/*
+  ./src/trips/*
 
 Must:
-  Expose billing behavior through BillingService.
-  Normalize provider errors before they leave the module.
-  Keep billing domain models independent of provider SDKs.
+  Trips have a destination and date range.
+  Places can be added to a trip itinerary.
+  Itinerary items remain grouped by day.
+  Changes are saved through trip storage.
 
 Must not:
-  Own tax calculation.
-  Own accounting ledger behavior.
-  Own authentication.
+  Purchase bookings.
+  Manage destination search results.
 ```
 
 ### Feature spec
@@ -982,27 +1067,26 @@ feature.sdd
 Example:
 
 ```sdd
-Spec: Invoice Creation
+Spec: Add Place To Itinerary
 
 Purpose:
-  Create a valid invoice for a billing customer through an external billing provider.
+  Places can be added to a trip itinerary.
 
 Must:
-  Validate invoice input before provider calls.
-  Store provider invoice id after successful creation.
-  Return normalized billing errors.
+  An existing trip is required.
+  A place name is required.
+  When the trip and place are valid, the place appears on the selected trip day.
 
 Must not:
-  Collect payment.
-  Render invoice PDFs.
-  Calculate tax.
+  Create a new trip automatically.
+  Purchase bookings or tickets.
+  Change destination search results.
 
-Scenario: invoice is valid
-  Given a billing customer exists
-  And the invoice amount is greater than zero
-  When an invoice is created
-  Then the provider invoice is created
-  And the local invoice is stored
+Scenario: trip exists
+  Given a Paris trip exists
+  When the person adds "Louvre Museum" for "2026-06-12"
+  Then "Louvre Museum" appears on the June 12 itinerary
+  And the Paris trip remains selected
 ```
 
 ### Service spec
@@ -1012,45 +1096,44 @@ Defines orchestration or application/domain service behavior.
 Typical files:
 
 ```text
-invoice.sdd
-invoice.service.sdd
+itinerary.sdd
+itinerary.service.sdd
 ```
 
 Example:
 
 ```sdd
-Spec: Invoice Service
+Spec: Itinerary Behavior
 
 Purpose:
-  Coordinate invoice creation.
+  Keep the visible itinerary current as places are added or moved between days.
 
 Owns:
-  ./invoice.ts
-  ./invoice.test.ts
+  ./itinerary.js
+  ./itinerary.test.js
 
 Must:
-  Validate input before provider calls.
-  Persist invoice after provider success.
-  Normalize provider failures.
+  A missing place name is rejected.
+  After a place is added, itinerary changes are saved.
+  Itinerary items remain grouped by day.
 
 Must not:
-  Call Stripe directly.
-  Calculate tax.
-  Send emails.
+  Change destination search behavior.
+  Purchase bookings or tickets.
 
 Depends on:
-  InvoiceRepository
-  BillingProviderPort
+  TripStorage
+  DestinationSearch
 
 Tasks:
-  [ ] Add validation for zero or negative amount.
-  [ ] Add unit tests for invalid input.
+  [ ] Show a clear message for a missing place name.
+  [ ] Add tests for adding and moving itinerary items.
 
-Scenario: invalid invoice
-  Given invoice amount is zero
-  When createInvoice is called
-  Then validation fails
-  And provider is not called
+Scenario: missing place name is rejected
+  Given the place name is empty
+  When the person adds a place
+  Then a validation message is shown
+  And no itinerary item is stored
 ```
 
 ### Model spec
@@ -1060,26 +1143,26 @@ Defines domain state, entities, value objects, and invariants.
 Typical files:
 
 ```text
-invoice.sdd
-invoice.model.sdd
+itinerary-item.sdd
+itinerary-item.model.sdd
 ```
 
 Example:
 
 ```sdd
-Spec: Invoice
+Spec: Itinerary Item
 
 Purpose:
-  Represent an invoice and protect invoice state transitions.
+  Represent one planned place or activity in an itinerary.
 
 Must:
-  Store amounts in integer minor units.
-  Require a supported ISO currency.
-  Prevent paid invoices from returning to draft.
+  A nonempty place name is stored.
+  The trip day is tracked for the item.
+  Display order remains stable within the day.
 
 Must not:
-  Import repository code.
-  Import provider SDK types.
+  Persist itself to storage.
+  Purchase bookings or tickets.
 ```
 
 ### Adapter spec
@@ -1089,31 +1172,30 @@ Defines a boundary implementation for an external system.
 Typical files:
 
 ```text
-stripe.sdd
-stripe.adapter.sdd
+trip-storage.sdd
+trip-storage.adapter.sdd
 ```
 
 Example:
 
 ```sdd
-Spec: Stripe Billing Adapter
+Spec: Trip Storage
 
 Purpose:
-  Implement the billing provider port using Stripe.
+  Persist and retrieve trips and itinerary items.
 
 Must:
-  Convert internal invoice data into Stripe requests.
-  Convert Stripe errors into BillingProviderError.
-  Keep Stripe types inside this adapter.
+  Trip changes are saved.
+  Previously saved trips are loaded when the app starts.
+  Save failures are reported in a way the itinerary can show to the person.
 
 Must not:
-  Import repositories.
-  Change domain models.
-  Return Stripe response objects.
+  Change place names.
+  Move itinerary items between days.
+  Decide which itinerary items are visible.
 
 Depends on:
-  stripe
-  BillingProviderPort
+  browser local storage
 ```
 
 ### API spec
@@ -1123,36 +1205,36 @@ Defines an inbound interface such as HTTP, GraphQL, RPC, CLI, or webhook.
 Typical files:
 
 ```text
-create-invoice.sdd
-create-invoice.api.sdd
+create-trip.sdd
+create-trip.api.sdd
 ```
 
 Example:
 
 ```sdd
-Spec: Create Invoice API
+Spec: Create Trip API
 
 Purpose:
-  Expose invoice creation to authorized clients.
+  Accept requests to create trips.
 
 Must:
-  Validate request shape.
-  Call the invoice service.
-  Convert service errors into API errors.
+  A trip name is required.
+  A destination is required.
+  Missing required fields return a clear validation error.
 
 Must not:
-  Contain domain business logic.
-  Call repositories directly.
-  Call provider SDKs directly.
+  Create itinerary items.
+  Bypass trip storage.
+  Purchase bookings or tickets.
 
 Accepts:
-  POST /invoices
-  CreateInvoiceRequest
+  POST /trips
+  CreateTripRequest
 
 Returns:
-  201 with InvoiceResponse
+  201 with TripResponse
   400 for validation failure
-  502 for provider failure
+  500 for storage failure
 ```
 
 ### Component spec
@@ -1162,8 +1244,8 @@ Defines UI component behavior.
 Typical files:
 
 ```text
-invoice-form.sdd
-invoice-form.component.sdd
+itinerary.sdd
+itinerary.component.sdd
 ```
 
 Use for frontend or UI units.
@@ -1175,8 +1257,8 @@ Defines background or scheduled work.
 Typical files:
 
 ```text
-invoice-sync.sdd
-invoice-sync.job.sdd
+trip-summary.sdd
+trip-summary.job.sdd
 ```
 
 Use for queues, scheduled tasks, workers, and background processes.
@@ -1188,8 +1270,8 @@ Defines emitted or consumed event/message contracts.
 Typical files:
 
 ```text
-invoice-created.sdd
-invoice-created.event.sdd
+trip-created.sdd
+trip-created.event.sdd
 ```
 
 Use for domain events, integration events, pub/sub messages, or queue payloads.
@@ -1201,8 +1283,8 @@ Defines authorization, permission, or business decision rules.
 Typical files:
 
 ```text
-invoice-access.sdd
-invoice-access.policy.sdd
+trip-access.sdd
+trip-access.policy.sdd
 ```
 
 Use for rules that decide whether something is allowed.
@@ -1219,10 +1301,10 @@ one scenario.
 The following example is a valid minimal spec.
 
 ```sdd
-Spec: Math service
+Spec: Itinerary Filter
 
 Purpose:
-  Simple service that exposes methods to add and subtract two numbers.
+  Filter visible itinerary items by trip day.
 ```
 
 ## Working with SpecDD files
@@ -1233,21 +1315,21 @@ After a project has been initialized, the normal workflow is:
 2. Define purpose, ownership, rules, scenarios, and tasks.
 3. Implement one task or behavior at a time.
 4. Add or update tests.
-5. Mark completed tasks as `[x]`.
+5. Mark completed task entries as `[x]`.
 6. Keep the spec aligned with the code.
 
 For example:
 
 ```sdd
 Tasks:
-  [ ] Add todo completion.
+  [ ] Add place removal.
 ```
 
 After implementing and testing it:
 
 ```sdd
 Tasks:
-  [x] Add todo completion.
+  [x] Add place removal.
 ```
 
 Do not mark a task done just because code was written. Mark it done when the behavior is implemented and checked.
@@ -1257,10 +1339,10 @@ Do not mark a task done just because code was written. Mark it done when the beh
 A good agent prompt is short:
 
 ```text
-Implement task 2 in invoice service as defined by the spec.
+Implement task 2 in the itinerary spec.
 ```
 
-In a correct coding environment, the agent should:
+In a correct working environment, the agent should:
 
 1. read bootstrap files
 2. find the spec chain
@@ -1268,7 +1350,7 @@ In a correct coding environment, the agent should:
 4. read the local spec
 5. obey local write authority
 6. implement the requested task
-7. update tests
+7. add or update verification when needed
 8. update task status only when complete
 
 For implementation work, the agent should follow this loop:
@@ -1301,42 +1383,45 @@ Use the setup instructions at the top of this README to initialize SpecDD first.
 A minimal setup example:
 
 ```text
-.specdd/
-  bootstrap.md
-
-app.sdd
-src/
-  module.sdd
+travel-planner/
+  .specdd/
+    bootstrap.md
+  travel-planner.sdd
+  src/
+    trips/
+      trips.sdd
 ```
 
 Then add local specs where useful:
 
 ```text
-src/
-  todos/
-    module.sdd
-    todo.sdd
-    todo.js
+travel-planner/
+  src/
+    trips/
+      trips.sdd
+      itinerary.sdd
+      itinerary.js
 ```
 
-A minimal `app.sdd`:
+A minimal root spec for a project named `travel-planner`:
 
 ```sdd
-Spec: Todo App
+Spec: Travel Planner
 
 Platform: JavaScript/ES6
 
 Purpose:
-  Demonstrate SpecDD using a small todo application.
+  Demonstrate SpecDD using a small Travel Planner.
 
 Structure:
   ./src: Source code and colocated specs
   ./tests: Test suite
 
 Must:
-  Keep implementation simple.
-  Prefer plain JavaScript.
-  Keep tests readable.
+  Implementation remains simple.
+  Plain JavaScript remains sufficient.
+  Tests remain readable.
+  Trips and itinerary items can be created.
 
 Must not:
   Introduce frameworks unless requested.
@@ -1345,32 +1430,33 @@ Must not:
 A minimal local spec:
 
 ```sdd
-Spec: Todo Store
+Spec: Itinerary
 
 Purpose:
-  Manage todo items in memory.
+  Keep the in-memory itinerary for one trip.
 
 Owns:
-  ./todo.js
+  ./itinerary.js
 
 Must:
-  Add todos with unique ids.
-  List todos in insertion order.
-  Mark todos complete.
+  When the place name and date are present, a place exists in the itinerary.
+  Keep itinerary items grouped by trip day.
+  An itinerary item moves to another day when requested.
+  Itinerary items appear in chronological order.
 
 Must not:
-  Persist todos to disk.
-  Use external dependencies.
+  Persist trips to disk from this file.
+  Add external dependencies.
 
 Tasks:
-  [ ] Add todo creation.
-  [ ] Add todo completion.
-  [ ] Add todo listing.
+  [ ] Add place creation.
+  [ ] Add itinerary item moving.
+  [ ] Add itinerary listing by day.
 
-Scenario: add todo
-  Given an empty todo store
-  When a todo is added
-  Then the todo appears in the list
+Scenario: add place
+  Given the Paris trip has no itinerary items
+  When "Louvre Museum" is added for "2026-06-12"
+  Then "Louvre Museum" appears on the June 12 itinerary
 ```
 
 ## Adding SpecDD to an existing project
@@ -1386,8 +1472,8 @@ Typical flow:
 3. Draft a local spec from the current code or intended behavior.
 4. Mark uncertain assumptions clearly.
 5. Review the spec so old bugs, accidental behavior, and unclear assumptions do not become permanent contracts.
-6. Tighten `Purpose`, `Owns`, `Can modify`, `Must`, `Must not`, `Depends on`, `Forbids`, `Scenario`, `Tasks`, and
-   `Done when` sections as needed.
+6. Tighten `Purpose`, `Owns`, `Can modify`, `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Done when`, and
+   `Scenario` sections as needed.
 7. Implement a small slice against the reviewed spec.
 8. Run relevant checks and update task status only after verification.
 9. Expand SpecDD coverage incrementally around the areas where context matters most.
@@ -1423,7 +1509,7 @@ Challenge a draft spec:
 
 ```text
 Review this SpecDD spec for ambiguity, missing edge cases, and assumptions.
-List only issues that would affect implementation, tests, security, ownership, or architecture.
+List only issues that would affect behavior, checks, security, ownership, or architecture.
 Do not implement anything.
 ```
 
@@ -1439,14 +1525,14 @@ Review a change against specs:
 
 ```text
 Review this change against the applicable SpecDD specs.
-Focus on Must, Must not, Forbids, write authority, scenarios, tests, and Done when.
+Focus on Must, Must not, Forbids, write authority, scenarios, checks, and Done when.
 ```
 
 ## Best practices and observations
 
 ### Start small and iterate
 
-Begin with minimal specs. Just `Spec`, `Purpose`, and a few `Must not` rules and a `Scenario` or two. Run the workflow,
+Begin with minimal specs. Just `Spec`, `Purpose`, a few local boundary rules, and a `Scenario` or two. Run the workflow,
 observe what the agent gets right and wrong, then add sections to address gaps. A spec that is too thin will produce
 unfocused output; a spec that is too detailed will become hard to maintain and slow to write. Iterate toward the level
 of detail that produces reliable results without becoming a burden in your specific scenario. Most specs settle into a
@@ -1473,10 +1559,10 @@ have reviewed them.
 The less an agent must infer, the better the outcome. State constraints, non-goals, dependencies, and completion
 criteria directly in the spec rather than relying on the agent to fill in the gaps.
 
-### Use Must not aggressively
+### Use Must not for plausible local boundaries
 
-Non-goals and forbidden behavior are often more valuable for AI agents than positive requirements. A clear `Must not`
-prevents entire classes of wrong implementation without requiring the agent to reason about alternatives.
+Non-goals and forbidden behavior are valuable when they prevent plausible local boundary mistakes. A clear `Must not`
+prevents wrong work without becoming a list of unrelated capabilities.
 
 ### Keep tasks local
 
@@ -1500,11 +1586,11 @@ Without a clear completion signal, agents tend to either stop short or keep goin
 boundary explicit and gives both agents and reviewers a concrete checklist. Use it whenever the scope of a spec
 might otherwise be ambiguous.
 
-### Start with the app spec before adding local specs
+### Start with the root spec before adding local specs
 
-Without a root `app.sdd`, child specs have no architectural context to inherit from and agents must infer global
-rules. Even a minimal app spec with a handful of `Must` and `Must not` entries establishes the foundation that
-all local specs build on. Add it before writing module or service specs.
+Without a root spec named after the selected content root directory, child specs have no architectural context to inherit
+from and agents must infer global rules. Even a minimal root spec with a handful of `Must` and `Must not` entries
+establishes the foundation that all local specs build on. Add it before writing module or service specs.
 
 ### Do not duplicate parent constraints in child specs
 
@@ -1516,7 +1602,7 @@ owns it, and let inheritance carry it down.
 
 The naming examples in SpecDD, such as dot-separated suffixes, lowercase filenames, are illustrations, not rules. If
 your platform, language, or team has established naming conventions, follow those instead. A Python project may prefer
-`invoice.sdd`, a Java project may use `Invoice.sdd` or `InvoiceService.sdd`. What matters is that naming is consistent
+`itinerary.sdd`, a Java project may use `Itinerary.sdd`. What matters is that naming is consistent
 across the project, that spec files align closely with the source files and components they describe, and that the
 convention is applied uniformly so both people and agents can locate specs reliably.
 
@@ -1529,51 +1615,51 @@ If specs conflict, the agent should use these rules:
 3. Treat `Must not` and `Forbids` as stronger than `Must`, `Depends on`, or `Tasks`.
 4. Treat inherited architecture as active unless explicitly and safely narrowed.
 5. Do not use a task as justification to violate a rule.
-6. If safe partial implementation is possible, do the safe subset.
-7. If implementation cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
+6. If a safe partial change is possible, do the safe subset.
+7. If the change cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
 
 Example conflict:
 
 ```sdd
 Must not:
-  Call Stripe directly.
+  Access browser storage directly.
 
 Tasks:
-  [ ] Call Stripe from InvoiceService.
+  [ ] Save trips directly to browser storage from itinerary.js.
 ```
 
 The task is invalid because it violates `Must not`.
 
 ## Good specs and bad specs
 
-Good specs are short and actionable.
+Good specs are short and outcome-focused.
 
 Good:
 
 ```sdd
 Must:
-  Validate input before provider calls.
+  A missing place name is rejected before an itinerary item is added.
 ```
 
 Bad:
 
 ```sdd
 Must:
-  The implementation should carefully validate every possible kind of user input in a robust and production-quality way before it makes any calls to downstream services or external providers.
+  The implementation should carefully validate every possible kind of trip input in a robust and production-quality way before it writes anything anywhere.
 ```
 
 Good task:
 
 ```sdd
 Tasks:
-  [ ] Add validation for unsupported currency.
+  [ ] Add validation for missing place name.
 ```
 
 Bad task:
 
 ```sdd
 Tasks:
-  [ ] Make billing better.
+  [ ] Make trips better.
 ```
 
 Good specs:
@@ -1604,11 +1690,11 @@ Scenarios are especially useful as test inputs.
 Example spec fragment:
 
 ```sdd
-Scenario: invalid invoice
-  Given invoice amount is zero
-  When createInvoice is called
+Scenario: missing place name
+  Given the place name is empty
+  When the person adds the itinerary item
   Then validation fails
-  And provider is not called
+  And no itinerary item is stored
 ```
 
 This should usually become a test.
@@ -1661,14 +1747,15 @@ In the SpecDD repository:
 A practical SpecDD project may include:
 
 ```text
-.specdd/bootstrap.md
-.specdd/bootstrap.project.md
-.specdd/bootstrap.local.md
-AGENTS.md
-CLAUDE.md
-README.md
-app.sdd
-src/**/**/*.sdd
+travel-planner/
+  .specdd/bootstrap.md
+  .specdd/bootstrap.project.md
+  .specdd/bootstrap.local.md
+  AGENTS.md
+  CLAUDE.md
+  README.md
+  travel-planner.sdd
+  src/**/**/*.sdd
 ```
 
 Suggested `.gitignore` entry:
@@ -1718,8 +1805,8 @@ No. Humans can use it directly. It is designed to be especially useful with AI c
 ### Do I need tools?
 
 Use the SpecDD CLI to set up and update the framework files. After that, SpecDD specs are plain text files and can work
-with any LLM that can read repository files. Official tool setup instructions are available at
-https://specdd.ai/tools/.
+with any LLM that can read repository files. The [tools and setup guide](https://specdd.ai/tools/) has the official
+setup instructions.
 
 ### Can SpecDD work with my language or framework?
 
@@ -1729,16 +1816,17 @@ as the project work is organized in files.
 ### Why not just use tests?
 
 Tests describe expected behavior. Specs also describe ownership, architecture, constraints, dependencies, non-goals, and
-implementation tasks.
+local work tasks.
 
 ### Why not use one big specification?
 
 Large specs are hard to keep in context and tend to rot. SpecDD prefers many small specs close to the code they govern.
 
-### Can a project have multiple app specs?
+### Can a project have multiple root specs?
 
-Usually there should be one root `app.sdd` per hierarchy. A monorepo may have multiple independent app-level
-hierarchies.
+Usually there should be one root spec per independent SpecDD hierarchy, named after that hierarchy's selected content
+root. A monorepo may have multiple independent roots when packages or applications are configured as separate SpecDD
+projects.
 
 ### Should specs be reviewed?
 
