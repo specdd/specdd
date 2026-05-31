@@ -30,6 +30,7 @@ operating_system = 'Cross-platform'
 license = 'https://www.apache.org/licenses/LICENSE-2.0'
 
 [params.pageDescriptions]
+'/quickstart/' = 'A short SpecDD quickstart for installing the CLI, initializing a project, adding local specs, and guiding agents with SpecDD.'
 '/changelog/' = 'SpecDD release notes, framework updates, and changes to the specification-driven development workflow.'
 '/language-reference/' = 'SpecDD language reference for the .sdd file format, syntax, sections, task markers, comments, and parsing rules.'
 
@@ -55,6 +56,14 @@ target = "content"
 [[module.mounts]]
 source = "../README.md"
 target = "content/_index.md"
+
+[[module.mounts]]
+source = "../QUICKSTART.md"
+target = "content/quickstart.md"
+
+[[module.mounts]]
+source = "../TOOLS.md"
+target = "content/tools.md"
 
 [[module.mounts]]
 source = "../CHANGELOG.md"
