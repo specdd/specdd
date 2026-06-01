@@ -46,8 +46,10 @@ The official SpecDD project is published at:
 
 Community links:
 
+- Discussions: https://github.com/specdd/specdd/discussions
 - Reddit: https://www.reddit.com/r/specdd/
 - IRC: `#specdd` on Libera.Chat
+- Discord: https://discord.gg/dKabJKB2Ep
 
 ## Quickstart
 
