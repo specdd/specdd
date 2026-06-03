@@ -119,10 +119,27 @@ Primary:
 
 - Website: https://specdd.ai/
 - Language reference: https://specdd.ai/language-reference/
+- Tools and setup guide: https://specdd.ai/tools/
 - Articles: https://specdd.ai/articles/
 - News: https://specdd.ai/news/
 - Changelog: https://specdd.ai/changelog/
 - Sitemap: https://specdd.ai/sitemap.xml
+
+Tools and integrations:
+
+- SpecDD CLI source and help: https://github.com/specdd/cli
+- Agent plugins source: https://github.com/specdd/agent-plugins
+- Codex plugin: https://github.com/specdd/plugin-codex
+- Claude Code plugin: https://github.com/specdd/plugin-claude
+- GitHub Copilot plugin: https://github.com/specdd/plugin-copilot
+- Antigravity plugin: https://github.com/specdd/plugin-antigravity
+- Junie plugin: https://github.com/specdd/plugin-junie
+- Cline plugin: https://github.com/specdd/plugin-cline
+- Universal Agent Skills source: https://github.com/specdd/agentskills
+- JetBrains plugin marketplace: https://plugins.jetbrains.com/plugin/31808-specdd/
+- Visual Studio Code and compatible editors source: https://github.com/specdd/vscode-plugin
+- Visual Studio Marketplace: https://marketplace.visualstudio.com/items?itemName=specdd.specdd
+- Open VSX: https://open-vsx.org/extension/specdd/specdd
 
 Source repositories:
 
@@ -150,8 +167,10 @@ Agent bootstrap references:
 
 Community:
 
+- Discussions: https://github.com/specdd/specdd/discussions
 - Reddit: https://www.reddit.com/r/specdd/
 - IRC: `#specdd` on Libera.Chat
+- Discord: https://discord.gg/dKabJKB2Ep
 
 ## What SpecDD Is
 
