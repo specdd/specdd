@@ -778,6 +778,50 @@ body.has-toc #content {
   margin-bottom: 0;
 }
 
+#content .pro-tip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  margin: 1.2rem 0;
+  padding: 0.68rem 0.82rem 0.68rem 0.7rem;
+  border: 1px solid var(--border-soft);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 48%, var(--border));
+  background: color-mix(in srgb, var(--surface-subtle) 45%, transparent);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+#content .pro-tip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.12rem;
+  height: 1.12rem;
+  margin-top: 0.02rem;
+  color: color-mix(in srgb, var(--accent) 62%, var(--muted));
+  font-size: 1.02rem;
+}
+
+#content .pro-tip__icon svg {
+  display: block;
+}
+
+#content .pro-tip__label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: color-mix(in srgb, var(--accent) 62%, var(--muted));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+#content .pro-tip__body > :last-child {
+  margin-bottom: 0;
+}
+
 #content hr {
   border: none;
   border-top: 1px solid var(--border-soft);

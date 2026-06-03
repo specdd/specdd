@@ -58,6 +58,9 @@ Start with the [guided quickstart](https://specdd.ai/quickstart/) for the shorte
 It walks through installing the CLI, initializing a project, adding a root spec, adding a local same-basename spec, and
 giving an agent a focused change request.
 
+It shows the basic spec-driven development loop: write a small spec, review it, then implement from that reviewed
+contract.
+
 ## Tooling
 
 The SpecDD CLI manages setup and framework updates. The core workflow still uses plain files and should work with any
@@ -115,8 +118,8 @@ For CLI update commands, version options, file-safety details, and other command
 ## Example
 
 A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
-demonstrates a small Travel Planner with SpecDD bootstrap files, colocated .sdd specs, source code, tests, and agent
-entrypoint files.
+demonstrates how SpecDD applies specification-driven development to a small Travel Planner project, with bootstrap files,
+colocated `.sdd` specs, source code, tests, and agent entrypoint files.
 
 ```sdd
 Spec: Itinerary
@@ -155,9 +158,9 @@ SpecDD is built around a simple shift: stop treating the prompt as the source of
 and easy to lose. In AI-assisted delivery, the source of truth needs to survive across sessions, tools, contributors,
 reviews, and product changes.
 
-SpecDD solves this by chunking a project into small, local specification units. Each spec gives humans and agents a
-concrete source of truth for one part of the system. Instead of stuffing a huge architecture document into every prompt,
-the agent resolves the relevant spec chain and works inside that bounded context.
+SpecDD makes spec-driven development practical by chunking a project into small, local specification units. Each spec
+gives humans and agents a concrete source of truth for one part of the system. Instead of stuffing a huge architecture
+document into every prompt, the agent resolves the relevant spec chain and works inside that bounded context.
 
 At a business level, SpecDD turns scattered intent into a durable project asset. Reviewers can compare a patch against a
 local contract instead of reconstructing the contract from memory, new contributors can learn the area they are touching
@@ -170,6 +173,7 @@ SpecDD helps with:
 - giving agents and teams durable project context inside the repository
 - giving AI prompts concrete local source of truth
 - structuring otherwise loose design documents
+- practicing spec-driven development without one giant requirements document
 - preserving architecture and ownership boundaries
 - capturing business behavior near implementation
 - recording local work tasks where the work happens
@@ -249,7 +253,7 @@ assumption is that project work is organized in files.
 
 ## Workflow
 
-The recommended workflow is **spec-first**, similar in spirit to BDD.
+The recommended SpecDD workflow is a **spec-first** spec-driven development loop, similar in spirit to BDD.
 
 Typical flow:
 
@@ -320,7 +324,7 @@ constraints, or write authority.
 
 ## The role of the bootstrap file
 
-The bootstrap file explains SpecDD rules to an AI agent.
+The bootstrap file explains SpecDD rules that let an AI agent follow the spec-driven development workflow.
 
 It tells the agent how to:
 
@@ -439,8 +443,9 @@ trip-storage.adapter.js
 
 ## Path-based resolution
 
-SpecDD resolution is path-based. Applicable specs come from ancestor specs, directory-level specs, explicit `References`,
-and same-directory basename matches.
+SpecDD resolution is path-based, which keeps specification-driven development local to the files and project areas being
+changed. Applicable specs come from ancestor specs, directory-level specs, explicit `References`, and same-directory
+basename matches.
 
 The selected content root is the highest relevant project boundary used for `/` paths, spec indexing, and resolution.
 It is usually the repository or workspace root unless the project configures a different SpecDD root.
@@ -626,7 +631,8 @@ before making changes.
 
 ## Universal spec language
 
-All specs use the same basic language. Not every section is required for every spec.
+All specs use the same basic language so spec-driven development rules stay readable by humans, agents, and tools. Not
+every section is required for every spec.
 
 The defined sections are grouped by purpose. Identity sections are `Spec`, `Platform`, and `Purpose`. Scope and
 ownership sections are `Structure`, `Owns`, `Can modify`, `Can read`, and `References`. Requirement sections are `Must`,
@@ -984,7 +990,7 @@ Task rules:
 
 ## Spec levels
 
-SpecDD commonly uses the following spec levels.
+SpecDD commonly uses the following spec levels to keep spec-driven development local at the right scale.
 
 You do not need every level in every project. Use the levels that add clarity.
 
@@ -1311,7 +1317,7 @@ Purpose:
 
 ## Working with SpecDD files
 
-After a project has been initialized, the normal workflow is:
+After a project has been initialized, the normal spec-driven development workflow is:
 
 1. Create or update the relevant `.sdd` spec.
 2. Define purpose, ownership, rules, scenarios, and tasks.
@@ -1463,9 +1469,10 @@ Scenario: add place
 
 ## Adding SpecDD to an existing project
 
-For an existing codebase, start with one high-change, high-risk, or high-confusion area rather than trying to specify
-the whole project at once. Good starting points include a module under active change, a service with repeated review
-comments, a workflow with subtle business rules, or an automation path where operational constraints matter.
+For an existing codebase, adopt specification-driven development gradually: start with one high-change, high-risk, or
+high-confusion area rather than trying to specify the whole project at once. Good starting points include a module under
+active change, a service with repeated review comments, a workflow with subtle business rules, or an automation path
+where operational constraints matter.
 
 Typical flow:
 
@@ -1685,7 +1692,7 @@ Bad specs:
 
 ## Relationship to tests
 
-Specs are not tests, but they should guide tests.
+Specs are not tests, but in a specification-driven development workflow they should guide what gets tested.
 
 Scenarios are especially useful as test inputs.
 
@@ -1713,7 +1720,7 @@ boundaries implementation must respect.
 That said, specs are still readable by humans and can serve as useful project documentation. They can capture business
 rules, development intent, architecture, and operational constraints in a structured way.
 
-The difference is that specs are operational. Developers and agents use them while changing code.
+In specification-driven development, specs are operational. Developers and agents use them while changing code.
 
 ## Relationship to issues and tickets
 

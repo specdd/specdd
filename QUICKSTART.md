@@ -1,9 +1,21 @@
 # SpecDD Quickstart
 
-SpecDD helps humans and AI agents change a project without guessing.
+SpecDD is a lightweight framework for specification-driven development. It uses small, local `.sdd`
+files beside the code, docs, workflows, or infrastructure they describe, so humans and AI agents can
+share the same source of truth for intent, requirements, boundaries, and completion criteria.
 
-You add small `.sdd` files near the code, docs, workflows, or other project parts they describe. Each `.sdd` file is a
-local contract: what this part is for, what it owns, what outcomes must hold, and what boundaries should not be crossed.
+This quickstart walks through the smallest useful SpecDD setup: install the CLI, initialize a
+project, add one root spec, add one local same-basename spec, and ask an AI coding agent to complete
+a focused change from those specs. You can do this in a new project or add it gradually to an
+existing project around the next area you plan to change.
+
+It demonstrates a small spec-driven development loop: create a spec, check it, and ask for a
+bounded implementation.
+
+The point is to stop making the prompt carry all project context. Prompts are temporary and easy to
+misread; specs live in the repository where they can be reviewed, updated, inherited, and reused
+across tools and sessions. By the end, you will have a minimal project contract that tells an agent
+what it may change, what behavior must hold, and what is out of scope before implementation starts.
 
 ## 1. Install
 
@@ -147,4 +159,4 @@ and mark the task done only after the checks pass.
   or `[x]`.
 
 For full documentation, go to [SpecDD project homepage](https://specdd.ai) where you will find complete instructions
-on how to adopt SpecDD.
+on how to adopt SpecDD for specification-driven development.

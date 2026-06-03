@@ -1,11 +1,12 @@
 ---
-title: Tools
-seoDescription: "SpecDD tools, CLI setup, agent plugin setup, Agent Skills installation, and JetBrains IDE plugin setup."
+title: SpecDD Tools
+seoDescription: "SpecDD tools for spec-driven development: CLI setup, AI agent plugins, Agent Skills installation, and JetBrains IDE support for .sdd files."
 ---
 
-SpecDD works as plain files first. The CLI handles project setup and framework updates. Agents & Skills covers two paths
-for AI coding agents: named integrations for specific agents, and universal Agent Skills for clients that support the
-open Agent Skills standard. The JetBrains plugin adds editor support for `.sdd` files.
+SpecDD tools support the framework's spec-driven development workflow while keeping specs as plain files first. The CLI
+handles project setup and framework updates. Agents & Skills covers two paths for AI coding agents: named integrations
+for specific agents, and universal Agent Skills for clients that support the open Agent Skills standard. The JetBrains
+plugin adds editor support for `.sdd` files.
 
 ## SpecDD CLI
 
@@ -69,9 +70,10 @@ The npm and Yarn installs require Node.js 22 or newer. For all command options, 
 
 ## Agents & Skills
 
-SpecDD can give your AI coding assistant the same project rules a human reads in `.sdd` files. If you use Codex,
-Claude Code, GitHub Copilot, Antigravity, Junie, or Cline, start with the dedicated plugin below. If you use another
-tool that supports [Agent Skills](https://agentskills.io/home), install the universal Agent Skills package instead.
+SpecDD can give your AI coding assistant the same spec-driven development rules a human reads in `.sdd` files. If you
+use Codex, Claude Code, GitHub Copilot, Antigravity, Junie, or Cline, start with the dedicated plugin below. If you use
+another tool that supports [Agent Skills](https://agentskills.io/home), install the universal Agent Skills package
+instead.
 
 ### Dedicated Agent Plugins
 
