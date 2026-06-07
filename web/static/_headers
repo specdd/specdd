@@ -29,11 +29,20 @@
 /articles/index.xml
   Cache-Control: no-store
 
+/pagefind/*
+  Cache-Control: public, max-age=3600, s-maxage=3600, must-revalidate
+
 /*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/css/*.css
   Cache-Control: public, max-age=31536000, immutable
 
 /js/*.js
   Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=86400
 
 /*.png
   Cache-Control: public, max-age=86400

@@ -40,7 +40,7 @@ The official SpecDD project is published at:
 - Website: https://specdd.ai/
 - Tools and setup guide: https://specdd.ai/tools/
 - Source repository: https://github.com/specdd/specdd
-- Language specification: [LANGUAGE.md](LANGUAGE.md)
+- Language specification: https://specdd.ai/language-reference/
 - CLI source and help: https://github.com/specdd/cli
 - Release downloads: https://github.com/specdd/specdd/releases
 
@@ -69,9 +69,9 @@ editor, any repository, and any AI coding agent that can read project files.
 Official [tools and setup instructions](https://specdd.ai/tools/) are the current inventory for the SpecDD CLI, agent
 plugins, editor integrations, and any additional tooling as it becomes available.
 
-The formal `.sdd` language specification is maintained in [LANGUAGE.md](LANGUAGE.md). It is strongly recommended to
-follow the documented language closely and avoid inventing custom syntax. Future tooling will rely on the current
-conventions.
+The formal `.sdd` language specification is maintained
+in the [language reference page](https://specdd.ai/language-reference/). It is strongly recommended to follow the
+documented language closely and avoid inventing custom syntax. Future tooling will rely on the current conventions.
 
 ## Set up a project
 
@@ -118,7 +118,8 @@ For CLI update commands, version options, file-safety details, and other command
 ## Example
 
 A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
-demonstrates how SpecDD applies specification-driven development to a small Travel Planner project, with bootstrap files,
+demonstrates how SpecDD applies specification-driven development to a small Travel Planner project, with bootstrap
+files,
 colocated `.sdd` specs, source code, tests, and agent entrypoint files.
 
 ```sdd
@@ -504,9 +505,11 @@ Parent specs are automatically inherited. Sibling specs are not.
 ## Directory and target resolution
 
 Most SpecDD work starts from a requested target. That target might be a directory, a `.sdd` file, or an ordinary project
-file. Classifying it first keeps tools and agents from treating nearby files as authority just because they look related.
+file. Classifying it first keeps tools and agents from treating nearby files as authority just because they look
+related.
 
-If the target is already a `.sdd` file, that file is the target spec. If the target is an ordinary file, a same-directory
+If the target is already a `.sdd` file, that file is the target spec. If the target is an ordinary file, a
+same-directory
 same-basename `.sdd` file is the local spec when one exists. Matching is case-insensitive so projects can follow
 platform conventions such as `Trip.ts` and `Trip.sdd`, but exact filename matches should win. If two case-only
 matches compete and neither is exact, the correct result is ambiguity, not a guess.
@@ -527,7 +530,8 @@ For work on `src/trips/itinerary.js`, both `src/trips.sdd` and `src/trips/trips.
 context, and `src/trips/itinerary.sdd` may be the file-level local spec. Parent-held and local directory specs are
 cumulative context, not ambiguity. When both exist, read parent-held context before local context for that directory.
 
-The same rule applies at the selected content root. If the content root directory is named `travel-planner`, the root spec
+The same rule applies at the selected content root. If the content root directory is named `travel-planner`, the root
+spec
 must be `travel-planner.sdd` in that directory. This is the project root spec, not a separate syntax feature.
 
 When following explicit path references to find related specs, tools should follow links from these sections:
@@ -1597,7 +1601,8 @@ might otherwise be ambiguous.
 
 ### Start with the root spec before adding local specs
 
-Without a root spec named after the selected content root directory, child specs have no architectural context to inherit
+Without a root spec named after the selected content root directory, child specs have no architectural context to
+inherit
 from and agents must infer global rules. Even a minimal root spec with a handful of `Must` and `Must not` entries
 establishes the foundation that all local specs build on. Add it before writing module or service specs.
 

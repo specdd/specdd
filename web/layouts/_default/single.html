@@ -23,16 +23,18 @@
 {{ $contentClasses := slice }}
 {{ if not $hasToc }}{{ $contentClasses = $contentClasses | append "wide" }}{{ end }}
 {{ if eq .Section "news" }}{{ $contentClasses = $contentClasses | append "news-single" }}{{ end }}
-<main id="content"{{ with $contentClasses }} class="{{ delimit . " " }}"{{ end }}>
-  {{ if $isPostSection }}<p class="post-back"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
+{{ $pagefindSection := cond (eq .Section "articles") "Articles" (cond (eq .Section "news") "News" "Docs") }}
+<main id="content"{{ with $contentClasses }} class="{{ delimit . " " }}"{{ end }} data-pagefind-body>
+  {{ partial "pagefind-metadata.html" (dict "Section" $pagefindSection) }}
+  {{ if $isPostSection }}<p class="post-back" data-pagefind-ignore><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>{{ end }}
   {{ if $hasExplicitTitle }}<h1>{{ .Title }}</h1>{{ end }}
   {{ if or $hasDate $hasAuthor }}
-  <p class="post-meta">{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ if ne .Section "news" }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}{{ end }}</p>
+  <p class="post-meta" data-pagefind-ignore>{{ with .Date }}<time datetime="{{ .Format "2006-01-02" }}">{{ .Format "January 2, 2006" }}</time>{{ end }}{{ if ne .Section "news" }}{{ with .Params.author }} · <span class="post-author">{{ . }}</span>{{ end }}{{ end }}</p>
   {{ end }}
   {{ .Content }}
   {{ if $isPostSection }}
     {{ if or .PrevInSection .NextInSection }}
-    <nav class="article-nav" aria-label="{{ title $sectionItemLabel }} navigation">
+    <nav class="article-nav" aria-label="{{ title $sectionItemLabel }} navigation" data-pagefind-ignore>
       {{ with .PrevInSection }}
       <a class="article-nav-link" href="{{ .RelPermalink }}">
         <span>Previous {{ $sectionItemLabel }}</span>
@@ -47,7 +49,7 @@
       {{ end }}
     </nav>
     {{ end }}
-    <p class="post-back post-back-end"><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>
+    <p class="post-back post-back-end" data-pagefind-ignore><a href="{{ $sectionURL }}">← All {{ $sectionListLabel }}</a></p>
   {{ end }}
 </main>
 

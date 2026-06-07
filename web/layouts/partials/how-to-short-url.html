@@ -1,0 +1,8 @@
+{{- $rawID := . -}}
+{{- if $rawID -}}
+  {{- $id := replaceRE `^\s+|\s+$` "" (printf "%v" $rawID) -}}
+  {{- $id = replaceRE `(?i)^HOWTO-` "" $id -}}
+  {{- if $id -}}
+    {{- absURL (printf "/how-to/%s/" $id) -}}
+  {{- end -}}
+{{- end -}}

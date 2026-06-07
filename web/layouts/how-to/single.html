@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{ partial "site-head.html" . }}
+</head>
+{{ $contentClasses := slice "how-to-single" }}
+{{ $category := .CurrentSection }}
+{{ $hasCategory := and $category (ne $category.RelPermalink "/how-to/") }}
+{{ $hasLevel := isset .Params "level" }}
+{{ $categoryGuides := slice }}
+{{ if $hasCategory }}{{ $categoryGuides = where $category.RegularPages.ByWeight "RelPermalink" "ne" .RelPermalink }}{{ end }}
+{{ $otherCategories := slice }}
+{{ with .Site.GetPage "section" "how-to" }}
+  {{ $currentCategoryURL := cond $hasCategory $category.RelPermalink "" }}
+  {{ $otherCategories = where .Sections.ByWeight "RelPermalink" "ne" $currentCategoryURL }}
+{{ end }}
+{{ $hasPageToc := strings.Contains .TableOfContents "<li>" }}
+{{ $hasDrawer := or $hasPageToc (gt (len $categoryGuides) 0) (gt (len $otherCategories) 0) }}
+{{ if not $hasDrawer }}{{ $contentClasses = $contentClasses | append "wide" }}{{ end }}
+<body{{ if $hasDrawer }} class="has-toc"{{ end }}>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+{{ partial "site-header.html" (dict "Page" . "HasToc" $hasDrawer) }}
+
+{{ partial "site-drawer.html" (dict
+  "Page" .
+  "HasToc" $hasPageToc
+  "RelatedTitle" $category.Title
+  "RelatedPages" $categoryGuides
+  "CategoryTitle" "More categories"
+  "CategoryPages" $otherCategories
+) }}
+
+<main id="content" class="{{ delimit $contentClasses " " }}" data-pagefind-body>
+  {{ if $hasCategory }}
+  <p class="post-back" data-pagefind-ignore><a href="{{ $category.RelPermalink }}">&larr; {{ $category.Title }} guides</a></p>
+  {{ else }}
+  <p class="post-back" data-pagefind-ignore><a href="/how-to/">&larr; All How-To categories</a></p>
+  {{ end }}
+  <h1>{{ .Title }}</h1>
+  {{ $howtoID := or (index .Params "howtoID") (index .Params "howtoid") }}
+  {{ partial "pagefind-metadata.html" (dict
+    "Section" "How-To"
+    "Category" (cond $hasCategory $category.Title "")
+    "Level" .Params.level
+    "HowToID" $howtoID
+  ) }}
+  {{ if or $hasCategory $hasLevel $howtoID }}
+  <p class="post-meta how-to-single-meta" data-pagefind-ignore>{{ with $howtoID }}{{ partial "how-to-permalink-button.html" . }}<span class="how-to-id">{{ partial "how-to-id-label.html" . }}</span>{{ end }}{{ if $hasCategory }}<span>{{ $category.Title }}</span>{{ end }}{{ with .Params.level }}<span>{{ . }}</span>{{ end }}</p>
+  {{ end }}
+  {{ .Content }}
+  {{ if $hasCategory }}
+  <p class="post-back post-back-end" data-pagefind-ignore><a href="{{ $category.RelPermalink }}">&larr; {{ $category.Title }} guides</a></p>
+  {{ else }}
+  <p class="post-back post-back-end" data-pagefind-ignore><a href="/how-to/">&larr; All How-To categories</a></p>
+  {{ end }}
+</main>
+
+{{ partial "site-footer.html" . }}
+
+{{ partial "toc-scripts.html" . }}
+
+</body>
+</html>

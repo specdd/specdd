@@ -1,5 +1,7 @@
 public/
+node_modules/
 .hugo_build.lock
 specdd.zip
-content/articles/*.draft*
-content/articles/*.note*
+content/*/*.draft*
+content/*/*.note*
+content/how-to/reference

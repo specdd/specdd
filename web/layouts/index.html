@@ -12,7 +12,8 @@
 
 {{ partial "site-drawer.html" (dict "Page" . "HasToc" $hasToc) }}
 
-<main id="content"{{ if not $hasToc }} class="wide"{{ end }}>
+<main id="content"{{ if not $hasToc }} class="wide"{{ end }} data-pagefind-body>
+  {{ partial "pagefind-metadata.html" (dict "Section" "Home") }}
   {{ .Content }}
 </main>
 

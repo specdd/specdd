@@ -1,5 +1,5 @@
 ---
-title: SpecDD Tools
+title: Tools
 seoDescription: "SpecDD tools for spec-driven development: CLI setup, AI agent plugins, Agent Skills installation, and editor support for .sdd files."
 ---
 

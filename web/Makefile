@@ -3,7 +3,12 @@ HUGO_CACHEDIR := $(CURDIR)/tmp/hugo-cache
 build:
 	-rm -f specdd.zip
 	HUGO_CACHEDIR=$(HUGO_CACHEDIR) hugo --cleanDestinationDir --gc --minify --baseURL https://specdd.ai/
+	yarn pagefind --site public
 	zip -r specdd.zip public
+
+preview:
+	HUGO_CACHEDIR=$(HUGO_CACHEDIR) hugo --cleanDestinationDir --gc --baseURL http://127.0.0.1:1414/
+	yarn pagefind --site public --serve
 
 up:
 	@trap 'exit 130' INT TERM; \
@@ -17,4 +22,4 @@ up:
 		sleep 1; \
 	done
 
-.PHONY: build up
+.PHONY: build preview up

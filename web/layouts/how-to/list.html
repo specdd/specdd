@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {{ partial "site-head.html" . }}
+</head>
+<body>
+
+<a class="skip-link" href="#content">Skip to content</a>
+
+{{ partial "site-header.html" (dict "Page" . "HasToc" false) }}
+
+{{ partial "site-drawer.html" (dict "Page" . "HasToc" false) }}
+
+<main id="content" class="wide how-to-index">
+  {{ $isHowToRoot := eq .RelPermalink "/how-to/" }}
+  {{ partial "pagefind-metadata.html" (dict
+    "Section" "How-To"
+    "Category" (cond $isHowToRoot "" .Title)
+    "HowToID" (or (index .Params "howtoID") (index .Params "howtoid"))
+  ) }}
+  <h1 data-pagefind-body>{{ .Title }}</h1>
+
+  {{ with .Content }}<div class="section-intro" data-pagefind-body>{{ . }}</div>{{ end }}
+
+  {{ if $isHowToRoot }}
+    {{ $categories := .Sections.ByWeight }}
+    {{ if $categories }}
+      <ul class="how-to-category-list" data-pagefind-ignore>
+        {{ range $categories }}
+        {{ $guideCount := len .RegularPagesRecursive }}
+        <li class="how-to-category-card">
+          <a class="how-to-category-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{ with .Params.excerpt }}<p>{{ . }}</p>{{ else }}{{ with .Summary | plainify | truncate 220 " ..." }}<p>{{ . }}</p>{{ end }}{{ end }}
+          <span>{{ $guideCount }} {{ cond (eq $guideCount 1) "guide" "guides" }}</span>
+        </li>
+        {{ end }}
+      </ul>
+    {{ else }}
+      <p class="post-empty">No how-to categories yet.</p>
+    {{ end }}
+  {{ else }}
+    <p class="post-back" data-pagefind-ignore><a href="/how-to/">&larr; All How-To categories</a></p>
+    {{ $subcategories := .Sections.ByWeight }}
+    {{ if $subcategories }}
+      <ul class="how-to-category-list" data-pagefind-ignore>
+        {{ range $subcategories }}
+        {{ $guideCount := len .RegularPagesRecursive }}
+        <li class="how-to-category-card">
+          <a class="how-to-category-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{ with .Params.excerpt }}<p>{{ . }}</p>{{ else }}{{ with .Summary | plainify | truncate 220 " ..." }}<p>{{ . }}</p>{{ end }}{{ end }}
+          <span>{{ $guideCount }} {{ cond (eq $guideCount 1) "guide" "guides" }}</span>
+        </li>
+        {{ end }}
+      </ul>
+    {{ end }}
+    {{ $paginator := .Paginate (.RegularPages.ByWeight) 50 }}
+    {{ $guideCount := len .RegularPages }}
+    <div class="how-to-guide-summary" data-pagefind-ignore>
+      <span>{{ $guideCount }} {{ cond (eq $guideCount 1) "guide" "guides" }}</span>
+      <span>{{ .Title }}</span>
+      {{ with or (index .Params "howtoID") (index .Params "howtoid") }}{{ partial "how-to-permalink-button.html" . }}{{ end }}
+    </div>
+    {{ if $paginator.Pages }}
+      <ol class="how-to-guide-list" aria-label="{{ .Title }} guides" data-pagefind-ignore>
+        {{ range $index, $guide := $paginator.Pages }}
+        <li class="how-to-guide-item">
+          <div class="how-to-guide-index" aria-hidden="true">{{ printf "%02d" (add $index 1) }}</div>
+          <div class="how-to-guide-main">
+            <div class="how-to-guide-meta">
+              {{ with $guide.Params.level }}<span>{{ . }}</span>{{ end }}
+              <span>{{ $guide.ReadingTime }} min read</span>
+            </div>
+            <a class="how-to-guide-title" href="{{ $guide.RelPermalink }}">{{ $guide.Title }}</a>
+            {{ with $guide.Params.excerpt }}<p>{{ . }}</p>{{ else }}{{ with $guide.Summary | plainify | truncate 220 " ..." }}<p>{{ . }}</p>{{ end }}{{ end }}
+            <a class="how-to-guide-link" href="{{ $guide.RelPermalink }}">Read guide</a>
+          </div>
+        </li>
+        {{ end }}
+      </ol>
+    {{ else }}
+      <p class="post-empty">No how-to guides in this category yet.</p>
+    {{ end }}
+
+    {{ if gt $paginator.TotalPages 1 }}
+    <nav class="pagination" data-pagefind-ignore>
+      {{ if $paginator.HasPrev }}
+        <a href="{{ $paginator.Prev.URL }}" class="pagination-link">&larr; Newer</a>
+      {{ end }}
+      <span class="pagination-info">Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</span>
+      {{ if $paginator.HasNext }}
+        <a href="{{ $paginator.Next.URL }}" class="pagination-link">Older &rarr;</a>
+      {{ end }}
+    </nav>
+    {{ end }}
+
+    {{ with .Site.GetPage "section" "how-to" }}
+      {{ $otherCategories := where .Sections.ByWeight "RelPermalink" "ne" $.RelPermalink }}
+      {{ if $otherCategories }}
+      <section class="how-to-other-categories" aria-labelledby="how-to-other-categories-title" data-pagefind-ignore>
+        <h2 id="how-to-other-categories-title">More How-To categories</h2>
+        <ul class="how-to-category-list">
+          {{ range $otherCategories }}
+          {{ $guideCount := len .RegularPagesRecursive }}
+          <li class="how-to-category-card">
+            <a class="how-to-category-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+            {{ with .Params.excerpt }}<p>{{ . }}</p>{{ else }}{{ with .Summary | plainify | truncate 220 " ..." }}<p>{{ . }}</p>{{ end }}{{ end }}
+            <span>{{ $guideCount }} {{ cond (eq $guideCount 1) "guide" "guides" }}</span>
+          </li>
+          {{ end }}
+        </ul>
+      </section>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+</main>
+
+{{ partial "site-footer.html" . }}
+
+{{ partial "toc-scripts.html" . }}
+
+</body>
+</html>

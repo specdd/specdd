@@ -1,4 +1,7 @@
-# SpecDD Quickstart
+---
+title: Quickstart
+seoDescription: "This quickstart walks through the smallest useful SpecDD setup for spec-driven development."
+---
 
 SpecDD is a lightweight framework for specification-driven development. It uses small, local `.sdd`
 files beside the code, docs, workflows, or infrastructure they describe, so humans and AI agents can

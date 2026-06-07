@@ -1,0 +1,12 @@
+{{- $section := .Section | default "" -}}
+{{- $category := .Category | default "" -}}
+{{- $level := .Level | default "" -}}
+{{- $howtoID := .HowToID | default "" -}}
+{{- if or $section $category $level $howtoID -}}
+<div class="pagefind-metadata" data-pagefind-ignore>
+  {{ with $section }}<span data-pagefind-filter="section" data-pagefind-meta="section">{{ . }}</span>{{ end }}
+  {{ with $category }}<span data-pagefind-filter="how_to_category" data-pagefind-meta="how_to_category">{{ . }}</span>{{ end }}
+  {{ with $level }}<span data-pagefind-filter="level" data-pagefind-meta="level">{{ . }}</span>{{ end }}
+  {{ with $howtoID }}<span data-pagefind-meta="howto_id">{{ . }}</span><span data-pagefind-meta="howto_label">{{ partial "how-to-id-label.html" . }}</span>{{ end }}
+</div>
+{{- end -}}

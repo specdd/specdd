@@ -16,7 +16,7 @@ socialImageAlt = 'SpecDD - Specification-Driven Development framework'
 [params.schema]
 name = 'SpecDD'
 url = 'https://specdd.ai/'
-logo = '/logo-sm.png'
+logo = '/logo.png'
 image = '/social.png'
 author = 'Matīss Treinis'
 author_id = 'matiss-treinis'
@@ -31,6 +31,7 @@ license = 'https://www.apache.org/licenses/LICENSE-2.0'
 
 [params.pageDescriptions]
 '/quickstart/' = 'A short SpecDD quickstart for installing the CLI, initializing a project, adding local specs, and guiding agents with SpecDD.'
+'/how-to/' = 'Practical SpecDD how-to guides for setup, writing local specs, agent workflows, and specification-driven development patterns.'
 '/changelog/' = 'SpecDD release notes, framework updates, and changes to the specification-driven development workflow.'
 '/language-reference/' = 'SpecDD language reference for the .sdd file format, syntax, sections, task markers, comments, and parsing rules.'
 
@@ -47,6 +48,18 @@ style = 'github'
 
 [pagination]
 pagerSize = 10
+
+[mediaTypes.'text/x-cloudflare-redirects']
+suffixes = ['']
+
+[outputFormats.REDIRECTS]
+mediaType = 'text/x-cloudflare-redirects'
+baseName = '_redirects'
+isPlainText = true
+notAlternative = true
+
+[outputs]
+home = ['HTML', 'RSS', 'REDIRECTS']
 
 [module]
 [[module.mounts]]
@@ -76,6 +89,22 @@ target = "content/language-reference.md"
 [[module.mounts]]
 source = "static"
 target = "static"
+
+[[module.mounts]]
+source = "node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2"
+target = "static/fonts/inter/inter-latin-ext-wght-normal.woff2"
+
+[[module.mounts]]
+source = "node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2"
+target = "static/fonts/inter/inter-latin-wght-normal.woff2"
+
+[[module.mounts]]
+source = "node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-italic.woff2"
+target = "static/fonts/inter/inter-latin-ext-wght-italic.woff2"
+
+[[module.mounts]]
+source = "node_modules/@fontsource-variable/inter/files/inter-latin-wght-italic.woff2"
+target = "static/fonts/inter/inter-latin-wght-italic.woff2"
 
 [[module.mounts]]
 source = "../README.md"

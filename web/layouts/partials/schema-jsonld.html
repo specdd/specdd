@@ -6,7 +6,8 @@
 {{- $metaDescription := .MetaDescription | default $site.Params.description -}}
 {{- $isArticle := .IsArticle | default false -}}
 {{- $isNews := .IsNews | default false -}}
-{{- $isEditorialPage := or $isArticle $isNews -}}
+{{- $isHowTo := .IsHowTo | default false -}}
+{{- $isEditorialPage := or $isArticle $isNews $isHowTo -}}
 {{- $siteURL := (index $schema "url" | default $site.BaseURL | absURL) -}}
 {{- $siteName := index $schema "name" | default $shortTitle -}}
 {{- $siteDescription := $site.Params.description | default $metaDescription -}}
@@ -17,8 +18,11 @@
 {{- $authorName := index $schema "author" | default "Matiss Treinis" -}}
 {{- $authorID := index $schema "author_id" | default "author" -}}
 {{- $personID := printf "%s#%s" $siteURL $authorID -}}
+{{- $projectID := printf "%s#project" $siteURL -}}
+{{- $brandID := printf "%s#brand" $siteURL -}}
 {{- $websiteID := printf "%s#website" $siteURL -}}
 {{- $softwareID := printf "%s#software" $siteURL -}}
+{{- $sourceCodeID := printf "%s#source-code" $siteURL -}}
 {{- $lang := $site.LanguageCode | default "en" -}}
 
 {{- $person := dict
@@ -27,6 +31,27 @@
   "name" $authorName
   "url" $siteURL
 -}}
+
+{{- $brand := dict
+  "@type" "Brand"
+  "@id" $brandID
+  "name" $siteName
+  "url" $siteURL
+  "logo" (absURL $logo)
+-}}
+
+{{- $project := dict
+  "@type" "Project"
+  "@id" $projectID
+  "name" $siteName
+  "url" $siteURL
+  "description" $siteDescription
+  "logo" (absURL $logo)
+  "image" (absURL $schemaImage)
+  "brand" (dict "@id" $brandID)
+  "founder" (dict "@id" $personID)
+-}}
+{{- if gt (len $sameAs) 0 }}{{ $project = merge $project (dict "sameAs" $sameAs) }}{{ end -}}
 
 {{- $software := dict
   "@type" "SoftwareApplication"
@@ -37,11 +62,10 @@
   "applicationCategory" (index $schema "application_category" | default "DeveloperApplication")
   "operatingSystem" (index $schema "operating_system" | default "Cross-platform")
   "image" (absURL $schemaImage)
-  "logo" (absURL $logo)
   "author" (dict "@id" $personID)
-  "publisher" (dict "@id" $personID)
+  "publisher" (dict "@id" $projectID)
+  "maintainer" (dict "@id" $projectID)
 -}}
-{{- with index $schema "code_repository" }}{{ $software = merge $software (dict "codeRepository" .) }}{{ end -}}
 {{- with index $schema "license" }}{{ $software = merge $software (dict "license" .) }}{{ end -}}
 {{- if gt (len $sameAs) 0 }}{{ $software = merge $software (dict "sameAs" $sameAs) }}{{ end -}}
 
@@ -52,21 +76,46 @@
   "name" $siteName
   "description" $siteDescription
   "inLanguage" $lang
-  "publisher" (dict "@id" $personID)
-  "about" (dict "@id" $softwareID)
+  "publisher" (dict "@id" $projectID)
+  "about" (slice (dict "@id" $projectID) (dict "@id" $softwareID))
 -}}
 {{- if gt (len $sameAs) 0 }}{{ $website = merge $website (dict "sameAs" $sameAs) }}{{ end -}}
 
-{{- $graph := slice $website $software $person -}}
+{{- $graph := slice $website $project $brand $software $person -}}
+{{- with index $schema "code_repository" -}}
+  {{- $sourceCode := dict
+    "@type" "SoftwareSourceCode"
+    "@id" $sourceCodeID
+    "name" (printf "%s source code" $siteName)
+    "codeRepository" .
+    "targetProduct" (dict "@id" $softwareID)
+    "author" (dict "@id" $personID)
+    "publisher" (dict "@id" $projectID)
+    "maintainer" (dict "@id" $projectID)
+  -}}
+  {{- with index $schema "license" }}{{ $sourceCode = merge $sourceCode (dict "license" .) }}{{ end -}}
+  {{- $graph = $graph | append $sourceCode -}}
+{{- end -}}
 
 {{- if $isEditorialPage -}}
   {{- $articleAuthor := $page.Params.author | default $authorName -}}
   {{- $articleAuthorRef := dict "@type" "Person" "name" $articleAuthor -}}
   {{- if eq $articleAuthor $authorName }}{{ $articleAuthorRef = dict "@id" $personID }}{{ end -}}
-  {{- $schemaType := cond $isNews "NewsArticle" "BlogPosting" -}}
-  {{- $schemaID := cond $isNews "#news" "#article" -}}
-  {{- $sectionName := cond $isNews "News" "Articles" -}}
-  {{- $sectionURL := cond $isNews (absURL "/news/") (absURL "/articles/") -}}
+  {{- $schemaType := "BlogPosting" -}}
+  {{- $schemaID := "#article" -}}
+  {{- $sectionName := "Articles" -}}
+  {{- $sectionURL := absURL "/articles/" -}}
+  {{- if $isNews -}}
+    {{- $schemaType = "NewsArticle" -}}
+    {{- $schemaID = "#news" -}}
+    {{- $sectionName = "News" -}}
+    {{- $sectionURL = absURL "/news/" -}}
+  {{- else if $isHowTo -}}
+    {{- $schemaType = "HowTo" -}}
+    {{- $schemaID = "#how-to" -}}
+    {{- $sectionName = "How-To" -}}
+    {{- $sectionURL = absURL "/how-to/" -}}
+  {{- end -}}
 
   {{- $article := dict
     "@type" $schemaType
@@ -77,14 +126,14 @@
     "description" $metaDescription
     "url" $page.Permalink
     "inLanguage" $lang
-    "publisher" (dict "@id" $personID)
+    "publisher" (dict "@id" $projectID)
     "image" (absURL $socialImage)
     "isPartOf" (dict "@id" $websiteID)
-    "about" (dict "@id" $softwareID)
+    "about" (slice (dict "@id" $projectID) (dict "@id" $softwareID))
   -}}
-  {{- if $isArticle }}{{ $article = merge $article (dict "author" $articleAuthorRef) }}{{ end -}}
-  {{- if not $page.Date.IsZero }}{{ $article = merge $article (dict "datePublished" ($page.Date.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
-  {{- if not $page.Lastmod.IsZero }}{{ $article = merge $article (dict "dateModified" ($page.Lastmod.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
+  {{- if or $isArticle $isHowTo }}{{ $article = merge $article (dict "author" $articleAuthorRef) }}{{ end -}}
+  {{- if and (not $isHowTo) (not $page.Date.IsZero) }}{{ $article = merge $article (dict "datePublished" ($page.Date.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
+  {{- if and (not $isHowTo) (not $page.Lastmod.IsZero) }}{{ $article = merge $article (dict "dateModified" ($page.Lastmod.Format "2006-01-02T15:04:05Z07:00")) }}{{ end -}}
   {{- $graph = $graph | append $article -}}
 
   {{- $breadcrumbItems := slice
@@ -92,6 +141,14 @@
     (dict "@type" "ListItem" "position" 2 "name" $sectionName "item" $sectionURL)
     (dict "@type" "ListItem" "position" 3 "name" $pageTitle "item" $page.Permalink)
   -}}
+  {{- if and $isHowTo (ne $page.CurrentSection.RelPermalink "/how-to/") -}}
+    {{- $breadcrumbItems = slice
+      (dict "@type" "ListItem" "position" 1 "name" "Home" "item" $siteURL)
+      (dict "@type" "ListItem" "position" 2 "name" $sectionName "item" $sectionURL)
+      (dict "@type" "ListItem" "position" 3 "name" $page.CurrentSection.Title "item" (absURL $page.CurrentSection.RelPermalink))
+      (dict "@type" "ListItem" "position" 4 "name" $pageTitle "item" $page.Permalink)
+    -}}
+  {{- end -}}
   {{- $breadcrumb := dict
     "@type" "BreadcrumbList"
     "@id" (printf "%s#breadcrumb" $page.Permalink)

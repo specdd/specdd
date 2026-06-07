@@ -7,7 +7,8 @@
 {{ $metaTitle := cond .IsHome .Site.Title (printf "%s | %s" $pageTitle $shortTitle) }}
 {{ $isArticle := and .IsPage (eq .Section "articles") }}
 {{ $isNews := and .IsPage (eq .Section "news") }}
-{{ $isEditorialPage := or $isArticle $isNews }}
+{{ $isHowTo := and .IsPage (eq .Section "how-to") }}
+{{ $isEditorialPage := or $isArticle $isNews $isHowTo }}
 {{ $metaDescription := .Site.Params.description }}
 {{ $socialImage := .Site.Params.socialImage | default "/social.png" }}
 {{ with .Params.socialImage }}{{ $socialImage = . }}{{ end }}
@@ -38,7 +39,7 @@
 <meta property="og:image:width" content="{{ $socialImageWidth }}">
 <meta property="og:image:height" content="{{ $socialImageHeight }}">
 <meta property="og:image:alt" content="{{ $socialImageAlt }}">
-{{ if $isEditorialPage }}
+{{ if and $isEditorialPage (not $isHowTo) }}
 {{ with .Date }}<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
 {{ with .Lastmod }}<meta property="article:modified_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ end }}
 {{ if $isArticle }}
@@ -55,38 +56,50 @@
   "MetaDescription" $metaDescription
   "IsArticle" $isArticle
   "IsNews" $isNews
+  "IsHowTo" $isHowTo
   "SocialImage" $socialImage
 ) }}
 {{ with .OutputFormats.Get "RSS" }}
 <link rel="alternate" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $metaTitle }}">
 {{ end }}
-<link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+<link href="/pagefind/pagefind-component-ui.css" rel="stylesheet">
+<script src="/pagefind/pagefind-component-ui.js" type="module"></script>
 <script>
   (function () {
-    var root = document.documentElement;
-    var storedTheme = null;
+    'use strict';
+
+    const root = document.documentElement;
+    let storedTheme = null;
 
     try {
-      storedTheme = localStorage.getItem("specdd-theme");
+      storedTheme = localStorage.getItem('specdd-theme');
     } catch (error) {
       storedTheme = null;
     }
 
-    var explicitTheme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : null;
-    var systemTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    var resolvedTheme = explicitTheme || systemTheme;
+    const explicitTheme = 'dark' === storedTheme || 'light' === storedTheme ? storedTheme : null;
+    const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const resolvedTheme = explicitTheme || systemTheme;
 
-    if (explicitTheme) root.dataset.theme = explicitTheme;
+    if (explicitTheme) {
+      root.dataset.theme = explicitTheme;
+    }
+
     root.dataset.resolvedTheme = resolvedTheme;
     root.style.colorScheme = resolvedTheme;
   })();
 </script>
 {{ $css := resources.Get "main.css" | fingerprint }}
+{{ $interFont := resources.Get "css/inter.css" | fingerprint }}
+{{ $highlightTheme := resources.FromString "css/highlight-github.min.css" (readFile "node_modules/highlight.js/styles/github.min.css") | fingerprint }}
+<link rel="stylesheet" href="{{ $interFont.RelPermalink }}" integrity="{{ $interFont.Data.Integrity }}" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ $highlightTheme.RelPermalink }}" integrity="{{ $highlightTheme.Data.Integrity }}" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-{{ $specddHighlight := resources.Get "js/specdd-highlight.js" | fingerprint }}
-<script defer src="{{ $specddHighlight.RelPermalink }}" integrity="{{ $specddHighlight.Data.Integrity }}" crossorigin="anonymous"></script>
+{{ $specddHighlight := resources.Get "js/specdd-highlight.js" | js.Build (dict "targetPath" "js/specdd-highlight.js") | fingerprint }}
+<script type="module" src="{{ $specddHighlight.RelPermalink }}" integrity="{{ $specddHighlight.Data.Integrity }}" crossorigin="anonymous"></script>
 {{ $themeToggle := resources.Get "js/theme-toggle.js" | fingerprint }}
 <script defer src="{{ $themeToggle.RelPermalink }}" integrity="{{ $themeToggle.Data.Integrity }}" crossorigin="anonymous"></script>
+{{ $permalinkCopy := resources.Get "js/permalink-copy.js" | fingerprint }}
+<script defer src="{{ $permalinkCopy.RelPermalink }}" integrity="{{ $permalinkCopy.Data.Integrity }}" crossorigin="anonymous"></script>
+{{ $searchTrigger := resources.Get "js/search-trigger.js" | fingerprint }}
+<script defer src="{{ $searchTrigger.RelPermalink }}" integrity="{{ $searchTrigger.Data.Integrity }}" crossorigin="anonymous"></script>

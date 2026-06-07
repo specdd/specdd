@@ -1,0 +1,11 @@
+{{- $rawID := . -}}
+{{- if $rawID -}}
+  {{- $id := replaceRE `^\s+|\s+$` "" (printf "%v" $rawID) -}}
+  {{- if $id -}}
+    {{- if findRE `(?i)^HOWTO-` $id -}}
+      {{- $id -}}
+    {{- else -}}
+      {{- printf "HOWTO-%s" $id -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

@@ -1,11 +1,42 @@
 {{ $page := .Page }}
 {{ $hasToc := .HasToc | default false }}
+{{ $relatedPages := .RelatedPages | default (slice) }}
+{{ $hasRelated := gt (len $relatedPages) 0 }}
+{{ $categoryPages := .CategoryPages | default (slice) }}
+{{ $hasCategories := gt (len $categoryPages) 0 }}
+{{ $hasDrawerContent := or $hasToc $hasRelated $hasCategories }}
 <div id="toc-overlay"></div>
 
-<aside id="toc"{{ if not $hasToc }} class="site-drawer-only" aria-label="Site navigation"{{ else }} aria-labelledby="toc-label"{{ end }}>
+<aside id="toc"{{ if not $hasDrawerContent }} class="site-drawer-only" aria-label="Site navigation"{{ else if $hasToc }} aria-labelledby="toc-label"{{ else }} aria-label="Related guides"{{ end }}>
   {{ partial "toc-mobile-nav.html" $page }}
   {{ if $hasToc }}
   <span id="toc-label">Contents</span>
   {{ $page.TableOfContents }}
+  {{ end }}
+  {{ if $hasRelated }}
+  <section class="toc-related" aria-labelledby="toc-related-label">
+    <span id="toc-related-label">{{ with .RelatedTitle }}More in {{ . }}{{ else }}Related guides{{ end }}</span>
+    <ul class="toc-related-list">
+      {{ range $relatedPages }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+  {{ if $hasCategories }}
+  <section class="toc-related toc-related-categories" aria-labelledby="toc-categories-label">
+    <span id="toc-categories-label">{{ .CategoryTitle | default "More categories" }}</span>
+    <ul class="toc-related-list toc-category-list">
+      {{ range $categoryPages }}
+      {{ $guideCount := len .RegularPagesRecursive }}
+      <li class="toc-related-category">
+        <a href="{{ .RelPermalink }}">
+          <span class="toc-related-category-title">{{ .Title }}</span>
+          <span class="toc-related-category-count">{{ $guideCount }} {{ cond (eq $guideCount 1) "guide" "guides" }}</span>
+        </a>
+      </li>
+      {{ end }}
+    </ul>
+  </section>
   {{ end }}
 </aside>

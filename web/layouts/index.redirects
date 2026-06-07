@@ -1,0 +1,24 @@
+# Cloudflare Pages path redirects.
+# Host canonical redirects are configured in the Cloudflare dashboard:
+# apex HTTP host -> canonical HTTPS apex
+# www HTTPS host -> canonical HTTPS apex
+# Pages deployment host -> canonical HTTPS apex
+
+/articles/page/1/ /articles/ 301
+{{ $howToRoot := .Site.GetPage "section" "how-to" -}}
+{{ if $howToRoot -}}
+{{ $seen := newScratch -}}
+{{ range sort (where .Site.Pages "Section" "how-to") "RelPermalink" "asc" -}}
+{{ $page := . -}}
+{{ $rawID := or (index $page.Params "howtoID") (index $page.Params "howtoid") -}}
+{{ $isRedirectable := and (ne $page.RelPermalink $howToRoot.RelPermalink) (or $page.IsPage (eq $page.Kind "section")) -}}
+{{ if and $isRedirectable $rawID -}}
+{{ $id := replaceRE `^\s+|\s+$` "" (printf "%v" $rawID) -}}
+{{ $id = replaceRE `(?i)^HOWTO-` "" $id -}}
+{{ if not (findRE `^[0-9]+$` $id) }}{{ errorf "howtoID must be numeric or HOWTO-numeric for %s; got %q" $page.File.Path $rawID }}{{ end -}}
+{{ with $seen.Get $id }}{{ errorf "Duplicate howtoID %q redirects both %s and %s" $id . $page.RelPermalink }}{{ end -}}
+{{ $seen.Set $id $page.RelPermalink -}}
+{{ printf "/how-to/%s/ %s 301\n" $id $page.RelPermalink -}}
+{{ end -}}
+{{ end -}}
+{{ end -}}

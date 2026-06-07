@@ -1,0 +1,16 @@
+{{- $rawID := . -}}
+{{- if $rawID -}}
+  {{- $id := replaceRE `^\s+|\s+$` "" (printf "%v" $rawID) -}}
+  {{- $id = replaceRE `(?i)^HOWTO-` "" $id -}}
+  {{- if $id -}}
+    {{- $path := printf "/how-to/%s/" $id -}}
+    {{- $url := absURL $path -}}
+    <button class="how-to-permalink-button" type="button" data-permalink-path="{{ $path }}" data-permalink-url="{{ $url }}" title="{{ $url }}" aria-label="Copy permalink: {{ $url }}">
+      <span class="sr-only">Copy permalink</span>
+      <svg aria-hidden="true" focusable="false" width="1em" height="1em" viewBox="0 0 48 48">
+        <path d="M0 0h48v48H0z" fill="none" />
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M24.707 9.565L9.858 24.415a9 9 0 0 0 0 12.727v0a9 9 0 0 0 12.728 0l17.678-17.677a6 6 0 0 0 0-8.486v0a6 6 0 0 0-8.486 0L14.101 28.657a3 3 0 0 0 0 4.243v0a3 3 0 0 0 4.242 0l14.85-14.85" />
+      </svg>
+    </button>
+  {{- end -}}
+{{- end -}}
