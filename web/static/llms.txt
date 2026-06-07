@@ -141,6 +141,28 @@ Tools and integrations:
 - Visual Studio Marketplace: https://marketplace.visualstudio.com/items?itemName=specdd.specdd
 - Open VSX: https://open-vsx.org/extension/specdd/specdd
 
+How-To guides:
+
+- How-To index: https://specdd.ai/how-to/
+- Getting started: https://specdd.ai/how-to/getting-started/
+- Install and setup: https://specdd.ai/how-to/install-and-setup/
+- Set up your agent: https://specdd.ai/how-to/set-up-your-agent/
+- Editor setup: https://specdd.ai/how-to/editor-setup/
+- Agent workflows: https://specdd.ai/how-to/agent-workflows/
+- Write specs by level: https://specdd.ai/how-to/write-specs-by-level/
+- Use spec sections: https://specdd.ai/how-to/use-spec-sections/
+- Spec-writing technique: https://specdd.ai/how-to/spec-writing-technique/
+- Spec-driven workflows: https://specdd.ai/how-to/spec-driven-workflows/
+- Work with SpecDD skills: https://specdd.ai/how-to/work-with-specdd-skills/
+- Software design practices: https://specdd.ai/how-to/software-design-practices/
+- Adopt SpecDD on existing projects: https://specdd.ai/how-to/adopt-specdd-on-existing-projects/
+- Testing and quality: https://specdd.ai/how-to/testing-and-quality/
+- Code review and governance: https://specdd.ai/how-to/code-review-and-governance/
+- Refactoring and maintenance: https://specdd.ai/how-to/refactoring-and-maintenance/
+- Security and risk: https://specdd.ai/how-to/security-and-risk/
+- Teams and process: https://specdd.ai/how-to/teams-and-process/
+- Troubleshooting: https://specdd.ai/how-to/troubleshooting/
+
 Source repositories:
 
 - Framework repository: https://github.com/specdd/specdd
