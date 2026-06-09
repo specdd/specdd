@@ -3,15 +3,15 @@ ignoreFiles = ['\.draft\.', '\.note\.']
 disableKinds = ['taxonomy', 'term']
 languageCode = 'en-us'
 enableGitInfo = true
-title = 'SpecDD – Specification-Driven Development framework'
+title = 'SpecDD – Spec-Driven Development framework'
 
 [params]
 shortTitle = 'SpecDD'
-description = 'SpecDD is a Specification-Driven Development framework that enables humans and AI agents to build better software'
+description = 'SpecDD is a Spec-Driven Development framework that enables humans and AI agents to build better software'
 socialImage = '/social.png'
 socialImageWidth = 1200
 socialImageHeight = 630
-socialImageAlt = 'SpecDD - Specification-Driven Development framework'
+socialImageAlt = 'SpecDD - Spec-Driven Development framework'
 
 [params.schema]
 name = 'SpecDD'
@@ -31,8 +31,8 @@ license = 'https://www.apache.org/licenses/LICENSE-2.0'
 
 [params.pageDescriptions]
 '/quickstart/' = 'A short SpecDD quickstart for installing the CLI, initializing a project, adding local specs, and guiding agents with SpecDD.'
-'/how-to/' = 'Practical SpecDD how-to guides for setup, writing local specs, agent workflows, and specification-driven development patterns.'
-'/changelog/' = 'SpecDD release notes, framework updates, and changes to the specification-driven development workflow.'
+'/how-to/' = 'Practical SpecDD how-to guides for setup, writing local specs, agent workflows, and spec-driven development patterns.'
+'/changelog/' = 'SpecDD release notes, framework updates, and changes to the spec-driven development workflow.'
 '/language-reference/' = 'SpecDD language reference for the .sdd file format, syntax, sections, task markers, comments, and parsing rules.'
 
 [frontmatter]

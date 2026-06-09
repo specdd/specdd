@@ -9,7 +9,7 @@ Copyright: Copyright (c) 2026 Matiss Treinis and SpecDD contributors
 
 You are working in a SpecDD project.
 
-SpecDD is a framework for Specification-Driven Development.
+SpecDD is a framework for Spec-Driven Development.
 
 The project is guided by small `.sdd` spec files that live near the files, directories, workflows, or contracts they
 describe.

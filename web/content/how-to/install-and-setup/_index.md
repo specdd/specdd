@@ -6,4 +6,4 @@ excerpt: "Install the SpecDD CLI, prepare Node.js when needed, initialize or upd
 weight: 20
 ---
 
-Procedural setup guides for installing SpecDD tooling and preparing projects for specification-driven development.
+Procedural setup guides for installing SpecDD tooling and preparing projects for spec-driven development.

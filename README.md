@@ -1,6 +1,6 @@
 # SpecDD
 
-SpecDD™ is an open-source framework for **specification-driven development** in software, infrastructure, automation,
+SpecDD™ is an open-source framework for **spec-driven development** in software, infrastructure, automation,
 and documentation projects. It gives humans and AI agents a shared source of truth for intent, requirements, boundaries,
 and completion criteria.
 
@@ -118,7 +118,7 @@ For CLI update commands, version options, file-safety details, and other command
 ## Example
 
 A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
-demonstrates how SpecDD applies specification-driven development to a small Travel Planner project, with bootstrap
+demonstrates how SpecDD applies spec-driven development to a small Travel Planner project, with bootstrap
 files,
 colocated `.sdd` specs, source code, tests, and agent entrypoint files.
 
@@ -444,7 +444,7 @@ trip-storage.adapter.js
 
 ## Path-based resolution
 
-SpecDD resolution is path-based, which keeps specification-driven development local to the files and project areas being
+SpecDD resolution is path-based, which keeps spec-driven development local to the files and project areas being
 changed. Applicable specs come from ancestor specs, directory-level specs, explicit `References`, and same-directory
 basename matches.
 
@@ -1473,7 +1473,7 @@ Scenario: add place
 
 ## Adding SpecDD to an existing project
 
-For an existing codebase, adopt specification-driven development gradually: start with one high-change, high-risk, or
+For an existing codebase, adopt spec-driven development gradually: start with one high-change, high-risk, or
 high-confusion area rather than trying to specify the whole project at once. Good starting points include a module under
 active change, a service with repeated review comments, a workflow with subtle business rules, or an automation path
 where operational constraints matter.

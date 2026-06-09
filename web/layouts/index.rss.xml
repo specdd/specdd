@@ -6,7 +6,7 @@
   <channel>
     <title>{{ .Site.Params.shortTitle | default .Site.Title | transform.XMLEscape | safeHTML }} Articles</title>
     <link>{{ .Site.BaseURL }}</link>
-    <description>Recent articles about SpecDD, specification-driven development, AI coding agents, and implementation context.</description>
+    <description>Recent articles about SpecDD, spec-driven development, AI coding agents, and implementation context.</description>
     <generator>Hugo</generator>
     <language>{{ .Site.LanguageCode }}</language>
     {{- with $feedURL }}

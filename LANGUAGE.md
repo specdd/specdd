@@ -1,3 +1,8 @@
+---
+title: SpecDD Language Specification
+seoDescription: "Formal SpecDD language specification"
+---
+
 # SpecDD Language Specification
 
 This document defines the `.sdd` file format used by SpecDD specifications.
