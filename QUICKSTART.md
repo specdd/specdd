@@ -51,9 +51,9 @@ CLAUDE.md
 
 `AGENTS.md` is the normal agent entrypoint. `CLAUDE.md` points Claude to `AGENTS.md`.
 
-The `.specdd/` files contain the rules agents follow before they edit anything. Put shared project rules in
-`.specdd/bootstrap.project.md`, such as code style, commands, syntax choices, and where to find things. Put your own
-preferences in `.specdd/bootstrap.local.md`.
+The `.specdd/` files contain the rules agents follow before they edit anything. `bootstrap.md` is framework-managed.
+Put shared project rules in `.specdd/bootstrap.project.md`, such as code style, commands, syntax choices, and where to
+find things. Put your own preferences in `.specdd/bootstrap.local.md`.
 
 ## 3. Add the First Spec
 
@@ -140,24 +140,30 @@ Give the agent a focused request:
 Read AGENTS.md, find the SpecDD rules for src/trips/itinerary.sdd, and complete its open task.
 ```
 
-The agent should read the relevant specs, confirm what it may edit, make the smallest correct change, run useful checks,
-and mark the task done only after the checks pass.
+The agent should read the relevant specs, confirm ownership and modification permission for project files, make the
+smallest correct change, run useful checks, and mark the task done only after the checks pass.
 
 ## 6. Quick Tips
 
 - A spec describes the thing that should remain after the work, not the ticket or prompt that created it.
 - Put project-wide agent rules in `.specdd/bootstrap.project.md`.
 - Put personal working preferences in `.specdd/bootstrap.local.md`.
+- Include only sections and entries that materially affect implementation, review, or verification.
 - Use `Purpose` for a short summary of what the subject is for.
-- Use `Owns` or `Can modify` for edit permission.
-- Use `Can read` or `References` for context; they do not grant edit permission.
+- Use `Owns` for non-`.sdd` artifacts the spec governs authoritatively; owned paths are already readable and editable.
+- Use `Can modify` only for additional non-owned paths. It does not replace or override their owning spec.
+- Do not list `.sdd` files in `Owns` or `Can modify`; a spec selected by the request, workflow, or task needs no such
+  entry.
+- Use `References` and path entries in `Depends on` for read-only context. Use `Can read` only for additional context.
 - Use `Must` for required outcomes and observable behavior.
 - Use `Must not` for realistic local boundaries, not every unrelated thing the subject does not do.
 - Use `Forbids` for blocked dependencies, paths, tools, libraries, or access.
 - Use `Tasks` for local work items.
-- Do not duplicate a rule by writing the same idea again in reverse.
+- Put each statement in one canonical section, and do not repeat the same rule in reverse.
 - Apply specs from the selected content root down to the target. Sibling specs do not apply unless referenced.
-- Use explicit paths: `./local`, `../parent`, or `/from-content-root`.
+- Prefer exact explicit paths: `./local`, `../parent`, or `/from-content-root`.
+- In `.sdd` entries, write code symbols as `@Name` and use backticks only for the smallest exact literal or code
+  fragment.
 - Keep syntax simple: exact section labels, two-space body indentation, whole-line comments, and task markers like `[ ]`
   or `[x]`.
 

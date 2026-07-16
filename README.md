@@ -139,12 +139,12 @@ Must not:
   Manage destination search results.
 
 Exposes:
-  Itinerary.addPlace(input)
+  @Itinerary.addPlace
 
 Scenario: add place to itinerary
   Given the Paris trip has no itinerary items
-  When "Louvre Museum" is added for "2026-06-12"
-  Then "Louvre Museum" appears on the June 12 itinerary
+  When `Louvre Museum` is added for `2026-06-12`
+  Then `Louvre Museum` appears on the June 12 itinerary
 ```
 
 ## The problem SpecDD solves
@@ -321,7 +321,7 @@ Load order:
 ```
 
 Later bootstrap files may narrow or add local context. They should not silently weaken project contracts, inherited
-constraints, or write authority.
+constraints, ownership, or modification permission.
 
 ## The role of the bootstrap file
 
@@ -451,15 +451,22 @@ basename matches.
 The selected content root is the highest relevant project boundary used for `/` paths, spec indexing, and resolution.
 It is usually the repository or workspace root unless the project configures a different SpecDD root.
 
-When working on a target path, agents should:
+When working on an existing or intended target path, agents should:
 
 1. Classify the target as a directory, a `.sdd` spec file, or an ordinary file.
-2. Treat a `.sdd` target as the target spec itself.
-3. Include the same-directory basename spec when the target is an ordinary file and such a spec exists.
+2. Treat an existing `.sdd` target as the target spec itself. For a new `.sdd` target, resolve context from its intended
+   directory without requiring the spec to exist first.
+3. Include the same-directory basename spec when the target is an existing or intended ordinary file and such a spec
+   exists.
 4. Walk upward through parent directories to the selected content root.
 5. Collect specs whose declared governing scope applies to the target.
 6. Read the inherited chain from the selected content root to target.
 7. Include explicit `References` declared by included specs when they affect the task or context.
+
+A target selected for creation does not need to exist before resolution begins. Tools resolve it from its normalized
+intended path and existing ancestor directories. Creating an ordinary project artifact still requires modification
+permission for that intended path before work starts; creating a selected `.sdd` file does not require an `Owns` or
+`Can modify` entry.
 
 Example:
 
@@ -489,9 +496,9 @@ src/trips/itinerary.sdd
 
 This means the itinerary spec inherits rules from the trip-planning spec and the root project spec.
 
-Do not infer the applicable spec, ownership, or write authority from similar names in other directories, symbols,
-programming languages, module names, test names, or tool-specific conventions unless a project-specific spec or
-configuration explicitly defines that mapping.
+Do not infer the applicable spec, ownership, or modification permission from similar names in other directories,
+symbols, programming languages, module names, test names, or tool-specific conventions unless a project-specific spec
+or configuration explicitly defines that mapping.
 
 The core rule is:
 
@@ -508,11 +515,11 @@ Most SpecDD work starts from a requested target. That target might be a director
 file. Classifying it first keeps tools and agents from treating nearby files as authority just because they look
 related.
 
-If the target is already a `.sdd` file, that file is the target spec. If the target is an ordinary file, a
-same-directory
-same-basename `.sdd` file is the local spec when one exists. Matching is case-insensitive so projects can follow
-platform conventions such as `Trip.ts` and `Trip.sdd`, but exact filename matches should win. If two case-only
-matches compete and neither is exact, the correct result is ambiguity, not a guess.
+If the target is an existing `.sdd` file, that file is the target spec. A selected new `.sdd` file is resolved from its
+intended directory. If the target is an existing or intended ordinary file, a same-directory same-basename `.sdd` file
+is the local spec when one exists. Matching is case-insensitive so projects can follow platform conventions such as
+`Trip.ts` and `Trip.sdd`, but exact filename matches should win. If two case-only matches compete and neither is exact,
+the correct result is ambiguity, not a guess.
 
 Directory targets have their own convention. A directory can be described by a same-basename spec inside the directory,
 or by a same-basename spec held by its parent directory.
@@ -545,6 +552,9 @@ When following explicit path references to find related specs, tools should foll
 
 They should not use `Forbids` or `Exposes` to expand related-spec context, even though those sections may still contain
 paths that generic indexes can record.
+
+`Can modify` may make a spec relevant to a task, but it grants non-owning permission; it does not show that the spec
+governs or owns the referenced target.
 
 An exact path to a `.sdd` file resolves to that spec. An exact path to an ordinary file resolves to its same-basename
 spec when present. An exact path to a directory resolves only to directory-level specs for that directory. A non-glob
@@ -596,23 +606,39 @@ A child spec must not silently:
 - expand modification scope beyond local authority
 - contradict inherited architecture
 
-If two specs conflict, the stricter rule wins unless the Operator explicitly resolves the conflict.
+When compatible parent and child constraints differ only in strictness, the stricter rule applies. If one active rule
+requires behavior that another forbids, the conflict is unresolved rather than settled by choosing either rule.
+Competing ownership claims are also unresolved authority conflicts.
 
 ## Write authority
 
-Inherited specs provide context and constraints. The nearest relevant local spec provides write authority.
+Spec edit authority and project-artifact authority are separate.
 
-By default, an implementation should modify only files listed in the nearest spec’s:
+### Editing specs and bootstrap files
 
-```sdd
-Can modify:
-```
+A `.sdd` file is a framework contract, not a project artifact owned by another spec. When a spec is selected for
+creation or editing by a person’s request, an active SpecDD workflow, or an authorized task, an agent may edit that
+spec without finding it in `Owns` or `Can modify`. This selects only that spec; it does not authorize edits to
+inherited, referenced, sibling, or nearby specs.
 
-or, if absent:
+Specs should not list `.sdd` paths in `Owns` or `Can modify`, including through a directory or glob intended to
+authorize spec changes. `References` is the appropriate section when one spec names another as context.
 
-```sdd
-Owns:
-```
+Agents treat `.specdd/bootstrap.md` as immutable. The project and local override files do not require ownership entries,
+but agents edit them only when a person explicitly requests it or another explicit instruction authorizes the change.
+
+### Editing project artifacts
+
+For every non-`.sdd` project artifact, ownership and modification permission remain distinct:
+
+- `Owns` identifies the spec that is authoritative for an item’s contract. Ownership is exclusive and includes read and
+  modification permission for owned paths.
+- `Can modify` grants additional, non-owning permission. It implies read access, but it does not transfer ownership or
+  override the target’s owning spec and inherited constraints.
+- The modification boundary is the union of `Owns` and the additional paths in `Can modify`. The same path should not
+  appear in both sections.
+- Path entries in `References` and `Depends on` imply read access only. `Can read` is for additional context not already
+  available through inheritance or another section.
 
 Example:
 
@@ -622,16 +648,23 @@ Spec: Itinerary
 Owns:
   ./itinerary.js
   ./itinerary.test.js
+
+Can modify:
+  ./fixtures/expected-itinerary.json
 ```
 
-If `Can modify` is absent, `Owns` acts as the modification boundary.
+Before an agent makes the first change in an operation, it snapshots the effective `Owns` and `Can modify` authority for
+non-spec artifacts. Editing a spec during that operation does not silently widen the snapshot. Widened authority can be
+used in the same operation only when the person explicitly requested both the authority change and the corresponding
+project-artifact change; authority reductions apply immediately. New ordinary files must be covered by the
+pre-operation snapshot before they are created.
 
-Parent specs do not automatically grant broad edit rights. A module spec can define architectural context for a whole
-module, but a service-level task should not freely edit the whole module unless the local spec allows it.
+Before an agent modifies a path through `Can modify`, it should resolve and follow that path’s owning spec as well as
+the active task spec. Proximity, behavioral relevance, and references do not grant modification permission.
 
-If no local spec exists but a parent spec applies, use the nearest applicable parent spec and modify only the smallest
-necessary set of files. If no applicable spec can be found, ask the Operator to identify or create the relevant spec
-before making changes.
+If no local spec exists but a parent spec applies, the parent provides behavior and context, while the authority
+snapshot still determines which non-spec paths may change. If no applicable or owning spec can be found, the agent
+should ask the person directing the work to identify or create it before changing project artifacts.
 
 ## Universal spec language
 
@@ -643,7 +676,21 @@ ownership sections are `Structure`, `Owns`, `Can modify`, `Can read`, and `Refer
 `Must not`, and `Forbids`. Contract sections are `Depends on`, `Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles`.
 Workflow and behavior sections are `Tasks`, `Done when`, `Scenario`, and `Example`.
 
-A spec should include only sections that add useful local information.
+A spec should include only sections that add useful local authority, behavior, boundaries, context, or verification.
+
+### Relevance gate
+
+Every section and entry should earn its place in the local contract. A useful test is to remove the candidate entry and
+ask whether a reasonable implementation, review, or verification decision would materially change. Common-sense
+statements, implied defaults, and unrelated capabilities should be omitted.
+
+Negative entries should prevent plausible local mistakes. A `Must not` rule should be independent: if satisfying the
+applicable `Must` rules already makes the prohibited behavior impossible, the inverse wording is redundant. Authors
+should apply this gate to entries they add or materially edit without turning a scoped change into an unrelated cleanup
+of untouched legacy entries.
+
+Each contract statement should have one canonical home. When several sections could express the same meaning, the most
+specific section should carry it; another section should repeat it only when that occurrence adds a distinct meaning.
 
 ### Core syntax rules
 
@@ -660,8 +707,16 @@ A spec should include only sections that add useful local information.
 
 - Explicit paths start with `./`, `../`, or `/`.
 - Unprefixed filenames are treated as text, not path references.
-- Globs use the same explicit path prefixes, for example `./src/**/*.ts`.
-- Symbol references use `@Name`.
+- Exact paths are preferred. Globs use the same explicit path prefixes and should be used only for genuinely variable,
+  generated, or pattern-defined collections. A glob in `Owns` or `Can modify` grants authority over every current and
+  future non-`.sdd` match, so it should be as narrow as practical; `**` is appropriate only for deliberately recursive
+  scope.
+- Every code symbol or externally meaningful code contract uses an `@` reference, such as `@TripStorage` or
+  `@Itinerary.addPlace`, in every section and within prose.
+- Symbol references may appear inside or outside inline code spans and are recognized the same way in both places.
+- Inline code spans mark the smallest exact literal value, token, expression, or code fragment. They are not emphasis
+  and should not wrap ordinary prose or an entire entry.
+- Explicit paths inside inline code spans are literal text and do not resolve as paths.
 - Body sections may mix prose, paths, symbols, and key-value lines.
 - Key-value lines use `key: value` with a literal space after `:`. A line like `key:` is text.
 
@@ -677,7 +732,7 @@ Comment rules:
 
 - A comment line begins with optional whitespace followed by `#`.
 - Comments are ignored as spec content.
-- Comments do not create requirements, constraints, tasks, or write authority.
+- Comments do not create requirements, constraints, tasks, references, ownership, or modification permission.
 - Inline trailing comments are not recognized as comments. Text after other syntax is ordinary line content.
 
 Use comments sparingly. If a line affects required behavior, express it as `Must`, `Must not`, `Tasks`,
@@ -747,8 +802,8 @@ This section helps humans and agents understand local organization without readi
 
 ### Owns
 
-Files, directories, symbols, concepts, or responsibilities owned by the spec. Only one spec should own a specific item
-at any given time.
+Non-`.sdd` files, directories, symbols, concepts, or responsibilities for which the spec is the authoritative contract.
+Ownership is exclusive, and owned paths are implicitly readable and modifiable under that spec.
 
 ```sdd
 Owns:
@@ -758,24 +813,24 @@ Owns:
 
 ### Can modify
 
-Files or paths that may be changed when working under this spec.
+Additional non-`.sdd` files or paths that may be changed without being owned by this spec. This permission implies read
+access but does not transfer ownership or override the owning spec’s constraints.
 
 ```sdd
 Can modify:
-  ./itinerary.js
-  ./itinerary.test.js
+  ./fixtures/expected-itinerary.json
 ```
 
-Use this when writable scope should be narrower or different from ownership.
+An owned path should not be repeated in `Can modify`.
 
 ### Can read
 
-Files, paths, specs, or prose context that may be read for context.
+Additional files, paths, specs, or prose context that may be read when access is not already implied by inheritance or
+another section.
 
 ```sdd
 Can read:
-  ../storage/trip-storage.sdd
-  ../destinations/destination.sdd
+  ../support/storage-failure-samples.json
 ```
 
 ### References
@@ -788,7 +843,8 @@ References:
   ../destinations/destination.sdd
 ```
 
-Use references for context outside the inherited chain. References do not create inherited authority.
+Use references for context outside the inherited chain. Path references imply read access but grant neither ownership
+nor modification permission.
 
 ### Must
 
@@ -803,7 +859,8 @@ Must:
 
 ### Must not
 
-Forbidden behavior, non-goals, and architectural boundaries.
+Locally plausible forbidden behavior, adjacent non-goals, and boundaries that prevent likely misuse. A `Must not` entry
+should not merely invert a `Must` rule or list an unrelated capability.
 
 ```sdd
 Must not:
@@ -818,19 +875,20 @@ Forbidden dependencies, paths, modules, libraries, or architectural access.
 
 ```sdd
 Forbids:
-  localStorage direct writes
+  @localStorage
   ../booking/*
   ../destinations/editor/*
 ```
 
 ### Depends on
 
-Allowed dependencies, collaborators, modules, ports, libraries, or abstractions.
+Dependencies, collaborators, modules, ports, libraries, abstractions, or required context. Path entries imply read
+access but grant neither ownership nor modification permission.
 
 ```sdd
 Depends on:
-  TripStorage
-  DestinationSearch
+  @TripStorage
+  @DestinationSearch
 ```
 
 `Depends on` does not override inherited `Forbids` or `Must not`.
@@ -841,8 +899,8 @@ Public exports, endpoints, commands, components, events, or interfaces.
 
 ```sdd
 Exposes:
-  Itinerary.addPlace(input)
-  Itinerary.movePlace(id, date)
+  @Itinerary.addPlace
+  @Itinerary.movePlace
 ```
 
 ### Accepts
@@ -873,8 +931,8 @@ Errors this unit may raise or return.
 
 ```sdd
 Raises:
-  ItineraryPlaceRequired
-  ItinerarySaveFailed
+  @ItineraryPlaceRequired
+  @ItinerarySaveFailed
 ```
 
 ### Handles
@@ -909,7 +967,6 @@ Completion criteria.
 Done when:
   Adding a place has a test.
   Moving a place to another day has a test.
-  The itinerary does not change destination search or booking behavior.
 ```
 
 ### Scenario
@@ -919,8 +976,8 @@ A behavioral example written in a Gherkin-like style.
 ```sdd
 Scenario: add a place
   Given the Paris trip has no itinerary items
-  When "Louvre Museum" is added for "2026-06-12"
-  Then "Louvre Museum" appears on the June 12 itinerary
+  When `Louvre Museum` is added for `2026-06-12`
+  Then `Louvre Museum` appears on the June 12 itinerary
   And the itinerary remains assigned to the Paris trip
 ```
 
@@ -1023,11 +1080,13 @@ Spec: Travel Planner
 Purpose:
   Small application for planning trips and organizing itinerary items.
 
+Structure:
+  ./src/trips: Trip planning behavior
+
 Must:
   Trips can be created by a person.
   Places can be added to an itinerary.
   Keep itinerary items grouped by trip day.
-  Keep trip planning behavior under `./src/trips`.
 
 Must not:
   Purchase bookings or tickets.
@@ -1053,7 +1112,7 @@ Purpose:
   Provide the part of the app where people plan trips.
 
 Owns:
-  ./src/trips/*
+  ./src/trips
 
 Must:
   Trips have a destination and date range.
@@ -1096,8 +1155,8 @@ Must not:
 
 Scenario: trip exists
   Given a Paris trip exists
-  When the person adds "Louvre Museum" for "2026-06-12"
-  Then "Louvre Museum" appears on the June 12 itinerary
+  When the person adds `Louvre Museum` for `2026-06-12`
+  Then `Louvre Museum` appears on the June 12 itinerary
   And the Paris trip remains selected
 ```
 
@@ -1134,8 +1193,8 @@ Must not:
   Purchase bookings or tickets.
 
 Depends on:
-  TripStorage
-  DestinationSearch
+  @TripStorage
+  @DestinationSearch
 
 Tasks:
   [ ] Show a clear message for a missing place name.
@@ -1207,7 +1266,7 @@ Must not:
   Decide which itinerary items are visible.
 
 Depends on:
-  browser local storage
+  @localStorage
 ```
 
 ### API spec
@@ -1240,13 +1299,13 @@ Must not:
   Purchase bookings or tickets.
 
 Accepts:
-  POST /trips
-  CreateTripRequest
+  `POST /trips`
+  @CreateTripRequest
 
 Returns:
-  201 with TripResponse
-  400 for validation failure
-  500 for storage failure
+  `201` with @TripResponse
+  `400` for validation failure
+  `500` for storage failure
 ```
 
 ### Component spec
@@ -1304,11 +1363,12 @@ Use for rules that decide whether something is allowed.
 ## Minimum viable spec
 
 A minimal complete spec can contain only `Spec`. A useful minimal spec usually also contains `Purpose`. SpecDD itself
-does not prescribe how detailed your specs have to be. Use as many or as few sections as needed to describe the subject
-of the spec.
+does not prescribe how detailed specs have to be. Use only the sections and entries that materially describe the
+subject.
 
-Most implementation specs become more useful once they define ownership, key `Must` and `Must not` rules, and at least
-one scenario.
+Many implementation specs become more useful once they define ownership, key `Must` rules, any plausible local
+boundaries, and scenarios that clarify important behavior. None of those sections is required when it has no material
+local answer.
 
 The following example is a valid minimal spec.
 
@@ -1324,7 +1384,7 @@ Purpose:
 After a project has been initialized, the normal spec-driven development workflow is:
 
 1. Create or update the relevant `.sdd` spec.
-2. Define purpose, ownership, rules, scenarios, and tasks.
+2. Add only the purpose, ownership, rules, scenarios, and tasks that materially affect the local contract.
 3. Implement one task or behavior at a time.
 4. Add or update tests.
 5. Mark completed task entries as `[x]`.
@@ -1360,7 +1420,7 @@ In a correct working environment, the agent should:
 2. find the spec chain
 3. read parent specs
 4. read the local spec
-5. obey local write authority
+5. confirm that each spec edit was selected and resolve ownership plus modification permission for project artifacts
 6. implement the requested task
 7. add or update verification when needed
 8. update task status only when complete
@@ -1371,17 +1431,17 @@ For implementation work, the agent should follow this loop:
 Resolve -> Read -> Authorize -> Change -> Verify -> Report
 ```
 
-That means it should identify the target, read the applicable bootstrap and specs, confirm write authority before
-editing, make the smallest correct change, run or explain verification, and report the specs used, files changed,
-checks,
-and any remaining uncertainty.
+That means it should identify the target, read the applicable bootstrap and specs, authorize each target according to
+whether it is a spec or a project artifact, make the smallest correct change, run or explain verification, and report
+the specs used, files changed, checks, and any remaining uncertainty.
 
 The agent should stop before editing when:
 
-- no applicable spec exists
-- write authority is unclear
+- no applicable or owning spec exists for a non-`.sdd` project artifact
+- ownership or modification permission for a project artifact is unclear
+- a `.sdd` or bootstrap override was not selected for editing by the request, workflow, or an authorized task
 - the request cannot be completed without violating `Must not` or `Forbids`
-- the change would touch files outside `Can modify` or `Owns`
+- a project-artifact change would touch files outside the effective `Owns` plus `Can modify` boundary
 - requirements affect security, destructive behavior, or public contracts and are ambiguous
 
 Best practice: prompt implementation in small chunks. Depending on spec complexity, ask for at most one to three specs
@@ -1458,7 +1518,6 @@ Must:
 
 Must not:
   Persist trips to disk from this file.
-  Add external dependencies.
 
 Tasks:
   [ ] Add place creation.
@@ -1467,8 +1526,8 @@ Tasks:
 
 Scenario: add place
   Given the Paris trip has no itinerary items
-  When "Louvre Museum" is added for "2026-06-12"
-  Then "Louvre Museum" appears on the June 12 itinerary
+  When `Louvre Museum` is added for `2026-06-12`
+  Then `Louvre Museum` appears on the June 12 itinerary
 ```
 
 ## Adding SpecDD to an existing project
@@ -1485,8 +1544,7 @@ Typical flow:
 3. Draft a local spec from the current code or intended behavior.
 4. Mark uncertain assumptions clearly.
 5. Review the spec so old bugs, accidental behavior, and unclear assumptions do not become permanent contracts.
-6. Tighten `Purpose`, `Owns`, `Can modify`, `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Done when`, and
-   `Scenario` sections as needed.
+6. Tighten only the sections and entries that materially affect implementation, review, or verification.
 7. Implement a small slice against the reviewed spec.
 8. Run relevant checks and update task status only after verification.
 9. Expand SpecDD coverage incrementally around the areas where context matters most.
@@ -1538,18 +1596,18 @@ Review a change against specs:
 
 ```text
 Review this change against the applicable SpecDD specs.
-Focus on Must, Must not, Forbids, write authority, scenarios, checks, and Done when.
+Focus on Must, Must not, Forbids, ownership, modification permission, scenarios, checks, and Done when.
 ```
 
 ## Best practices and observations
 
 ### Start small and iterate
 
-Begin with minimal specs. Just `Spec`, `Purpose`, a few local boundary rules, and a `Scenario` or two. Run the workflow,
-observe what the agent gets right and wrong, then add sections to address gaps. A spec that is too thin will produce
-unfocused output; a spec that is too detailed will become hard to maintain and slow to write. Iterate toward the level
-of detail that produces reliable results without becoming a burden in your specific scenario. Most specs settle into a
-natural balance after a few cycles.
+Begin with minimal specs. Start with `Spec`, usually `Purpose`, and only the local rules or scenarios that materially
+change implementation or review decisions. Run the workflow, observe what the agent gets right and wrong, then add
+entries to address real gaps. A spec that is too thin will produce unfocused output; a spec that is too detailed will
+become hard to maintain and slow to write. Iterate toward the level of detail that produces reliable results without
+becoming a burden in your specific scenario. Most specs settle into a natural balance after a few cycles.
 
 ### Prefer many small specs over large ones
 
@@ -1569,18 +1627,21 @@ have reviewed them.
 
 ### Be explicit
 
-The less an agent must infer, the better the outcome. State constraints, non-goals, dependencies, and completion
-criteria directly in the spec rather than relying on the agent to fill in the gaps.
+The less an agent must infer about a material decision, the better the outcome. State relevant constraints, non-goals,
+dependencies, and completion criteria directly in the spec, but omit entries whose removal would not change a
+reasonable implementation, review, or verification decision.
 
 ### Use Must not for plausible local boundaries
 
-Non-goals and forbidden behavior are valuable when they prevent plausible local boundary mistakes. A clear `Must not`
-prevents wrong work without becoming a list of unrelated capabilities.
+Non-goals and forbidden behavior are valuable when they prevent plausible local boundary mistakes. A clear, independent
+`Must not` prevents wrong work without restating the inverse of a `Must` rule or becoming a list of unrelated
+capabilities.
 
 ### Keep tasks local
 
-A task should usually be implementable entirely inside the local spec’s `Owns` or `Can modify` boundary. Tasks that
-require touching files outside the local boundary are a signal that the spec or its ownership needs review.
+A task should usually be implementable inside the union of the active spec’s `Owns` and `Can modify` paths. A
+`Can modify` path remains governed by its owning spec. Tasks that require other project artifacts are a signal that
+ownership or modification permission needs review.
 
 ### Review agent output
 
@@ -1603,8 +1664,8 @@ might otherwise be ambiguous.
 
 Without a root spec named after the selected content root directory, child specs have no architectural context to
 inherit
-from and agents must infer global rules. Even a minimal root spec with a handful of `Must` and `Must not` entries
-establishes the foundation that all local specs build on. Add it before writing module or service specs.
+from and agents must infer global rules. Even a minimal root spec with a handful of material `Must` rules and local
+boundaries establishes the foundation that all local specs build on. Add it before writing module or service specs.
 
 ### Do not duplicate parent constraints in child specs
 
@@ -1624,13 +1685,16 @@ convention is applied uniformly so both people and agents can locate specs relia
 
 If specs conflict, the agent should use these rules:
 
-1. Prefer the more restrictive rule.
+1. Apply the more restrictive rule only when two compatible constraints differ in strictness and one safely narrows the
+   other.
 2. Prefer explicit local behavior only when it does not violate parent constraints.
-3. Treat `Must not` and `Forbids` as stronger than `Must`, `Depends on`, or `Tasks`.
-4. Treat inherited architecture as active unless explicitly and safely narrowed.
-5. Do not use a task as justification to violate a rule.
-6. If a safe partial change is possible, do the safe subset.
-7. If the change cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
+3. Treat a requirement to perform forbidden behavior as an unsatisfiable conflict; neither the positive nor negative
+   rule wins.
+4. Treat competing ownership claims as an authority conflict rather than resolving them by proximity or strictness.
+5. Treat inherited architecture as active unless explicitly and safely narrowed.
+6. Do not use a task as justification to violate a rule.
+7. If a safe partial change is possible, do the safe subset.
+8. If the change cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
 
 Example conflict:
 

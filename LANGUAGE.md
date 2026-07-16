@@ -66,8 +66,7 @@ A comment line is any line whose first non-whitespace character is `#`.
 Comments:
 
 - Are ignored as spec content.
-- Do not create requirements, constraints, tasks, references, or write
-  authority.
+- Do not create requirements, constraints, tasks, or references.
 - MAY appear before, between, and inside sections.
 
 Inline trailing comments are not recognized. Text after other syntax is
@@ -355,18 +354,31 @@ spans do not cross LF, CRLF, or CR line endings.
 
 ```sdd
 Must:
-  Use `TripStorage` and `./src/trips/itinerary.js`.
+  Use `@TripStorage` and `./src/trips/itinerary.js`.
 ```
 
-Inline code spans are code text. They do not change the section structure, body
-line kind, or validity of the surrounding line.
+Inline code spans designate exact literal or code-formatted text. They do not
+change the section structure, body line kind, or validity of the surrounding
+line.
+
+Inline code span delimiters do not suppress symbol recognition. Span content
+MUST be scanned for escaped `@` sequences and symbol references using the same
+rules as text outside a span. The start of inline code span content is a valid
+symbol boundary.
+
+Explicit path or glob text inside an inline code span MUST remain literal code
+text. It MUST NOT be extracted or resolved as an explicit path or glob.
+
+In the example above, `@TripStorage` is a symbol reference, while
+`./src/trips/itinerary.js` is literal code text and not a path reference.
 
 Symbol references use `@`.
 
 A symbol reference:
 
 - Starts with `@`.
-- May appear at line start, after whitespace, or after opening punctuation.
+- May appear at line start, at the start of inline code span content, after
+  whitespace, or after opening punctuation.
 - The first symbol character after `@` MUST be an ASCII letter or `_`.
 - Subsequent symbol characters MAY be ASCII letters, digits, `_`, `.`, `:`,
   `#`, `\`, `/`, `?`, or `!`.
@@ -414,9 +426,10 @@ Because symbol references use an explicit `@` prefix, plain text such as
 
 Tools MUST NOT recognize `@` inside a larger non-whitespace token as a symbol
 reference unless the immediately preceding character is allowed opening
-punctuation. This prevents ordinary text such as email addresses from being
-treated as symbol references while still allowing forms like `(@Symbol)`.
-Embedded `@` text is ignored rather than reported as invalid syntax.
+punctuation or the `@` begins inline code span content. This prevents ordinary
+text such as email addresses from being treated as symbol references while
+still allowing forms like `(@Symbol)` and `` `@Symbol` ``. Embedded `@` text is
+ignored rather than reported as invalid syntax.
 
 Inline code spans, escaped `@` sequences, and symbol references may appear
 inside text body entries, task text, scenario step text, key-value values, and
@@ -985,8 +998,9 @@ This grammar is informative rather than a complete parser contract.
 
 When tokenizing `text`, implementations should recognize `inline-code-span`,
 `escaped-at`, and `symbol-reference` before falling back to `character`.
-Implementations that extract references MAY tokenize `code-text` recursively for
-paths and symbol references.
+Implementations that extract references MUST tokenize `code-text` recursively
+for escaped `@` sequences and symbol references. They MUST NOT extract paths or
+globs from `code-text`.
 
 ```ebnf
 document             = { blank-line | comment } { section } ;
@@ -1044,10 +1058,11 @@ task-text            = text ;
 value                = text ;
 
 inline-code-span     = "`" code-text "`" ;
+code-text            = { escaped-at | symbol-reference | character } ;
 escaped-at           = backslash "@" ;
 backslash            = U+005C ;
 symbol-reference     = symbol-boundary "@" symbol-start { symbol-char } ;
-symbol-boundary      = line-start | whitespace | opening-punctuation ;
+symbol-boundary      = line-start | inline-code-start | whitespace | opening-punctuation ;
 opening-punctuation  = "(" | "[" | "{" | "<" | "\"" | "'" ;
 closing-punctuation  = ")" | "]" | "}" | ">" | "\"" | "'" ;
 symbol-start         = ascii-letter | "_" ;
@@ -1062,6 +1077,8 @@ symbol-char          = ascii-letter
                      | "?"
                      | "!" ;
 
+; inline-code-start is the zero-width boundary at the first position of
+; code-text immediately after an opening backtick.
 ; If captured symbol text ends with "." and the next source character after the
 ; captured symbol text is whitespace, line-end, or closing-punctuation, the
 ; final "." is sentence punctuation and is not part of the resolved symbol text.
@@ -1188,21 +1205,25 @@ Path-bearing section guidance:
   candidate, even in path-bearing sections.
 - A path-bearing section may still contain prose.
 
-Inline paths in text are recognized only when they use `./`, `../`, or `/`.
-URLs are not file paths.
+Outside inline code spans, inline paths in text are recognized only when they
+use `./`, `../`, or `/`. URLs are not file paths.
 
 Reference extraction inside inline code spans:
 
-- Tools MAY tokenize inline code span content recursively.
-- References such as `@dataclass` and `./src/app.py` MAY resolve even though the
-  surrounding backticks remain code-span delimiters.
-- References found inside inline code spans SHOULD NOT create structural
+- Tools MUST tokenize inline code span content for escaped `@` sequences and
+  symbol references using the same rules as other text. The start of span
+  content is a valid symbol boundary.
+- Symbol references such as `@dataclass` resolve even though the surrounding
+  backticks remain code-span delimiters.
+- Explicit path or glob text such as `./src/app.py` remains literal code text
+  and MUST NOT resolve from inside an inline code span.
+- Symbol references found inside inline code spans SHOULD NOT create structural
   validation errors only because they appear inside code text.
 
 Path resolution guidance:
 
-- `./` and `../` exact paths resolve relative to the current `.sdd` file
-  directory.
+- `./` and `../` exact paths resolve relative to the directory containing the
+  current `.sdd` file.
 - `/` exact paths resolve relative to the selected content root.
 - Resolved targets SHOULD remain inside the selected content root.
 - Missing exact paths are unresolved references, not syntax errors.
@@ -1280,6 +1301,16 @@ key-value text, paths, globs, symbol references, and inline code spans. They MAY
 normalize blank lines, section spacing, and indentation.
 
 ## Language Changelog
+
+### [1.2] - 2026-07-16
+
+#### Changed
+
+- Define inline code spans as exact literal or code-formatted text.
+- Treat the start of inline code span content as a valid symbol boundary and
+  apply the normal escaped-`@` and symbol-reference rules inside spans.
+- Treat explicit path and glob text inside inline code spans as literal,
+  non-resolving code text.
 
 ### [1.1] - 2026-05-30
 

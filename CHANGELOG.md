@@ -2,6 +2,36 @@
 title: SpecDD Framework Changelog
 ---
 
+## [1.5] - 2026-07-16
+
+### Added
+
+- Clarified spec-edit authority: a `.sdd` file selected by the request, an active SpecDD workflow, or an authorized
+  task is modifiable without an `Owns` or `Can modify` entry, while nearby, inherited, and referenced specs remain
+  unselected.
+- Added bootstrap control-file rules: agents treat the installed `.specdd/bootstrap.md` as immutable and edit project
+  or local overrides only when explicitly authorized.
+- Added a Relevance Gate requiring added or materially edited entries to affect authority, behavior, boundaries,
+  necessary context, or verification, without turning scoped work into cleanup of untouched legacy entries.
+- Added intended-path resolution for new targets and pre-operation authority snapshots for non-`.sdd` project
+  artifacts, preventing spec edits from silently widening the same operation unless the authority change and
+  corresponding artifact change were explicitly requested together.
+
+### Changed
+
+- Reworked non-spec write authority so `Owns` defines exclusive authoritative ownership with implicit read and edit
+  permission, while `Can modify` grants only additional non-owning permission and never overrides the owning spec.
+- Changed path-based context semantics so `References` and `Depends on` path entries imply read access only, and
+  `Can read` is reserved for additional context not already available through inheritance or another section.
+- Tightened spec authoring around one canonical section and polarity per statement, independent `Must not` rules, exact
+  paths over unnecessary globs, and narrow authority patterns that remain valid for every current and future match.
+- Changed inline notation so code symbols and externally meaningful code contracts use `@` references consistently,
+  inline code marks exact literal or code-formatted text, and paths inside inline code remain literal and non-resolving.
+- Changed conflict handling so stricter compatible constraints may narrow each other, while required-versus-forbidden
+  behavior and competing ownership claims are reported as unresolved conflicts.
+- Updated the compliance checklist and examples to demonstrate the new ownership, relevance, glob, symbol, literal,
+  and conflict rules; the comprehensive example is explicitly not a template.
+
 ## [1.4] - 2026-05-31
 
 ### Added

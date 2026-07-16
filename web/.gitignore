@@ -2,6 +2,4 @@ public/
 node_modules/
 .hugo_build.lock
 specdd.zip
-content/*/*.draft*
-content/*/*.note*
-content/how-to/reference
+tmp

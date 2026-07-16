@@ -1,13 +1,13 @@
 ---
-Version: 1.4
+Version: 1.5
 Website: https://specdd.ai
 Changelog: https://specdd.ai/changelog/
-Copyright: Copyright (c) 2026 Matiss Treinis and SpecDD contributors
+Copyright: 2026 Matiss Treinis and SpecDD contributors
 ---
 
 # SpecDD Bootstrap
 
-You are working in a SpecDD project.
+You are working inside a SpecDD-governed project.
 
 SpecDD is a framework for Spec-Driven Development.
 
@@ -19,7 +19,7 @@ Specs are source-adjacent development contracts. Treat them as binding instructi
 This bootstrap file defines the base operating rules for agents working in the project. It tells you how to find specs,
 how to resolve inherited constraints, and how to determine what you may read or modify.
 
-Also read adjacent bootstrap files when they exist:
+Also, read adjacent bootstrap files when they exist:
 
 ```text
 .specdd/bootstrap.md
@@ -34,16 +34,20 @@ Use them in order:
 - `bootstrap.local.md` defines local operator or environment preferences.
 
 Later files override earlier files when they are stricter or more specific. Local overrides must not silently weaken
-project contracts, inherited constraints, or write authority.
+project contracts, inherited constraints, ownership, or modification permission.
 
-Before editing any file, identify:
+Before editing any target, identify:
 
 - The requested target path or task.
 - The applicable bootstrap files.
 - The effective spec chain.
-- The nearest spec that grants write authority.
+- Whether each `.sdd` target was selected for change by the Operator's request, an active SpecDD workflow, or an
+  authorized task.
+- For each non-`.sdd` project artifact, its authoritative owning spec and the modification scope granted by the active
+  spec.
 
-If you cannot identify write authority, stop and ask the Operator.
+If you cannot identify ownership or modification permission for a non-`.sdd` project artifact, stop and ask the
+Operator.
 
 ## Execution Contract
 
@@ -57,7 +61,8 @@ Do not skip directly to `Change`.
 
 - `Resolve`: identify the target path or task and the applicable bootstrap/spec chain.
 - `Read`: read the bootstrap files, inherited specs, and relevant explicit `References`.
-- `Authorize`: confirm the nearest local spec grants the needed write authority.
+- `Authorize`: confirm each `.sdd` or bootstrap control-file target is editable under the Spec Edit Authority rules; for
+  every non-`.sdd` project artifact, confirm the modification scope and resolve its authoritative owning spec.
 - `Change`: make the smallest correct change inside that authority.
 - `Verify`: run relevant checks when available, or explain why they were not run.
 - `Report`: summarize specs used, files changed, verification, and any remaining uncertainty.
@@ -75,19 +80,20 @@ When making changes:
 If any instruction conflicts with your default coding habits or assumptions, follow SpecDD. Do not treat examples,
 conventions, nearby files, or familiar project patterns as permission to ignore the active spec chain.
 
-If the Operator asks you to create or modify specs, follow this bootstrap and do not alter implementation files or
-operational artifacts unless explicitly asked.
+If the Operator asks you to create or modify specs, follow the Spec Edit Authority rules below and do not alter
+implementation files or operational artifacts unless explicitly asked.
 
-If unclear requirements affect scope, write authority, destructive changes, security, or public behavior, ask the
-Operator before editing. For minor ambiguity, choose the option that best preserves inherited constraints and local
-scope.
+If unclear requirements affect scope, ownership, modification permission, destructive changes, security, or public
+behavior, ask the Operator before editing. For minor ambiguity, choose the option that best preserves inherited
+constraints and local scope.
 
 Stop and ask the Operator before editing when:
 
-- No applicable spec exists.
-- Write authority is unclear.
-- Requested work cannot be completed without violating `Must not` or `Forbids`.
-- The change would touch files outside `Can modify` or `Owns`.
+- No applicable spec exists for a non-`.sdd` project artifact.
+- Ownership or modification permission is unclear for a non-`.sdd` project artifact.
+- The requested work cannot be completed without violating `Must not` or `Forbids`.
+- A non-`.sdd` project-artifact change would touch files outside the modification scope granted by `Owns` plus
+  `Can modify`.
 - Requirements affect security, destructive behavior, or public contracts and are ambiguous.
 
 ## Planning Mode
@@ -107,8 +113,8 @@ Use planning mode especially when the request is to apply framework or spec chan
 
 ## Core Model
 
-SpecDD projects are developed top-down. Operators define structure, boundaries, behavior, and implementation and work
-tasks through local specs. Agents implement and work locally within those boundaries.
+SpecDD projects are developed top-down. Operators define structure, boundaries, behavior, implementation tasks, and
+other work through local specs. Agents perform that work locally within those boundaries.
 
 A spec should include only sections that add useful local authority, constraints, behavior, or context. Do not repeat
 parent rules unless narrowing or clarifying them.
@@ -120,21 +126,24 @@ When a task causes a spec to be created or changed, the spec should still descri
 the task that produced it.
 
 A local spec should stay relevant to the subject's real boundary. It should not list everything the subject obviously
-does not do. Negative rules are useful only when they prevent a plausible boundary mistake, dependency inversion,
-security or data risk, or repeated local confusion.
+does not do. Negative rules are useful only when they prevent plausible boundary mistakes, dependency inversions,
+security or data risks, or repeated local confusion.
 
 Specs are local maps, not inventories. A directory spec describes the directory concept and the roles of immediate
-children. It should not describe nested descendant inventory or detailed file, class, service, job, or adapter,
-artifact, component, workflow, operation, interface, policy, service, or asset behavior when a nearer spec can own it.
+children. It should not describe nested descendant inventory or detailed behavior for a file, class, service, job,
+adapter, artifact, component, workflow, operation, interface, policy, or asset when a nearer spec can own that detail.
 
-When a same-directory artifact, file, class, service, component, job, adapter, workflow, operation, interface, policy,
-service, asset, or other subject has substantial behavior, put that behavior in a same-basename spec next to the
+When a same-directory artifact or other subject, such as a file, class, service, component, job, adapter, workflow,
+operation, interface, policy, or asset, has substantial behavior, put that behavior in a same-basename spec next to the
 subject. Keep the directory spec focused on the local boundary and immediate structure.
 
 Avoid both overreach and overcorrection: do not pull child-specific details into parent specs, and do not replace useful
 immediate roles with vague labels.
 
-A useful spec answers the local parts of these questions:
+The following questions are prompts, not a checklist. Answer only those that have a material local answer; do not create
+a section merely because a prompt or section label exists.
+
+A useful spec answers the relevant local questions:
 
 - What stable outcome or responsibility does this subject provide?
 - What does it own?
@@ -157,11 +166,27 @@ Good specs are:
 - Easy for humans to review.
 - Easy for agents to follow.
 
+### Relevance Gate
+
+Every section and entry must earn its place in the local contract. Keep an entry only when removing it would materially
+change a reasonable implementation, review, or verification decision or remove necessary local context about the
+subject. Relevant entries grant local authority, define observable behavior or invariants, establish a plausible
+dependency or boundary, provide necessary local context, or make the local contract verifiable. Omit entries that
+merely state common sense, repeat implied defaults, or describe capabilities unrelated to the subject.
+
+Evaluate a negative entry against the effective spec with that candidate entry removed. Keep it only when a reasonable
+implementer could then choose the forbidden behavior and it would be a plausible local mistake. Crossing the subject's
+boundary or misusing a dependency may be exactly the mistake the entry needs to prevent. Omit the entry when the
+behavior is unrelated, implausible, or already excluded by another active rule.
+
+Apply this gate to entries being added or materially edited. Do not opportunistically remove untouched legacy entries
+during a scoped change; report them unless the Operator requested a full-spec review or cleanup.
+
 ## Spec Files
 
 Spec files use a line-oriented, section-based format and the `.sdd` extension.
 
-The root project spec must live at the selected content root and must be named after that root directory basename.
+The root project spec must live at the selected content root and must be named after the basename of that root directory.
 
 Example:
 
@@ -217,8 +242,9 @@ travel-planner.config.js -> travel-planner.config.sdd
 This is not a guess. It is part of spec resolution. Similar names in other directories, symbols inside files, module
 names, or test names do not create a spec relationship by themselves.
 
-Align other spec and source or artifact file naming when a project convention exists, but conventions beyond
-same-directory basename matching do not define inheritance, write authority, or ownership by themselves.
+Align the names of other specs and source or artifact files when a project convention exists, but conventions beyond
+same-directory basename matching do not define inheritance, governing scope, ownership, or modification permission by
+themselves.
 
 When no project naming convention applies, prefer this order:
 
@@ -271,14 +297,22 @@ There can be multiple spec hierarchies in a project; only the target path's ance
 Resolution algorithm:
 
 - Classify the target as a directory, a `.sdd` spec file, or an ordinary file.
-- The target should exist before related-spec resolution begins.
-- If the target is a `.sdd` file, treat that file as the target spec.
-- If the target is an ordinary file, include the same-directory same-basename `.sdd` spec when it exists.
-- If an ordinary file has no same-basename spec, continue resolving upward from the file's containing directory.
+- A target selected for creation need not exist. Resolve it from its normalized intended path and existing ancestor
+  directories.
+- If the target is an existing `.sdd` file, treat that file as the target spec and do not resolve `Owns` or `Can modify`
+  authority for the file itself.
+- If a new `.sdd` file is selected for creation, resolve the bootstrap files and the intended directory's ancestry
+  without requiring the target to exist or appear in `Owns` or `Can modify`.
+- If the target is an existing or intended ordinary file, include the same-directory same-basename `.sdd` spec when it
+  exists.
+- If an ordinary file has no same-basename spec, continue resolving upward from its intended parent directory.
+- Before creating an ordinary file, require its normalized intended path to be covered by the pre-operation `Owns` or
+  `Can modify` authority defined below, unless it is a bootstrap override authorized under the Spec Edit Authority
+  rules.
 - Walk upward through parent directories until the selected content root.
 - At each directory, collect specs whose declared governing scope applies to the target.
 - Reverse the collected inherited specs so they are read from root to target.
-- Include explicit `References` declared by included specs when they affect the task or when building context.
+- Include explicit `References` declared by the included specs when they affect the task or are needed to build context.
 
 Directory-level specs are specs whose basename matches the directory they govern. Matching is case-insensitive, but exact
 basename matches win. If multiple case-insensitive matches exist for the same placement and no exact match exists, report
@@ -304,14 +338,17 @@ tool's command semantics.
 
 A spec's governing scope should be discoverable from the spec itself. Relevant signals include:
 
-- `Owns`, `Can modify`, or `Structure` entries that cover the target path.
+- `Owns` or `Structure` entries that cover the target path.
 - Same-directory basename matching.
 - Directory-level basename matching.
 - A clear directory-scope role, such as an app, module, feature, or service spec governing that directory subtree.
 - A project-specific rule that explicitly defines the mapping.
 
+`Can modify` establishes non-owning edit permission only. It may make a spec relevant to a task, but it does not show
+that the spec governs or owns the target.
+
 If a spec's scope is not discoverable, do not guess from similar names. Use the nearest applicable parent spec and ask
-the Operator when write authority is unclear.
+the Operator when ownership or modification permission is unclear.
 
 Example for `src/trips/itinerary.js`:
 
@@ -371,21 +408,56 @@ A child spec must not silently:
 - Expand modification scope beyond local authority.
 - Contradict inherited architecture.
 
-If a local task or rule appears to conflict with a parent spec, prefer the stricter interpretation.
+If compatible local and parent constraints differ in strictness, apply the stricter interpretation. If one requires
+what another forbids, treat them as an unresolved conflict under Conflict Handling rather than choosing either rule.
 
 ## Write Authority
 
-Inherited specs provide context and constraints. The nearest relevant local spec provides write authority.
+### Spec Edit Authority
+
+`.sdd` files are framework contracts, not owned project artifacts. A spec selected as a change target is implicitly
+modifiable and requires no `Owns` or `Can modify` entry in any spec, including the target spec itself. `Owns` and
+`Can modify` never grant or restrict modification permission for `.sdd` files, whether matched directly, through a
+directory, or by a glob.
+
+Implicit modifiability removes only the path-authorization check. It does not select inherited, referenced, sibling, or
+nearby specs for editing. Edit a spec only when the Operator's request, an active SpecDD workflow, or an authorized task
+selects it. Continue to follow bootstrap rules and inherited constraints, and apply normal ownership and modification
+rules to every non-`.sdd` project artifact.
+
+`bootstrap.md` is immutable. `bootstrap.project.md` and `bootstrap.local.md` need no `Owns` or `Can modify` entry but may
+be edited only at the Operator's explicit request or when another explicit instruction authorizes the edit.
+
+Use `References`, not `Owns` or `Can modify`, when one spec names another spec as context.
+
+### Non-Spec Write Authority
+
+Ownership authority and modification permission are distinct.
+
+Before the first change in an operation, snapshot the effective `Owns` and `Can modify` authority available to that
+operation and evaluate every non-`.sdd` project artifact against it. Spec edits do not expand authority usable during
+that operation unless the Operator explicitly requests both the authority change and the corresponding non-spec
+change. Authority reductions apply immediately.
 
 By default:
 
-- Modify only files listed in the nearest spec's `Can modify` or `Owns`.
-- If `Can modify` is absent, treat `Owns` as the modification boundary.
-- Read files listed in `Can read`, `References`, or inherited context as needed.
-- Treat `References` as read context only. References do not grant write authority.
-- Do not edit parent-level files unless the targeted spec is a parent spec.
+- `Owns` identifies the spec that is authoritative for an item's contract. Every owned path is implicitly modifiable
+  and readable under that spec; `Owns` already includes the permission represented by `Can modify`.
+- `Can modify` grants only additional, non-owning permission to edit paths the spec does not own. It does not transfer
+  ownership, make the spec authoritative for those paths, or override their owning specs. Every such path is also
+  readable.
+- The modification boundary is the union of owned paths and the additional paths in `Can modify`. A path in `Owns` must
+  not also appear in `Can modify`; the duplicate grants no additional permission and must be omitted.
+- Before modifying a path through `Can modify`, resolve and obey that path's owning spec and effective spec chain in
+  addition to the active spec. If ownership is unclear or the contracts conflict, stop and ask the Operator.
+- `References` and `Depends on` imply read access to their path entries and grant neither ownership nor modification
+  permission. Use `Can read` only for additional read context not already represented by inherited context or another
+  section.
+- Spec proximity and behavioral relevance do not grant write authority. Modify a non-`.sdd` project artifact only when
+  the pre-operation authority snapshot covers it through `Owns` or `Can modify`.
 - Do not perform broad refactors unless the spec or Operator explicitly asks for them.
-- If no local spec exists, use the nearest parent spec and modify only the smallest necessary set of files.
+- If no local spec exists, use the nearest parent spec for behavior and context, but modify only the smallest necessary
+  set of files covered by the authority snapshot.
 - If no applicable spec can be found, ask the Operator to identify or create the relevant spec before making changes.
 
 ## Universal Spec Language
@@ -393,8 +465,8 @@ By default:
 This section is authoritative for `.sdd` syntax. If examples, project prose, or conventions conflict with these rules,
 these rules win. Project rules may add meaning to entries, but must not redefine syntax.
 
-When creating or editing `.sdd` files, check changed specs against this agent-facing syntax checklist before reporting
-completion:
+When creating or editing `.sdd` files, check the changed specs against this agent-facing syntax checklist before
+reporting completion:
 
 - A complete `.sdd` file starts with `Spec: Name`; only blank lines and comments may appear before it.
 - Section labels are exact and case-sensitive. Unknown section labels are invalid in strict validation.
@@ -416,7 +488,7 @@ completion:
 - A spec file uses the `.sdd` extension, is plain text, should be UTF-8, may use LF, CRLF, or CR line endings, and is
   line-oriented.
 - `.sdd` is Markdown-adjacent, but it is not Markdown, YAML, TOML, JSON, or Gherkin.
-- Each line is blank, comment, section header, body entry, continuation, or invalid text.
+- Each line is classified as blank, a comment, a section header, a body entry, a continuation, or invalid text.
 - Line classification precedence is: comment, known section header, continuation, task line, scenario step, key-value,
   text.
 - Comments, blank lines, and section headers may appear before the first section. Other top-level text is invalid.
@@ -431,7 +503,8 @@ completion:
 - Extracted continuation text is normalized by trimming each segment, dropping empty continuation segments, and joining
   remaining segments with one ASCII space.
 - A comment line is any line whose first non-whitespace character is `#`.
-- Comments are ignored as spec content and create no requirements, constraints, tasks, references, or write authority.
+- Comments are ignored as spec content and create no requirements, constraints, tasks, references, ownership, or
+  modification permission.
 - Inline trailing comments do not exist. Text after other syntax is ordinary content.
 
 ### Sections
@@ -470,7 +543,7 @@ Section rules:
 
 - A complete `.sdd` file starts with `Spec`.
 - Only `Spec`, `Platform`, `Scenario`, and `Example` may have inline values.
-- `Spec`, `Platform` when present, and `Scenario` require nonempty inline values.
+- `Spec`, `Platform` (when present), and `Scenario` require nonempty inline values.
 - Empty or whitespace-only required inline values are invalid.
 - `Example` may have an inline value, body entries, or both.
 - `Spec` and `Platform` are bodyless.
@@ -490,35 +563,61 @@ Section rules:
 
 ### Inline Code And Symbols
 
-- Inline code spans use balanced single backticks on one line. They do not change section structure or body validity.
-- Paths and symbol references may still be extracted inside inline code spans.
-- Symbol references start with `@` at line start, after whitespace, or after opening punctuation `(`, `[`, `{`, `<`,
-  `"`, or `'`.
+- Inline code spans use balanced single backticks on one line. They mark exact literal or code-formatted text and do not
+  change section structure or body validity.
+- Backticks do not suppress `@` symbol references. Recognize them inside inline code spans using the same rules as
+  elsewhere; the start of span content is a valid symbol boundary. Explicit paths inside inline code spans remain
+  literal and non-resolving.
+- Symbol references start with `@` at the start of a line or inline code span, after whitespace, or after an opening
+  punctuation character: `(`, `[`, `{`, `<`, `"`, or `'`.
 - The first symbol character after `@` must be an ASCII letter or `_`.
 - Later symbol characters may be ASCII letters, digits, `_`, `.`, `:`, `#`, `\`, `/`, `?`, or `!`.
 - A symbol ends at the first character outside that set.
-- If captured symbol text ends with `.`, and the next source character is whitespace, end of line, or closing
-  punctuation
-  `)`, `]`, `}`, `>`, `"`, or `'`, the final `.` is sentence punctuation and is excluded.
+- If captured symbol text ends with `.`, and it is followed by whitespace, the end of the line, or one of the closing
+  punctuation characters `)`, `]`, `}`, `>`, `"`, or `'`, the final `.` is sentence punctuation and is excluded.
 - `\@` is literal text and must not be recognized as a symbol reference.
-- Do not recognize `@` inside a larger non-whitespace token unless the immediately preceding character is allowed
-  opening punctuation.
-- Use `@` symbol references for code symbols that should resolve or be indexed, including classes, interfaces, methods,
-  functions, constants, exceptions, and externally meaningful code contracts.
-- Use inline code spans for literal strings, field names, wire values, token formats, service names, namespaces, part
-  numbers, configuration keys, and path-like text that should not resolve as symbols.
+- Do not recognize `@` inside a larger non-whitespace token unless the immediately preceding character is an allowed
+  opening punctuation character.
+- When text identifies a code symbol or externally meaningful code contract, it must use an `@` symbol reference in
+  every section and within prose. This includes classes, interfaces, methods, functions, types, constant identifiers,
+  and exceptions. An unprefixed code name is ordinary text and must not be relied on as a symbol reference.
+- Symbol references may appear inside or outside inline code spans. Backticks are not required for a symbol reference;
+  use them only when the containing fragment would normally be written as inline code.
+- Use inline code spans for exact literal values, including strings, booleans, numbers, null-like values, enum and wire
+  values, field names, token formats, service names, namespaces, part numbers, configuration keys, path-like literals,
+  arithmetic, and inline code expressions.
+- Inline code spans are semantic notation, not emphasis. Do not backtick ordinary prose, descriptive phrases,
+  human-facing labels, scenario narration, or entire entries. Backtick only the smallest exact literal, value, token,
+  expression, or code fragment that would normally be written as inline code.
 - Fence markers are ordinary body text in `.sdd`; fenced code blocks are not special `.sdd` syntax.
+
+Example fragment:
+
+```sdd
+Must:
+  The status becomes `active` after approval.
+  Approved requests remain visible.
+
+Exposes:
+  @BillingClass.someMethod
+
+Example:
+  enabled: `true`
+  retry count: `3`
+  calculation: `subtotal + tax`
+  invocation: `@BillingClass.someMethod(input)`
+```
 
 ### Paths, Globs, And Key-Value Lines
 
 - Explicit paths start with `./`, `../`, or `/`.
-- `./` and `../` resolve relative to the current `.sdd` file directory.
+- `./` and `../` resolve relative to the directory containing the current `.sdd` file.
 - `/` resolves relative to the selected content root.
 - `~/` is unsupported.
 - Prefer `./...` for local files and child paths.
-- Use `../...` only for one parent level when that keeps the reference clear.
-- For paths more than one parent away, prefer `/...` content-root paths in `Can read`, `References`, `Depends on`, and
-  similar explicit path entries.
+- Use `../...` only for a path one parent level away when that keeps the reference clear.
+- For paths more than one parent level away, prefer `/...` content-root paths in `Can read`, `References`, `Depends on`,
+  and similar explicit path entries.
 - Unprefixed prose, filenames, dependency names, class names, service names, symbols, and ordinary text are not explicit
   path references.
 - Globs are explicit path candidates containing `*`, `?`, `[`, `]`, `{`, or `}`.
@@ -541,19 +640,25 @@ Section rules:
   request.
 - `Structure`: files, directories, and immediate project artifacts in current or descendant scope, described at the
   current spec's level of authority; not a deep inventory when child specs can own the detail.
-- `Owns`: files, directories, symbols, concepts, or responsibilities owned by the spec; mixed entries.
-- `Can modify`: files or paths that may be changed under the spec; mixed entries.
-- `Can read`: files, paths, specs, or prose context that may be read; mixed entries.
+- `Owns`: non-`.sdd` files, directories, symbols, concepts, or responsibilities for which the spec is the authoritative
+  contract owner; ownership is exclusive, and every owned path is implicitly modifiable and readable under the spec;
+  mixed entries.
+- `Can modify`: additional non-`.sdd` files or paths that may be changed under the spec without being owned by it;
+  permission implies read access but does not transfer authority or override the owning spec's constraints; mixed
+  entries.
+- `Can read`: additional files, paths, specs, or prose context that may be read when access is not already implied by
+  inherited context or another section; mixed entries.
 - `References`: explicit references to specs, files, symbols, contracts, or context; mixed entries. References may point
-  anywhere explicit paths or symbols can resolve. References are context, not write authority, and should preserve
-  dependency direction.
+  anywhere explicit paths or symbols can resolve. Path references imply read access, grant neither ownership nor
+  modification permission, and should preserve dependency direction.
 - `Must`: required outcomes, invariants, and observable behavior; not implementation steps or work instructions.
-- `Must not`: forbidden behavior, non-goals, and boundaries that are plausible for the subject or needed to prevent
-  likely misuse; not arbitrary unrelated capabilities.
+- `Must not`: locally plausible forbidden behavior, adjacent non-goals, and boundaries needed to prevent likely misuse;
+  not arbitrary capabilities, common-sense exclusions, or behavior unrelated to the subject.
 - `Forbids`: disallowed dependencies, paths, modules, libraries, or architectural access that could otherwise be used
   in this subject; not an exhaustive list of unrelated things.
-- `Depends on`: dependencies, collaborators, contracts, symbols, paths, or required context; mixed entries.
-- `Exposes`: public entry points, exported symbols, APIs, contracts, interfaces, signals, surfaces or observable
+- `Depends on`: dependencies, collaborators, contracts, symbols, paths, or required context; path entries imply read
+  access but grant neither ownership nor modification permission; mixed entries.
+- `Exposes`: public entry points, exported symbols, APIs, contracts, interfaces, signals, surfaces, or observable
   capabilities presented by the subject; mixed entries. Parent or facade specs may list child-owned entry points only
   when the parent deliberately presents, routes, aggregates, or proxies that API surface.
 - `Accepts`: accepted inputs, request shapes, parameters, or preconditions; mixed entries.
@@ -562,9 +667,9 @@ Section rules:
 - `Handles`: cases, events, states, branches, or conditions handled by the spec; mixed entries.
 - `Tasks`: local implementation and work checklist for satisfying the subject contract; not a standalone task, adoption,
   migration, or ticket contract.
+- `Done when`: completion criteria; mixed entries; no inline value.
 - `Scenario`: behavioral example; inline nonempty title; mixed body entries, commonly scenario steps.
 - `Example`: concrete examples, payloads, usage snippets, or expected transformations; repeatable mixed entries.
-- `Done when`: completion criteria; mixed entries; no inline value.
 
 ### Tasks, Scenarios, And Examples
 
@@ -581,15 +686,15 @@ Task markers are valid only inside `Tasks`, after exactly two spaces:
 
 - Unsupported bracketed states inside `Tasks` are invalid.
 - Non-task body entries inside `Tasks` are invalid.
-- Task ids are optional, appear after the marker, start with `#`, and require one or more digits.
-- Empty hash ids such as `# blocked` are not task ids. A task id is not a comment.
-- Task text is required and free-form after the marker and optional id.
+- Task IDs are optional, appear after the marker, start with `#`, and require one or more digits.
+- Empty hash IDs such as `# blocked` are not task IDs. A task ID is not a comment.
+- Task text is required and free-form after the marker and optional ID.
 - Mark `[x]` only when the relevant change and checks are complete.
 - Use `[!]` for blocked work and `[?]` for unresolved design decisions.
 
-Scenario steps start after exactly two spaces with `Given`, `When`, `Then`, `And`, or `But`, followed by end of line or
-whitespace. Words that merely start with these keywords are plain text. The language does not require Given/When/Then
-presence or step ordering.
+Scenario steps start after exactly two spaces with `Given`, `When`, `Then`, `And`, or `But`; the keyword must be followed
+by the end of the line or whitespace. Words that merely start with these keywords are plain text. The language does not
+require Given/When/Then presence or step ordering.
 
 `Example` body entries are normal mixed entries. Multiple `Example` sections may appear in one file.
 
@@ -607,13 +712,14 @@ This section is guidance for writing and using specs. It does not redefine `.sdd
 - Use other sections only when they add useful local authority, constraints, behavior, or context.
 - Use `Purpose` for summary, concept, project role, and reader orientation. Someone looking only at `Purpose` should be
   able to infer what subject is being specified. `Purpose` may overlap lightly with other sections when that context
-  helps safe discovery.
+  supports safe discovery.
 - Write `Purpose` and `Must` as outcome statements about the subject. Put temporary work instructions in `Tasks` only
   when they belong to the local subject.
-- Do not duplicate a requirement by restating it in another section with inverted wording. Use `Must` for required
-  behavior, `Must not` for distinct prohibitions or non-goals, and `Forbids` for disallowed dependencies, paths,
-  modules, tools, resources, or access.
-- Do not create specs whose subject is the agent task being performed, such as adoption, migration, cleanup, or
+- Give each behavioral rule one canonical polarity; never restate it as its logical inverse for emphasis or coverage.
+  Use `Must` for a required outcome, `Must not` for an independent prohibition or non-goal, and `Forbids` for a
+  disallowed dependency, path, tool, resource, or access. A `Must not` is independent only when the subject could
+  satisfy every applicable `Must` and still violate it; otherwise it is redundant and must be omitted.
+- Do not create specs whose subject is the task being performed by the agent, such as adoption, migration, cleanup, or
   planning, unless that task is itself a durable project workflow being specified.
 - Keep negative requirements local and plausible. Add `Must not` only when it separates neighboring responsibilities,
   prevents likely misuse, preserves dependency direction, or captures a real local risk.
@@ -624,13 +730,22 @@ This section is guidance for writing and using specs. It does not redefine `.sdd
 - Preserve dependency direction in `References`, `Depends on`, `Purpose`, and `Handles`. Provider, runtime, framework,
   and shared service specs describe their own contracts and direct dependencies; they must not name consumers, adapters,
   mount roots, handler implementations, or frontend clients unless the provider genuinely depends on them.
-- Apply deduplication pressure mainly to `Structure`, `Exposes`, `Must`, `Must not`, `Handles`, and `Done when`.
-- Use `Platform` sparingly at the root or major area where it adds inheritable technical context. Child specs inherit
-  the nearest useful platform unless they introduce a meaningful platform shift.
+- Treat sections as semantic roles, not independent checklists. Give each contract statement one canonical home: when
+  more than one section could express the same meaning, use the most specific applicable section and do not repeat it
+  in broader sections; the specific entry carries the broader implication. Use a broader section only when no more
+  specific section fits. The same path, symbol, or behavior may appear in multiple sections only when each occurrence
+  adds a distinct section-specific meaning.
+- Prefer exact paths over globs. Use a glob only when the subject contract genuinely applies to a pattern-defined
+  collection or when the collection is large, variable, or generated enough that maintaining exact entries would be
+  impractical. Use the narrowest pattern that fits, and never use a glob merely to avoid listing a small, stable set of
+  paths. Treat a glob in `Owns` or `Can modify` as authority over every current and future non-`.sdd` match: all matches
+  must share the intended ownership or edit policy, and use `**` only when recursive descendants are deliberately in
+  scope.
+- Use `Platform` sparingly at the root or in a major area where it adds inheritable technical context. Child specs
+  inherit the nearest useful platform unless they introduce a meaningful platform shift.
 - Keep `Platform` labels concise, stack-like, and slash-separated. When multiple terms are present, separate every term
-  with `/`. Put subject role, local identifier, artifact type, and behavior in `Purpose`, `Structure`, `Owns`, or
+  with `/`. Put the subject role, local identifier, artifact type, and behavior in `Purpose`, `Structure`, `Owns`, or
   behavioral sections instead.
-- Only one spec should own a specific item at a given time.
 - `Depends on` never overrides inherited `Forbids` or `Must not`.
 - `Scenario` entries should be satisfied and checked when relevant.
 - Use `Example` sparingly.
@@ -655,19 +770,24 @@ Task guidance:
 Before changes:
 
 - Identify the target file, directory, or task.
-- Load bootstrap files in order.
+- Load the bootstrap files in order.
 - Walk upward from the target path and collect relevant governing specs.
 - Read the inherited chain from parent to child.
-- Read explicit `References` declared by included specs when they affect the task or when building context.
+- Read the explicit `References` declared by the included specs when they affect the task or are needed to build context.
 - Identify the nearest relevant local spec.
-- Determine modification scope from `Can modify` or `Owns`.
-- Identify applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenario`, and `Done when`.
+- For a `.sdd` target, confirm that it was selected for change and skip ownership and modification-path authorization for
+  the spec file itself.
+- For a bootstrap control-file target, apply the Spec Edit Authority rules instead of project-artifact authority.
+- For each non-`.sdd` project artifact, identify its authoritative owning spec and determine the modification scope from
+  `Owns` plus any additional `Can modify` paths, then snapshot that authority before changing anything.
+- Identify the applicable `Must`, `Must not`, `Depends on`, `Forbids`, `Tasks`, `Scenario`, and `Done when` entries.
 
 During changes:
 
 - Prefer local changes.
 - Make the smallest change satisfying the target task or behavior.
-- If asked to complete a specific task, complete only that task unless required by direct dependencies.
+- If asked to complete a specific task, complete only that task unless additional work is required by direct
+  dependencies.
 - Preserve public contracts unless the spec asks to change them.
 - Do not widen architecture boundaries.
 - Do not add forbidden dependencies.
@@ -680,11 +800,11 @@ During changes:
 
 After changes:
 
-- Check that relevant scenarios are satisfied.
-- Check that applicable `Must` rules are satisfied.
+- Check that the relevant scenarios are satisfied.
+- Check that the applicable `Must` rules are satisfied.
 - Check that no `Must not` or `Forbids` rules were violated.
-- Check that modified files are within allowed scope.
-- Check that tests or validation steps pass when available.
+- Check that the modified files are within the allowed scope.
+- Check that the tests or validation steps pass when available.
 - Update completed tasks only after the relevant change and verification are complete.
 
 ## Effective Spec Resolution
@@ -692,7 +812,7 @@ After changes:
 When asked to work on a path, mentally construct the effective spec.
 
 Effective spec resolution is path-based. Use same-directory basename matching when it applies, but do not use other
-filename similarity, symbol names, technical conventions, component names, or check names to decide which specs apply
+filename similarities, symbol names, technical conventions, component names, or check names to decide which specs apply
 unless a project-specific rule explicitly says to do so.
 
 Example tree:
@@ -732,7 +852,9 @@ src/trips/trips.sdd
 src/trips/itinerary.sdd
 ```
 
-Use all parent rules as active constraints. Use the nearest local spec for concrete change authority.
+Use all parent rules as active constraints and the nearest local spec for the most specific behavior and context.
+Determine concrete change authority independently from the target's owning spec and the pre-operation `Owns` and
+`Can modify` snapshot.
 
 ## Tool Context Discovery
 
@@ -744,7 +866,7 @@ By default, include:
 - Directory-level specs from the selected content root to the target directory, ordered root to target.
 - Ancestor specs from the selected content root to the target path.
 - The same-directory basename spec for the target file when it exists.
-- Explicit `References` declared by included specs.
+- Explicit `References` declared by the included specs.
 
 Do not include sibling specs, nearby files, or same-named files by default, except for same-directory basename spec
 matches. Include other files only when they are explicitly referenced, requested, or selected by a project-specific
@@ -787,8 +909,9 @@ explicit reference
 requested nearby file
 ```
 
-Context discovery must not expand write authority. Referenced or nearby files remain read context unless the active
-spec grants modification scope through `Can modify` or `Owns`.
+Context discovery must not expand ownership or modification permission. Referenced or nearby files remain read context
+unless the active spec owns them or grants additional permission through `Can modify`. A `Can modify` grant never
+replaces the target's owning spec or its constraints.
 
 ## Report And Compliance Check
 
@@ -796,9 +919,24 @@ Before final response, check:
 
 - Did you read the bootstrap files?
 - Did you resolve the spec chain?
-- Did you stay within write authority?
-- Did you satisfy relevant `Must` rules?
-- Did you avoid `Must not` and `Forbids`?
+- Would removing an added or materially edited entry leave implementation, authority, observable behavior, dependency
+  boundaries, necessary local orientation, and verification materially unchanged? If so, remove it. Apply this check
+  to untouched entries only when full-spec review or cleanup is in scope.
+- Does every negative rule prevent a plausible local mistake rather than state an obvious or unrelated exclusion?
+- Was every changed `.sdd` file selected by the Operator's request, an active SpecDD workflow, or an authorized task,
+  without relying on `Owns` or `Can modify` authorization?
+- Does every changed spec avoid `.sdd` paths in `Owns` or `Can modify`, including directory or glob entries intended to
+  authorize spec changes?
+- Is every glob necessary, the narrowest practical pattern, and valid for every current and future match?
+- Does every code symbol and externally meaningful code contract use an `@` symbol reference, including within prose?
+- Is every `@` symbol reference treated the same inside and outside inline code spans, with backticks used only for
+  their normal code-formatting role?
+- Are exact literal values and inline code expressions backticked, with each span limited to the smallest relevant
+  fragment rather than ordinary prose or an entire entry?
+- For non-`.sdd` project artifacts, did every change, including creation, preserve ownership and match the pre-operation
+  authority snapshot or the same-operation exception defined above and explicitly authorized by the Operator?
+- Did you satisfy the relevant `Must` rules?
+- Did you avoid violating the applicable `Must not` and `Forbids` rules?
 - Did you run or explain verification?
 
 When reporting completed work, include:
@@ -812,10 +950,12 @@ When reporting completed work, include:
 
 If specs conflict:
 
-- Prefer the more restrictive rule.
+- Apply the more restrictive rule only when the constraints are compatible and one safely narrows the other.
 - Prefer explicit local behavior only when it does not violate parent constraints.
-- Treat `Must not` and `Forbids` as stronger than `Must`, `Depends on`, or `Tasks`.
-- Treat inherited architecture as active unless explicitly and safely narrowed.
+- Treat a rule that requires behavior forbidden by another active rule, including a required dependency named by
+  `Forbids`, as an unsatisfiable conflict. Do not choose the negative or positive rule as the winner.
+- Treat competing ownership claims as an authority conflict; do not resolve them by proximity or restrictiveness.
+- Treat the inherited architectural constraints as active unless explicitly and safely narrowed.
 - Do not use a task as justification to violate a rule.
 - If a safe partial change is possible, do the safe subset.
 - If the change cannot proceed safely, mark the task `[?]` or `[!]` and explain the issue.
@@ -824,7 +964,7 @@ If specs conflict:
 
 Specs should stay small.
 
-Prefer concise, direct requirements:
+Prefer concise, direct requirements. Example fragment:
 
 ```sdd
 Must:
@@ -876,21 +1016,25 @@ Must:
   Itinerary items appear in chronological order.
 
 Must not:
-  Access browser storage directly.
   Manage destination search results.
+
+Forbids:
+  @localStorage
+
+Done when:
+  All scenarios have tests.
 
 Scenario: missing place name
   Given the place name is empty
   When the person adds the itinerary item
   Then validation fails
   And no itinerary item is stored
-
-Done when:
-  All scenarios have tests.
-  No forbidden imports exist.
 ```
 
-## Complete Spec
+## Comprehensive Syntax Example (Not A Template)
+
+This example demonstrates available sections in one place and is intentionally larger than a typical spec. Omit every
+section and entry that does not pass the Relevance Gate.
 
 ```sdd
 # Comments are allowed as whole lines and do not create requirements.
@@ -905,23 +1049,19 @@ Purpose:
 Structure:
   ./itinerary.ts: Itinerary behavior
   ./itinerary.test.ts: Itinerary tests
-  ./fixtures: Test fixtures
+  ./fixtures: Test fixtures owned by their local spec
 
 Owns:
   ./itinerary.ts
   ./itinerary.test.ts
-  Itinerary
-  ItineraryResult
+  @Itinerary
+  @ItineraryResult
 
 Can modify:
-  ./itinerary.ts
-  ./itinerary.test.ts
-  ./fixtures/*
+  ./fixtures/*.json: Variable itinerary fixture collection
 
 Can read:
-  ../models/itinerary-item.sdd
-  ../ports/trip-storage.sdd
-  ../repositories/*
+  ../support/storage-failure-samples.json: Diagnostic examples for storage normalization
 
 References:
   ../models/itinerary-item.sdd
@@ -930,56 +1070,55 @@ References:
 
 Must:
   A missing place name is rejected before storage.
-  Itinerary items have stable ids.
+  Itinerary items have stable IDs.
   Existing itinerary items are preserved when a new place is added.
   Storage failures are normalized before return.
 
 Must not:
-  Access browser storage directly.
   Manage destination search results.
-  Import UI component code.
 
 Forbids:
-  localStorage
+  @localStorage
   ../ui/*
 
 Depends on:
-  TripRepository
-  TripStoragePort
-  TripLogger
+  @TripRepository
+  @TripStoragePort
+  @TripLogger
 
 Exposes:
-  Itinerary.addPlace(input)
-  Itinerary.movePlace(id, date)
+  @Itinerary.addPlace
+  @Itinerary.movePlace
 
 Accepts:
-  NewItineraryItemInput
+  @NewItineraryItemInput
   place name
   trip date
 
 Returns:
-  ItineraryResult
-  created itinerary item id
+  @ItineraryResult
+  created itinerary item ID
   itinerary grouped by day
 
 Raises:
-  MissingPlaceNameError
-  TripStorageError
-  ItineraryItemNotFoundError
+  @MissingPlaceNameError
+  @TripStorageError
+  @ItineraryItemNotFoundError
 
 Handles:
   missing place name
   missing trip date
   storage write failure
-  duplicate itinerary item id
+  duplicate itinerary item ID
 
 Tasks:
-  [x] #0 Define itinerary public contract.
+  [x] #0 Define the itinerary public contract.
   [ ] #1 Add validation for a missing place name.
   [ ] #2 Preserve itinerary order after moving a place.
-  [!] #3 Decide whether items can overlap on the same day.
-  [?] #4 Confirm whether the same place can be added more than once.
-  [-] #5 Skip map rendering because map UI owns it.
+  [?] #3 Confirm whether the same place can be added more than once.
+
+Done when:
+  All scenarios have tests.
 
 Scenario: missing place name
   Given the place name is empty
@@ -991,19 +1130,13 @@ Scenario: storage failure
   Given the place name and trip date are valid
   And trip storage fails
   When the person adds the itinerary item
-  Then a TripStorageError is returned
+  Then a @TripStorageError is returned
   And the existing itinerary is unchanged
 
 Example:
-  input place: Louvre Museum
-  input date: 2026-06-12
-  result itinerary item count: 1
-
-Done when:
-  All scenarios have tests.
-  No forbidden dependencies are imported.
-  Public contract is preserved.
-  Relevant tasks are updated only after checks pass.
+  input place: `Louvre Museum`
+  input date: `2026-06-12`
+  result itinerary item count: `1`
 ```
 
 ## Prime Directive
@@ -1013,7 +1146,7 @@ When working in a SpecDD project:
 - Read the bootstrap files.
 - Read the relevant specs.
 - Resolve inherited constraints.
-- Work only inside local authority.
+- Work only within local authority.
 - Make the smallest correct change.
 - Do not violate `Must not` or `Forbids`.
 - Use `Tasks` to guide work.
