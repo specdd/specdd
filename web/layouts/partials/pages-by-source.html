@@ -1,0 +1,11 @@
+{{- /* Keep all matches so mounting one source as multiple pages is an error. */ -}}
+{{- $pages := newScratch -}}
+{{- range .Pages -}}
+  {{- $page := . -}}
+  {{- with .File -}}
+    {{- $filename := path.Clean (replace .Filename `\` "/") -}}
+    {{- $matches := $pages.Get $filename | default slice -}}
+    {{- $pages.Set $filename ($matches | append $page) -}}
+  {{- end -}}
+{{- end -}}
+{{- return $pages.Values -}}

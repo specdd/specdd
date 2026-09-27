@@ -1,21 +1,21 @@
 # Contributing to SpecDD
 
-Thank you for your interest in contributing! We actively welcome suggestions, proposals, and contributions of all kinds.
+We welcome suggestions, proposals, and contributions of all kinds.
 
-## How to Contribute
+## How to contribute
 
 ### Start a discussion or open an issue
 
-Not sure if your idea is fully formed yet? Feel free to start a conversation
-in [GitHub Discussions](https://github.com/specdd/specdd/discussions) — it's a great place for questions, ideas, and open-ended proposals.
+For questions or ideas you want to explore, start a conversation in
+[GitHub Discussions](https://github.com/specdd/specdd/discussions).
 
-When you're ready to move forward with something concrete, open an issue to describe what you have in mind. This ensures
-your submission is on the right track and avoids wasted effort. We use GitHub Issues to track bugs, feature requests,
-and proposals.
+For a specific bug report, feature request, or proposal, [open an issue](https://github.com/specdd/specdd/issues).
+Describe the problem or proposed change and why it matters. Discussing the idea before implementation helps clarify
+its scope and how it fits the project.
 
 ### Submit a pull request
 
-Once your idea has been discussed and is ready to implement, open a pull request referencing the related issue.
+After discussing the proposed change, implement it and open a pull request that links to the related issue.
 
 ## License
 

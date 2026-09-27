@@ -13,6 +13,10 @@ build: verify-public-key
 	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output $(PACKAGE_SIG) $(PACKAGE_ZIP)
 	$(MAKE) verify-package
 
+sign-plugins: verify-public-key
+	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/dsd/plugin.md.asc .plugins/dsd/plugin.md
+	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/ssg/plugin.md.asc .plugins/ssg/plugin.md
+
 verify-public-key:
 	gpg --show-keys --with-colons $(PUBLIC_KEY) | grep -q '^fpr:::::::::$(SIGNING_KEY):'
 
@@ -25,4 +29,4 @@ verify-package:
 	gpg --batch --homedir "$$tmp_homedir" --import $(PUBLIC_KEY); \
 	gpg --batch --homedir "$$tmp_homedir" --verify $(PACKAGE_SIG) $(PACKAGE_ZIP)
 
-.PHONY: build verify-public-key verify-package
+.PHONY: build sign-plugins verify-public-key verify-package

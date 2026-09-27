@@ -3,10 +3,14 @@
     <a href="/articles/">Articles</a>
     <a href="/news/">News</a>
     <a href="/tools/">Tools</a>
+    <a href="/plugins/">Plugins</a>
     <a href="/how-to/">How-To</a>
     <a href="/quickstart/">Quickstart</a>
     <a href="/changelog/">Changelog</a>
+    {{ with .Site.GetPage "/contributing" }}<a href="{{ .RelPermalink }}">Contributing</a>{{ end }}
     <a href="/language-reference/">Language reference</a>
+    {{ with .Site.GetPage "/style-guide" }}<a href="{{ .RelPermalink }}">Style guide</a>{{ end }}
+    {{ with .Site.GetPage "/security" }}<a href="{{ .RelPermalink }}">Security</a>{{ end }}
     <a href="/contact/">Contact</a>
     <a href="/privacy/">Privacy</a>
     <a href="https://specdd.eo.page/subscribe-to-specletter" target="_blank" rel="noopener">Subscribe</a>

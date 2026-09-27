@@ -2,6 +2,38 @@
 title: SpecDD Framework Changelog
 ---
 
+## [1.6] - 2026-09-27
+
+### Added
+
+- **Framework:** Added a [framework plugin system](./PLUGINS.md) for reusable instructions and workflows, with signed
+  official plugins and support for third-party and team extensions. The plugin guide covers installation, updates, and
+  publishing.
+- **Plugins:** Added [Domain & Solution Design (DSD)](./.plugins/dsd/README.md) for Domain Definitions and Solution Designs
+  that connect business rules, architecture decisions, and acceptance criteria with implementation specs. Its workflow
+  keeps affected designs and specs synchronized.
+- **Plugins:** Added [SpecDD Style Guide (SSG)](./.plugins/ssg/README.md) for writing and reviewing specs, designs, and other
+  SpecDD artifacts while preserving their meaning and native formats.
+- **Documentation:** Added a [technical writing style guide](./STYLE-GUIDE.md) for framework-specific documentation and
+  agent instructions.
+
+### Changed
+
+- **Framework:** Clarified that planning mode applies to requests for a plan. Requests to apply framework or spec changes
+  follow the working procedure within the authorized scope.
+- **Framework:** Clarified that write authority is evaluated across the complete requested change, and tightened the
+  rules against weakening inherited constraints or modification permissions.
+- **Documentation:** Expanded the quickstart and tools guide with prerequisites, spec review, and checks for setup and
+  implementation results.
+- **Documentation:** Updated security guidance to cover signed official plugins, automatic verification, and manual
+  signature checks.
+- **Web:** Expanded the website with plugin, contribution, style, and security guides, plus updated navigation.
+
+### Fixed
+
+- **Framework:** Corrected bootstrap guidance on `Spec` as the first section of a complete `.sdd` file.
+- **Web:** Fixed shared documentation links on the website.
+
 ## [1.5] - 2026-07-16
 
 ### Added

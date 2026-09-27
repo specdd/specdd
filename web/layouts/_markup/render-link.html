@@ -1,4 +1,38 @@
 {{- $destination := .Destination -}}
+{{- $source := .PageInner -}}
+{{- with $source.File -}}
+  {{- $filename := path.Clean (replace .Filename `\` "/") -}}
+  {{- with $source.Site.Home.File -}}
+    {{- /* The homepage is mounted from the repository's root README.md. */ -}}
+    {{- $root := path.Dir (replace .Filename `\` "/") -}}
+    {{- /* Shared documentation includes root documents and mounted plugin guides. */ -}}
+    {{- $pluginRoot := printf "%s/.plugins/" $root -}}
+    {{- if or (eq (path.Dir $filename) $root) (strings.HasPrefix $filename $pluginRoot) -}}
+      {{- $url := urls.Parse $destination -}}
+      {{- if and (not $url.IsAbs) (not $url.Host) (eq (lower (path.Ext $url.Path)) ".md") -}}
+        {{- if strings.HasPrefix $url.Path "/" -}}
+          {{- errorf "Shared document link %q must be relative to its source file. See %s" $destination $.Position -}}
+        {{- else -}}
+          {{- $target := path.Clean (path.Join (path.Dir $filename) $url.Path) -}}
+          {{- $pages := partialCached "pages-by-source.html" $source.Site $root $source.Site.Language.Lang -}}
+          {{- $matches := index $pages $target | default slice -}}
+          {{- if eq (len $matches) 1 -}}
+            {{- $page := index $matches 0 -}}
+            {{- with $page.RelPermalink -}}
+              {{- /* Keep the original encoding of the query string and fragment. */ -}}
+              {{- $suffix := replaceRE `^[^?#]*` "" $destination -}}
+              {{- $destination = printf "%s%s" . $suffix -}}
+            {{- else -}}
+              {{- errorf "Shared document link %q has no published URL. See %s" $destination $.Position -}}
+            {{- end -}}
+          {{- else -}}
+            {{- errorf "Shared document link %q resolves to %d pages; expected one published Markdown target. See %s" $destination (len $matches) $.Position -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 {{- $isExternal := or (strings.HasPrefix $destination "http://") (strings.HasPrefix $destination "https://") -}}
 {{- $newTab := and $isExternal (eq .Page.RelPermalink "/tools/") -}}
 <a href="{{ $destination | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if $newTab }} target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>

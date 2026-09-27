@@ -17,7 +17,8 @@ files that are actively changing.
 
 ## How it works
 
-SpecDD is deliberately simple. Use the CLI to add the framework bootstrap files to your project.
+SpecDD is deliberately simple. Use the SpecDD command-line interface (CLI) to add the framework bootstrap files to your
+project.
 
 After initialization, place small `.sdd` specs beside the files or project areas they describe. If your AI agent does
 not automatically read the SpecDD bootstrap, tell it to read `.specdd/bootstrap.md` before it starts working. The agent
@@ -38,53 +39,81 @@ describe, where both humans and agents can use them.
 The official SpecDD project is published at:
 
 - Website: https://specdd.ai/
-- Tools and setup guide: https://specdd.ai/tools/
+- [Project overview](./README.md)
+- [Tools and setup guide](./TOOLS.md)
 - Source repository: https://github.com/specdd/specdd
-- Language specification: https://specdd.ai/language-reference/
+- [Language specification](./LANGUAGE.md)
 - CLI source and help: https://github.com/specdd/cli
 - Release downloads: https://github.com/specdd/specdd/releases
 
 Community links:
 
 - Discussions: https://github.com/specdd/specdd/discussions
-- Reddit: https://www.reddit.com/r/specdd/
-- IRC: `#specdd` on Libera.Chat
 - Discord: https://discord.gg/dKabJKB2Ep
+- Reddit: https://www.reddit.com/r/specdd/
 
 ## Quickstart
 
-Start with the [guided quickstart](https://specdd.ai/quickstart/) for the shortest setup path.
+Start with the [guided quickstart](./QUICKSTART.md) for the shortest setup path.
 
 It walks through installing the CLI, initializing a project, adding a root spec, adding a local same-basename spec, and
 giving an agent a focused change request.
 
-It shows the basic spec-driven development loop: write a small spec, review it, then implement from that reviewed
-contract.
+A basename is a filename without its final extension, such as `itinerary` in `itinerary.js` and `itinerary.sdd`.
+
+The quickstart shows the basic spec-driven development loop: write a small spec, review it, then implement from that
+reviewed contract.
 
 ## Tooling
 
 The SpecDD CLI manages setup and framework updates. The core workflow still uses plain files and should work with any
 editor, any repository, and any AI coding agent that can read project files.
 
-Official [tools and setup instructions](https://specdd.ai/tools/) are the current inventory for the SpecDD CLI, agent
-plugins, editor integrations, and any additional tooling as it becomes available.
+The official [tools and setup guide](./TOOLS.md) lists the SpecDD CLI, agent plugins, editor integrations, and any
+additional tooling as it becomes available.
 
 The formal `.sdd` language specification is maintained
-in the [language reference page](https://specdd.ai/language-reference/). It is strongly recommended to follow the
+in the [language reference](./LANGUAGE.md). It is strongly recommended to follow the
 documented language closely and avoid inventing custom syntax. Future tooling will rely on the current conventions.
+
+## Framework plugins
+
+SpecDD framework plugins add reusable instructions, document types, and workflows to a project. Agents load enabled
+plugins through the SpecDD bootstrap.
+
+Official plugins include:
+
+- [Domain & Solution Design (DSD)](./.plugins/dsd/README.md) (`dsd`): adds Domain Definitions and Solution Designs to
+  connect business rules and design decisions with implementation specs.
+- [SpecDD Style Guide (SSG)](./.plugins/ssg/README.md) (`ssg`): helps write clear specs, designs, and other SpecDD artifacts
+  while preserving their meaning and native formats.
+
+You can develop your own plugins and distribute them through public or private Git repositories accessible over SSH
+or HTTPS, including repositories you host yourself. To propose a plugin for inclusion in the SpecDD repository,
+follow the [contribution guide](./CONTRIBUTING.md).
+
+See the [plugin guide](./PLUGINS.md) for installation, updates, and publishing instructions.
 
 ## Set up a project
 
 To start with SpecDD, install the official CLI tool. It requires Node.js 22 or newer. The
-[tools and setup guide](https://specdd.ai/tools/) covers CLI, agent plugin, and editor setup options.
+[tools and setup guide](./TOOLS.md) covers CLI, agent plugin, and editor setup options.
+
+Choose the installation method you prefer.
+
+With npm:
 
 ```bash
 npm install --global specdd
 ```
 
+With Yarn:
+
 ```bash
 yarn global add specdd
 ```
+
+With Homebrew:
 
 ```bash
 brew tap specdd/cli
@@ -103,12 +132,17 @@ Initialize SpecDD in another directory:
 specdd init path/to/project
 ```
 
-Or run the CLI with Docker by mounting your project at `/workspace`:
+Or run the CLI with Docker by mounting your project at `/workspace`. Choose the image source you prefer.
+
+Docker Hub:
 
 ```bash
-# From DockerHub
 docker run --rm -v "$PWD:/workspace" specdd/cli:latest init
-# From Github Container Registry
+```
+
+GitHub Container Registry:
+
+```bash
 docker run --rm -v "$PWD:/workspace" ghcr.io/specdd/cli:latest init
 ```
 
@@ -117,9 +151,8 @@ For CLI update commands, version options, file-safety details, and other command
 
 ## Example
 
-A complete working example is available in the SpecDD example repository: https://github.com/specdd/example. It
-demonstrates how SpecDD applies spec-driven development to a small Travel Planner project, with bootstrap
-files,
+A complete working example is available in the [SpecDD example repository](https://github.com/specdd/example). It
+demonstrates how SpecDD applies spec-driven development to a small Travel Planner project, with bootstrap files,
 colocated `.sdd` specs, source code, tests, and agent entrypoint files.
 
 ```sdd
@@ -152,7 +185,7 @@ Scenario: add place to itinerary
 Technical projects are hard to reason about because the relevant context is usually large, scattered, stale, or
 implicit. Important decisions, constraints, and assumptions are spread across code, docs, tickets, conversations, and
 individual memory. Humans feel this during handoffs, onboarding, review, maintenance, and incident response. AI agents
-expose the same problem faster because they can produce implementation quickly without the project memory a human team
+expose the same problem faster because they can produce implementations quickly without the project memory a human team
 has built up.
 
 SpecDD is built around a simple shift: stop treating the prompt as the source of truth. The prompt is temporary, narrow,
@@ -164,15 +197,15 @@ gives humans and agents a concrete source of truth for one part of the system. I
 document into every prompt, the agent resolves the relevant spec chain and works inside that bounded context.
 
 At a business level, SpecDD turns scattered intent into a durable project asset. Reviewers can compare a patch against a
-local contract instead of reconstructing the contract from memory, new contributors can learn the area they are touching
-without reading every historical discussion, and teams can preserve the reasoning behind important behavior in the
+local contract instead of reconstructing the contract from memory. New contributors can learn the area they are touching
+without reading every historical discussion. Teams can preserve the reasoning behind important behavior in the
 repository itself.
 
 SpecDD helps with:
 
 - breaking large projects into small implementation areas
 - giving agents and teams durable project context inside the repository
-- giving AI prompts concrete local source of truth
+- giving AI prompts a concrete local source of truth
 - structuring otherwise loose design documents
 - practicing spec-driven development without one giant requirements document
 - preserving architecture and ownership boundaries
@@ -254,7 +287,8 @@ assumption is that project work is organized in files.
 
 ## Workflow
 
-The recommended SpecDD workflow is a **spec-first** spec-driven development loop, similar in spirit to BDD.
+The recommended SpecDD workflow is a **spec-first** spec-driven development loop, similar in spirit to behavior-driven
+development (BDD).
 
 Typical flow:
 
@@ -272,7 +306,8 @@ First, a developer can write the spec manually and then ask an agent to implemen
 Read .specdd/bootstrap.md, resolve the relevant SpecDD chain, and implement it.
 ```
 
-Second, a developer can ask an agent to draft specs, review them, edit them as needed, and then ask for implementation:
+Second, a developer can ask an agent to draft specs. The developer can then review the drafts, edit them as needed,
+and ask the agent to implement them:
 
 ```text
 Create SpecDD specs for the trip planning area. Do not implement code yet.
@@ -291,6 +326,9 @@ prompts alone.
 
 SpecDD bootstrap instructions live in `.specdd`. The root spec must live at the selected content root and must be named
 after that root directory.
+
+The [selected content root](#path-based-resolution) is usually the repository or workspace root unless the project
+configures a different SpecDD root.
 
 Example: if the selected content root is `/home/bob/Projects/travel-planner/`, the root spec is:
 
@@ -316,6 +354,7 @@ Load order:
 
 ```text
 .specdd/bootstrap.md
+-> enabled plugins (if any, in registry order)
 -> .specdd/bootstrap.project.md
 -> .specdd/bootstrap.local.md
 ```
@@ -367,8 +406,8 @@ itinerary-filter.sdd
 itinerary.component.sdd
 ```
 
-Common non-root spec names include - adapt these to your platform's naming conventions as needed, including
-capitalization:
+Common non-root spec names include the following. Adapt these names to your platform's naming conventions as needed,
+including capitalization:
 
 ```text
 module.sdd
@@ -396,7 +435,7 @@ src/trips/itinerary.sdd
 src/trips/itinerary.js
 ```
 
-A suffix is useful when the folder does not disambiguate. For example:
+A suffix is useful when the folder does not make the role clear. For example:
 
 ```text
 src/trips/itinerary.component.sdd
@@ -415,10 +454,10 @@ more detail in [Directory and target resolution](#directory-and-target-resolutio
 ## Naming conventions for project files
 
 Aligning spec and source file naming as closely as possible improves how reliably agents locate and apply specs.
-The guidance below describes sensible defaults - if your platform, language, or team already has established naming
+The guidance below describes sensible defaults. If your platform, language, or team already has established naming
 conventions, follow those instead and apply them consistently across the project.
 
-When no existing convention applies, consider this priority order:
+Consider this priority order:
 
 1. Follow existing project naming conventions.
 2. If the folder already describes the thing, do not suffix.
@@ -460,7 +499,7 @@ When working on an existing or intended target path, agents should:
    exists.
 4. Walk upward through parent directories to the selected content root.
 5. Collect specs whose declared governing scope applies to the target.
-6. Read the inherited chain from the selected content root to target.
+6. Read the inherited chain from the selected content root to the target.
 7. Include explicit `References` declared by included specs when they affect the task or context.
 
 A target selected for creation does not need to exist before resolution begins. Tools resolve it from its normalized
@@ -504,7 +543,7 @@ The core rule is:
 
 ```text
 Vertical inheritance is implicit.
-Other context, including horizontal references, are explicit.
+Other context, including horizontal references, is explicit.
 ```
 
 Parent specs are automatically inherited. Sibling specs are not.
@@ -538,8 +577,7 @@ context, and `src/trips/itinerary.sdd` may be the file-level local spec. Parent-
 cumulative context, not ambiguity. When both exist, read parent-held context before local context for that directory.
 
 The same rule applies at the selected content root. If the content root directory is named `travel-planner`, the root
-spec
-must be `travel-planner.sdd` in that directory. This is the project root spec, not a separate syntax feature.
+spec must be `travel-planner.sdd` in that directory. This is the project root spec, not a separate syntax feature.
 
 When following explicit path references to find related specs, tools should follow links from these sections:
 
@@ -565,7 +603,7 @@ use an explicit glob such as `../tags/**/*.sdd`.
 
 A codebase can contain multiple spec hierarchies.
 
-Only the target path’s ancestor tree is relevant.
+For implicit inheritance, only the target path's ancestor tree is relevant.
 
 Example:
 
@@ -579,7 +617,7 @@ src/
 
 When working inside `src/trips`, do not automatically load `src/tags/module.sdd`.
 
-Use explicit references when one area needs another area’s contract.
+Use explicit references when one area needs another area's contract.
 
 ```sdd
 References:
@@ -617,7 +655,7 @@ Spec edit authority and project-artifact authority are separate.
 ### Editing specs and bootstrap files
 
 A `.sdd` file is a framework contract, not a project artifact owned by another spec. When a spec is selected for
-creation or editing by a person’s request, an active SpecDD workflow, or an authorized task, an agent may edit that
+creation or editing by a person's request, an active SpecDD workflow, or an authorized task, an agent may edit that
 spec without finding it in `Owns` or `Can modify`. This selects only that spec; it does not authorize edits to
 inherited, referenced, sibling, or nearby specs.
 
@@ -631,10 +669,10 @@ but agents edit them only when a person explicitly requests it or another explic
 
 For every non-`.sdd` project artifact, ownership and modification permission remain distinct:
 
-- `Owns` identifies the spec that is authoritative for an item’s contract. Ownership is exclusive and includes read and
+- `Owns` identifies the spec that is authoritative for an item's contract. Ownership is exclusive and includes read and
   modification permission for owned paths.
 - `Can modify` grants additional, non-owning permission. It implies read access, but it does not transfer ownership or
-  override the target’s owning spec and inherited constraints.
+  override the target's owning spec and inherited constraints.
 - The modification boundary is the union of `Owns` and the additional paths in `Can modify`. The same path should not
   appear in both sections.
 - Path entries in `References` and `Depends on` imply read access only. `Can read` is for additional context not already
@@ -656,10 +694,10 @@ Can modify:
 Before an agent makes the first change in an operation, it snapshots the effective `Owns` and `Can modify` authority for
 non-spec artifacts. Editing a spec during that operation does not silently widen the snapshot. Widened authority can be
 used in the same operation only when the person explicitly requested both the authority change and the corresponding
-project-artifact change; authority reductions apply immediately. New ordinary files must be covered by the
+project-artifact change. Authority reductions apply immediately. New ordinary files must be covered by the
 pre-operation snapshot before they are created.
 
-Before an agent modifies a path through `Can modify`, it should resolve and follow that path’s owning spec as well as
+Before an agent modifies a path through `Can modify`, it should resolve and follow that path's owning spec as well as
 the active task spec. Proximity, behavioral relevance, and references do not grant modification permission.
 
 If no local spec exists but a parent spec applies, the parent provides behavior and context, while the authority
@@ -671,10 +709,13 @@ should ask the person directing the work to identify or create it before changin
 All specs use the same basic language so spec-driven development rules stay readable by humans, agents, and tools. Not
 every section is required for every spec.
 
-The defined sections are grouped by purpose. Identity sections are `Spec`, `Platform`, and `Purpose`. Scope and
-ownership sections are `Structure`, `Owns`, `Can modify`, `Can read`, and `References`. Requirement sections are `Must`,
-`Must not`, and `Forbids`. Contract sections are `Depends on`, `Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles`.
-Workflow and behavior sections are `Tasks`, `Done when`, `Scenario`, and `Example`.
+The defined sections are grouped by purpose:
+
+- Identity: `Spec`, `Platform`, and `Purpose`.
+- Scope and ownership: `Structure`, `Owns`, `Can modify`, `Can read`, and `References`.
+- Requirements: `Must`, `Must not`, and `Forbids`.
+- Contracts: `Depends on`, `Exposes`, `Accepts`, `Returns`, `Raises`, and `Handles`.
+- Workflow and behavior: `Tasks`, `Done when`, `Scenario`, and `Example`.
 
 A spec should include only sections that add useful local authority, behavior, boundaries, context, or verification.
 
@@ -750,7 +791,7 @@ Spec: Itinerary
 
 ### Platform
 
-Describes technical platform, runtime, framework, or tool stack. Use it sparingly at the root or major area where it
+Describes the technical platform, runtime, framework, or tool stack. Use it sparingly at the root or major area where it
 adds inheritable technical context.
 
 Labels should be concise, stack-like, and slash-separated when multiple terms are present:
@@ -778,7 +819,7 @@ Purpose:
 
 ### Structure
 
-Describes file and directory structure for the current and descendant scope.
+Describes the file and directory structure for the current and descendant scope.
 
 Common forms:
 
@@ -814,7 +855,7 @@ Owns:
 ### Can modify
 
 Additional non-`.sdd` files or paths that may be changed without being owned by this spec. This permission implies read
-access but does not transfer ownership or override the owning spec’s constraints.
+access but does not transfer ownership or override the owning spec's constraints.
 
 ```sdd
 Can modify:
@@ -916,8 +957,7 @@ Accepts:
 ### Returns
 
 Outputs produced by this unit, such as returned values, responses, result states, generated artifacts, output files,
-exit
-values, or other observable results.
+exit values, or other observable results.
 
 ```sdd
 Returns:
@@ -957,7 +997,7 @@ Tasks:
   [ ] Keep itinerary items sorted after moving a place.
 ```
 
-Tasks are described in more detail below.
+See [task states and rules](#tasks-1) for more detail.
 
 ### Done when
 
@@ -1042,7 +1082,7 @@ Task rules:
 - Tasks are work guidance, not architecture overrides.
 - Tasks must not contradict `Must`, `Must not`, `Forbids`, or inherited constraints.
 - Parent tasks are planning context, not automatically actionable in child specs.
-- Only update task status in the currently targeted spec unless instructed otherwise.
+- Update task status only in the currently targeted spec unless instructed otherwise.
 - Prefer completing one task or a small related group of tasks at a time.
 - Do not complete unrelated tasks opportunistically.
 - Mark `[x]` only when the relevant change and checks are complete.
@@ -1058,8 +1098,8 @@ You do not need every level in every project. Use the levels that add clarity.
 SpecDD is adaptable to different project structures, languages, styles, and frameworks. The examples below are
 illustrative, not prescriptive. Use specs and bootstrap overrides to adapt SpecDD to your project.
 
-Important: remember that suffixes for the spec names are OPTIONAL and should be skipped when spec location implies
-the spec level or component already.
+Important: spec name suffixes are OPTIONAL and should be skipped when the spec's location already makes its level or
+component clear.
 
 ### Root project spec
 
@@ -1103,7 +1143,7 @@ Typical file:
 module.sdd
 ```
 
-Example:
+Example with `module.sdd` at the selected content root:
 
 ```sdd
 Spec: Trips Area
@@ -1449,7 +1489,7 @@ at a time. Prefer one spec at a time for best results.
 
 ## Creating a new SpecDD project
 
-Use the setup instructions at the top of this README to initialize SpecDD first. For additional CLI options, run
+Use the [setup instructions](#set-up-a-project) to initialize SpecDD first. For additional CLI options, run
 `specdd init --help` or see https://github.com/specdd/cli.
 
 A minimal setup example:
@@ -1639,7 +1679,7 @@ capabilities.
 
 ### Keep tasks local
 
-A task should usually be implementable inside the union of the active spec’s `Owns` and `Can modify` paths. A
+A task should usually be implementable inside the union of the active spec's `Owns` and `Can modify` paths. A
 `Can modify` path remains governed by its owning spec. Tasks that require other project artifacts are a signal that
 ownership or modification permission needs review.
 
@@ -1663,8 +1703,7 @@ might otherwise be ambiguous.
 ### Start with the root spec before adding local specs
 
 Without a root spec named after the selected content root directory, child specs have no architectural context to
-inherit
-from and agents must infer global rules. Even a minimal root spec with a handful of material `Must` rules and local
+inherit from and agents must infer global rules. Even a minimal root spec with a handful of material `Must` rules and local
 boundaries establishes the foundation that all local specs build on. Add it before writing module or service specs.
 
 ### Do not duplicate parent constraints in child specs
@@ -1675,9 +1714,9 @@ owns it, and let inheritance carry it down.
 
 ### Follow platform, language and project conventions in naming
 
-The naming examples in SpecDD, such as dot-separated suffixes, lowercase filenames, are illustrations, not rules. If
+The naming examples in SpecDD, such as dot-separated suffixes and lowercase filenames, are illustrations, not rules. If
 your platform, language, or team has established naming conventions, follow those instead. A Python project may prefer
-`itinerary.sdd`, a Java project may use `Itinerary.sdd`. What matters is that naming is consistent
+`itinerary.sdd`; a Java project may use `Itinerary.sdd`. What matters is that naming is consistent
 across the project, that spec files align closely with the source files and components they describe, and that the
 convention is applied uniformly so both people and agents can locate specs reliably.
 
@@ -1775,7 +1814,7 @@ Scenario: missing place name
   And no itinerary item is stored
 ```
 
-This should usually become a test.
+This scenario should usually become a test.
 
 Tests prove behavior. Specs explain why the behavior exists and where it belongs.
 
@@ -1883,7 +1922,7 @@ No. Humans can use it directly. It is designed to be especially useful with AI c
 ### Do I need tools?
 
 Use the SpecDD CLI to set up and update the framework files. After that, SpecDD specs are plain text files and can work
-with any LLM that can read repository files. The [tools and setup guide](https://specdd.ai/tools/) has the official
+with any LLM that can read repository files. The [tools and setup guide](./TOOLS.md) has the official
 setup instructions.
 
 ### Can SpecDD work with my language or framework?

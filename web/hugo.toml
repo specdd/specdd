@@ -79,12 +79,36 @@ source = "../TOOLS.md"
 target = "content/tools.md"
 
 [[module.mounts]]
+source = "../PLUGINS.md"
+target = "content/plugins/_index.md"
+
+[[module.mounts]]
+source = "../.plugins/dsd/README.md"
+target = "content/plugins/official/dsd.md"
+
+[[module.mounts]]
+source = "../.plugins/ssg/README.md"
+target = "content/plugins/official/ssg.md"
+
+[[module.mounts]]
 source = "../CHANGELOG.md"
 target = "content/changelog.md"
 
 [[module.mounts]]
+source = "../CONTRIBUTING.md"
+target = "content/contributing.md"
+
+[[module.mounts]]
 source = "../LANGUAGE.md"
 target = "content/language-reference.md"
+
+[[module.mounts]]
+source = "../STYLE-GUIDE.md"
+target = "content/style-guide.md"
+
+[[module.mounts]]
+source = "../SECURITY.md"
+target = "content/security.md"
 
 [[module.mounts]]
 source = "static"
@@ -113,6 +137,11 @@ target = "static/reference/README.md"
 [[module.mounts]]
 source = "../CHANGELOG.md"
 target = "static/reference/CHANGELOG.md"
+
+# Preserve the contributing guide's relative license link.
+[[module.mounts]]
+source = "../LICENSE"
+target = "static/contributing/LICENSE"
 
 [[module.mounts]]
 source = "../src"
