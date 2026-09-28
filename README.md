@@ -72,6 +72,9 @@ editor, any repository, and any AI coding agent that can read project files.
 The official [tools and setup guide](./TOOLS.md) lists the SpecDD CLI, agent plugins, editor integrations, and any
 additional tooling as it becomes available.
 
+Complementary spec tooling:
+- **[MySpec](https://myspec.dev)**: An interactive requirements discovery platform and spec compiler for humans and AI agents. It compiles project requirements into a 4-file bundle (`constitution.md`, `requirements.md`, `solution.md`, `tasks.md`) with native MCP server support (`@myspec/mcp-server`), aligning with spec-driven development practices.
+
 The formal `.sdd` language specification is maintained
 in the [language reference](./LANGUAGE.md). It is strongly recommended to follow the
 documented language closely and avoid inventing custom syntax. Future tooling will rely on the current conventions.
