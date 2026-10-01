@@ -963,6 +963,11 @@ body.has-toc #content {
   background: color-mix(in srgb, var(--surface-subtle) 50%, transparent);
 }
 
+#content #official-plugins + table th:nth-child(-n + 3),
+#content #official-plugins + table td:nth-child(-n + 3) {
+  white-space: nowrap;
+}
+
 #toc-toggle {
   display: none;
   flex-direction: column;

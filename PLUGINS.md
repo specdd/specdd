@@ -8,7 +8,8 @@ SpecDD framework plugins add reusable instructions and workflows to your project
 file that agents load through the SpecDD bootstrap, alongside the framework and project rules. Plugins can add document
 types, design practices, or workflows while keeping your project's intent in plain files.
 
-[Agent plugins](./TOOLS.md#dedicated-agent-plugins) serve a different purpose: they provide SpecDD skills for your coding
+[Agent plugins](./TOOLS.md#dedicated-agent-plugins) serve a different purpose: they provide SpecDD skills for your
+coding
 agent.
 
 Use plugins from SpecDD, third-party maintainers, or your own team to share domain-specific methods and conventions
@@ -17,10 +18,11 @@ records their sources and versions, lists enabled plugins, and updates their ins
 
 ## Official plugins
 
-| Plugin | Repository | Plugin name | Purpose |
-| --- | --- | --- | --- |
-| [Domain & Solution Design (DSD)](./.plugins/dsd/README.md) | `@specdd/specdd` | `dsd` | Document problem domains and solution designs that guide implementation specs. |
-| [SpecDD Style Guide (SSG)](./.plugins/ssg/README.md) | `@specdd/specdd` | `ssg` | Write clear specs, designs, and other SpecDD artifacts while preserving meaning and format. |
+| Plugin                                               | Repository       | Plugin name | Purpose                                                                                     |
+|------------------------------------------------------|------------------|-------------|---------------------------------------------------------------------------------------------|
+| [Domain & Solution Design](./.plugins/dsd/README.md) | `@specdd/specdd` | `dsd`       | Document problem domains and solution designs that guide implementation specs.              |
+| [SpecDD Style Guide](./.plugins/ssg/README.md)       | `@specdd/specdd` | `ssg`       | Write clear specs, designs, and other SpecDD artifacts while preserving meaning and format. |
+| [Zen](./.plugins/zen/README.md)                      | `@specdd/specdd` | `zen`       | Guide AI-agent work with attention, restraint, honesty, and care.                           |
 
 ## Install a plugin
 
@@ -52,11 +54,11 @@ brackets. See [Choose a version](#choose-a-version) for details.
 
 The repository address can use any of these forms:
 
-| Address form | Example |
-| --- | --- |
-| GitHub shorthand over SSH | `@owner/repository` |
-| SSH address | `git@example.com:namespace/repository.git` |
-| HTTPS URL | `https://example.com/namespace/repository.git` |
+| Address form              | Example                                        |
+|---------------------------|------------------------------------------------|
+| GitHub shorthand over SSH | `@owner/repository`                            |
+| SSH address               | `git@example.com:namespace/repository.git`     |
+| HTTPS URL                 | `https://example.com/namespace/repository.git` |
 
 The repository must contain `.plugins/<pluginname>/plugin.md`. The CLI installs that instruction file in your project
 and registers it in `.specdd/plugins.json`, the ordered list of enabled plugins. Adding the same plugin again updates
@@ -67,11 +69,11 @@ its existing registration. After installation, run `specdd plugin list` to check
 The optional `version` argument accepts an exact Git tag, branch, or reachable commit identifier. The CLI preserves the
 string you supply, including prefixes such as `v`, and records the resolved commit separately.
 
-| Version argument | What the CLI installs | Recorded `version` |
-| --- | --- | --- |
-| Omitted | The remote default branch | `latest` |
-| Tag or branch | The exact tag or branch you name | The supplied name |
-| Commit identifier | The selected revision | The supplied commit identifier |
+| Version argument  | What the CLI installs            | Recorded `version`             |
+|-------------------|----------------------------------|--------------------------------|
+| Omitted           | The remote default branch        | `latest`                       |
+| Tag or branch     | The exact tag or branch you name | The supplied name              |
+| Commit identifier | The selected revision            | The supplied commit identifier |
 
 Version selection uses Git references (refs), rather than semantic version ranges or GitHub releases. If a branch and
 tag share a name, use `refs/heads/<name>` for the branch or `refs/tags/<name>` for the tag. Replace `<name>` with the
@@ -110,7 +112,8 @@ The update command manages plugins installed under your project's `.specdd/plugi
 at other locations can still be listed and loaded, but you must update their files separately.
 
 Before replacing an existing instruction file, the CLI checks it against the recorded checksum. If you have edited
-the file locally, the operation stops and preserves your edits; see [Recover from local edits](#recover-from-local-edits)
+the file locally, the operation stops and preserves your edits;
+see [Recover from local edits](#recover-from-local-edits)
 before retrying. If an update fails, any earlier successful updates remain in place.
 
 To update every managed plugin in the current project, run:
@@ -150,7 +153,8 @@ before retrying:
 2. Rerun the update command. The CLI recreates the missing registered file. If the update fails and the file is still
    missing, restore the backup to its original path.
 3. After a successful update, compare the installed file with your backup. Keep project-specific instructions in
-   `.specdd/bootstrap.project.md` and personal instructions in `.specdd/bootstrap.local.md` so future updates can replace
+   `.specdd/bootstrap.project.md` and personal instructions in `.specdd/bootstrap.local.md` so future updates can
+   replace
    the plugin file without overwriting your customizations.
 
 ## How plugins load
@@ -182,11 +186,11 @@ the full repository address. For example, installing `dsd` from `@specdd/specdd`
 `.specdd/plugins.json` stores registrations as an ordered JSON array. Each registration must contain these four nonempty
 string fields:
 
-| Field | Meaning |
-| --- | --- |
-| `src` | Instruction file path. CLI-generated paths are relative to `plugins.json`. |
-| `origin` | Repository address followed by `#` and the full resolved commit identifier. |
-| `sig` | Lowercase SHA-256 checksum of the installed instruction file bytes. |
+| Field     | Meaning                                                                             |
+|-----------|-------------------------------------------------------------------------------------|
+| `src`     | Instruction file path. CLI-generated paths are relative to `plugins.json`.          |
+| `origin`  | Repository address followed by `#` and the full resolved commit identifier.         |
+| `sig`     | Lowercase SHA-256 checksum of the installed instruction file bytes.                 |
 | `version` | Requested tag, branch, or commit string; `latest` when omitted during installation. |
 
 Existing `src` paths can also be absolute or begin with `~` for the user's home directory. Relative paths are resolved
@@ -213,7 +217,8 @@ The CLI installs only the selected `plugin.md`; supporting documentation stays i
 instructions that work from the [installed location](#plugin-files-and-registry). Give users the repository address
 and plugin name so they can run the installation command.
 
-For command help, run `specdd plugin --help` or `specdd plugin <command> --help`, replacing `<command>` with `add`, `list`,
+For command help, run `specdd plugin --help` or `specdd plugin <command> --help`, replacing `<command>` with `add`,
+`list`,
 or `update`.
 
 ### Sign your plugin with GPG
@@ -242,7 +247,9 @@ You need GnuPG installed and access to your private signing key. Run these comma
 3. Commit `plugin.md.asc` alongside `plugin.md` in `.plugins/<pluginname>/` and publish both files at the same Git
    revision. Regenerate the signature whenever you change `plugin.md`, and commit both files together.
 
-Publish your public key and its full fingerprint, and link to them from the plugin's `README.md`. You should also publish
-the public key to an independent keyserver such as [keys.openpgp.org](https://keys.openpgp.org/about/usage/) so users can
+Publish your public key and its full fingerprint, and link to them from the plugin's `README.md`. You should also
+publish
+the public key to an independent keyserver such as [keys.openpgp.org](https://keys.openpgp.org/about/usage/) so users
+can
 retrieve it outside the plugin repository. Users need the public key to verify the signature and should confirm its
 fingerprint through a trusted source before accepting it.

@@ -91,6 +91,10 @@ source = "../.plugins/ssg/README.md"
 target = "content/plugins/official/ssg.md"
 
 [[module.mounts]]
+source = "../.plugins/zen/README.md"
+target = "content/plugins/official/zen.md"
+
+[[module.mounts]]
 source = "../CHANGELOG.md"
 target = "content/changelog.md"
 
