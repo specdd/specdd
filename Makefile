@@ -17,6 +17,7 @@ sign-plugins: verify-public-key
 	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/dsd/plugin.md.asc .plugins/dsd/plugin.md
 	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/ssg/plugin.md.asc .plugins/ssg/plugin.md
 	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/zen/plugin.md.asc .plugins/zen/plugin.md
+	gpg --batch --yes --local-user $(SIGNING_KEY) --armor --detach-sign --output .plugins/flow/plugin.md.asc .plugins/flow/plugin.md
 
 verify-public-key:
 	gpg --show-keys --with-colons $(PUBLIC_KEY) | grep -q '^fpr:::::::::$(SIGNING_KEY):'

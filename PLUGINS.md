@@ -21,6 +21,7 @@ records their sources and versions, lists enabled plugins, and updates their ins
 | Plugin                                               | Repository       | Plugin name | Purpose                                                                                     |
 |------------------------------------------------------|------------------|-------------|---------------------------------------------------------------------------------------------|
 | [Domain & Solution Design](./.plugins/dsd/README.md) | `@specdd/specdd` | `dsd`       | Document problem domains and solution designs that guide implementation specs.              |
+| [Flow](./.plugins/flow/README.md)                    | `@specdd/specdd` | `flow`      | Coordinate complex implementation with reviewed plans, sub-agents, and verified results.    |
 | [SpecDD Style Guide](./.plugins/ssg/README.md)       | `@specdd/specdd` | `ssg`       | Write clear specs, designs, and other SpecDD artifacts while preserving meaning and format. |
 | [Zen](./.plugins/zen/README.md)                      | `@specdd/specdd` | `zen`       | Guide AI-agent work with attention, restraint, honesty, and care.                           |
 

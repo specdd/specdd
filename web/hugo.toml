@@ -87,6 +87,10 @@ source = "../.plugins/dsd/README.md"
 target = "content/plugins/official/dsd.md"
 
 [[module.mounts]]
+source = "../.plugins/flow/README.md"
+target = "content/plugins/official/flow.md"
+
+[[module.mounts]]
 source = "../.plugins/ssg/README.md"
 target = "content/plugins/official/ssg.md"
 

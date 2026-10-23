@@ -85,8 +85,11 @@ Official plugins include:
 
 - [Domain & Solution Design (DSD)](./.plugins/dsd/README.md) (`dsd`): adds Domain Definitions and Solution Designs to
   connect business rules and design decisions with implementation specs.
+- [Flow](./.plugins/flow/README.md) (`flow`): helps deliver complex changes efficiently and reliably through reviewed plans,
+  focused sub-agents, and verification. Runs only when explicitly requested.
 - [SpecDD Style Guide (SSG)](./.plugins/ssg/README.md) (`ssg`): helps write clear specs, designs, and other SpecDD artifacts
   while preserving their meaning and native formats.
+- [Zen](./.plugins/zen/README.md) (`zen`): guides agent work with attention, restraint, honesty, and care.
 
 You can develop your own plugins and distribute them through public or private Git repositories accessible over SSH
 or HTTPS, including repositories you host yourself. To propose a plugin for inclusion in the SpecDD repository,
@@ -1865,6 +1868,7 @@ A practical SpecDD project may include:
 
 ```text
 travel-planner/
+  .specdd/.gitignore
   .specdd/bootstrap.md
   .specdd/bootstrap.project.md
   .specdd/bootstrap.local.md
@@ -1875,10 +1879,10 @@ travel-planner/
   src/**/**/*.sdd
 ```
 
-Suggested `.gitignore` entry:
+Suggested `.specdd/.gitignore` entry:
 
 ```text
-.specdd/bootstrap.local.md
+bootstrap.local.md
 ```
 
 Optional short `CLAUDE.md`:
