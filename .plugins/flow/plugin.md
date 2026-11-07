@@ -37,6 +37,15 @@ plans.
 Use the selected requirements, designs, specs, and implementation to identify the outcome, affected work, and unresolved
 decisions. Record relevant source revisions and pre-existing working changes for later reconciliation.
 
+Gather context for the current decision or assignment. Satisfy the bootstrap's context resolution and explicit reading
+requirements, then select additional material by affected scope, dependencies, and risk. Do not load whole documentation
+or spec trees, previous plans, or conversation histories merely because they are available. Expand context when a
+specific uncertainty, dependency, or finding requires it.
+
+Reuse already-read sources and findings while they remain reliable and sufficient. A phase change or handoff does not
+itself require repeating discovery. Reopen the narrowest relevant original source when it may have changed, exact
+detail is needed, or the current context is insufficient; summaries do not replace governing authority.
+
 Divide the work into stages with clear entry and exit conditions. Establish shared contracts before dependent
 implementation, group independent tasks where useful, and include integration and final verification. Use only the
 stages the work needs. Give tasks stable IDs and explicit dependencies without cycles.
@@ -45,6 +54,16 @@ Check the host's delegation capabilities. Record whether agents share a workspac
 workspaces, and choose a concurrency limit within the available capacity. If sub-agents are unavailable, disclose that
 limitation and propose sequential execution by the coordinator for approval. Work that explicitly requires separate
 agents or independent review remains blocked until those capabilities are available.
+
+Select verification before implementation. Choose the smallest practical set of checks that provides adequate evidence
+for the current change and stage of work. Each check must address changed behavior, an affected dependency, a concrete
+risk, or an explicit requirement. Assess consequences, affected boundaries, and uncertainty rather than diff size;
+a one-line permission change can warrant broad verification. Available suites or habits from previous tasks do not
+establish relevance.
+
+Identify each check's purpose, scope, owner, and execution point, using the project's commands, coverage boundaries,
+thresholds, and mandatory checks. Record this in the existing Verification section; reference shared checks from tasks
+instead of duplicating them or creating another tracker.
 
 Use this plan structure, replacing placeholders and expanding task briefs as needed:
 
@@ -87,7 +106,7 @@ Ordered stages with entry and exit conditions.
 
 ## Verification
 
-Checks for the combined result and their outcomes.
+Selected checks, their purpose, scope, owner, and execution point; latest outcomes and evidence needed to judge reuse.
 
 ## Progress and decisions
 
@@ -128,6 +147,9 @@ changes, prefer workers returning findings or proposed patches from isolated wor
 reconciling and applying the unified changes. Give preparation tasks their own acceptance criteria; accepting a proposal
 does not establish that the implementation has been applied or verified.
 
+Give each shared integration or broad check one owner. Workers run scoped task checks; the coordinator schedules shared
+checks, and reviewers inspect the evidence. Share valid results instead of independently repeating the same checks.
+
 Allow parallel implementation edits only when the coordinator can establish all of the following:
 
 - Write scopes do not overlap, including new files, renames, deletions, generated files, and command side effects.
@@ -146,8 +168,12 @@ Before dispatching a task:
 1. Confirm that its dependencies have been accepted and their outputs are available.
 2. Check reads and writes against active assignments, other plans, and existing user changes. Record the assigned writer
    for each writable scope and shared resource. Keep research and review on stable inputs while relevant writers run.
-3. Provide the task brief, approved revision, governing sources, workspace, required checks, and expected return format.
-   Workers must consult the relevant original instructions and specs, not rely solely on a summary.
+3. Provide a bounded task brief, approved revision, governing sources, workspace, required checks, and expected return format.
+   Include all applicable Operator instructions, clarifications, restrictions, decisions, and approval state or
+   authorized overrides, including those recorded only in the conversation. Preserve these when reducing context.
+   Where the host supports selective context, pass the brief and relevant evidence instead of the full coordinator
+   history unless that history is needed. Workers apply the same context rules and consult the relevant original
+   instructions and specs, not rely solely on a summary.
 4. Require the result to identify the task, starting revision or snapshot, changed or proposed paths, delivered behavior,
    checks and outcomes, and unresolved findings or blockers.
 
@@ -167,19 +193,63 @@ to `review`; only the coordinator can accept the result. Release dependent work 
 ## Review and verify results
 
 Inspect actual changes against the task's requirements, write scope, and acceptance criteria. Use a reviewer separate
-from the worker when the approved execution mode supports it. Evaluate the findings and verification evidence before
-accepting the task; a favorable summary alone is insufficient.
+from the worker when the approved execution mode supports it. Resolve accepted review findings before the final combined
+verification pass. Evaluate the findings and verification evidence before accepting the task; a favorable summary alone
+is insufficient. Review repairs and their affected consequences without restarting the whole review unless the impact
+warrants it.
+
+During implementation and repair, run targeted checks for changed behavior and affected dependencies. Minor wording or
+presentation adjustments normally need inspection of the affected result and focused checks where useful, without a
+full-suite rerun. Substantial logic changes need focused regression checks as work proceeds, followed by the integration
+checks and suites appropriate to the affected boundaries.
+
+Visual changes normally require inspecting the rendered result in affected views, states, and interactions. Select
+responsive layouts, themes, and accessibility checks according to what the change could affect and any explicit project
+requirements. For shared components, layouts, or design tokens, check representative affected consumers and distinct
+integration contexts. Do not retest unrelated screens and features simply because browser checks are available.
+
+Broaden verification when major or cross-cutting changes affect shared behavior, uncertain dependencies prevent safely
+bounding the impact, failures reveal a wider problem, governing contracts require it, or the Operator explicitly
+requests larger runs. Reserve broad suites for the final integrated state unless a specific request, contract, or
+concrete risk requires an earlier run.
+
+General requirements for comprehensive testing or 100% coverage apply to the final agreed scope. They do not by
+themselves require running every test or enforcing global coverage after each edit, task, or stage. Explicit intermediate
+checks and coverage gates required by the Operator, governing contracts, or approved plan still apply. Subject to those
+gates, use focused test selections and, where supported, scoped coverage or runs without global coverage enforcement
+during development. Keep the required final coverage scope and thresholds intact.
 
 Return concrete findings as repair assignments and review the repaired result. After two unsuccessful repair attempts
 for the same finding, mark the task blocked and reassess the approach. Continue unaffected work when its dependencies
 allow it. Reopen accepted tasks and recheck dependents when later changes invalidate their results.
 
-After integration, set the plan status to `verifying`. Run the required integration, acceptance, and project checks on
-the combined changes while relevant writers are stopped and check resources are isolated or serialized. Individual
-task checks do not establish that the integrated result works. If relevant files change during verification, invalidate
-the affected results and rerun those checks on a stable state. Repair integration findings and repeat the affected
-checks. A failed or unavailable required check prevents completion; record the blocker and resolve it without weakening
-the agreed acceptance criteria.
+After integration, set the plan status to `verifying`. Stop relevant writers and isolate or serialize shared check
+resources. Complete the selected checks on the combined changes, including full suites and final coverage gates where
+the agreed scope or governing requirements call for them. Final verification does not itself require running every
+suite in the repository. Consolidate necessary broad checks into one planned final pass. Reuse earlier results only
+when their evidence covers that combined state; individually passing task checks do not by themselves establish that
+integration works.
+
+Keep the latest check results in the plan's Verification section, with the command or procedure, outcome, and enough
+evidence about the tested inputs and environment to judge reuse. Account for relevant uncommitted changes; a matching
+Git commit alone does not establish that the inputs are unchanged. Reuse successful results only when relevant source,
+tests, fixtures, dependencies, configuration, environment, and acceptance criteria are unchanged or evidence establishes
+that intervening changes cannot affect the result.
+A phase transition, agent handoff, plan update, or unrelated edit does not by itself invalidate them. If validity is
+uncertain, inspect the affected state or run the check needed to resolve that uncertainty.
+
+Before repeating or broadening verification, identify the failure, relevant input change, newly discovered risk, or
+explicit verification request that requires it. Rerun affected checks on a stable state and widen only as that reason
+requires. Do not restart all verification merely because one result became invalid.
+
+When a check fails, distinguish an introduced regression, an outdated test expectation, a pre-existing baseline
+failure, and an environment problem. Investigate enough to establish the cause and impact. Keep repairs within the
+authorized scope and use the existing scope-change rules for additional work; do not silently absorb unrelated cleanup.
+A failed, unavailable, or unverified required check still prevents completion, even when its failure predates the
+task. Record and resolve the blocker without weakening assertions, coverage requirements, or agreed acceptance criteria.
+
+Once the agreed outcome and required checks are satisfied, finish verification and proceed to cleanup. Additional
+polish, review rounds, or test variations need a concrete task-relevant reason.
 
 Record lasting decisions in the appropriate authorized project artifacts. Replace any references introduced by this
 run to its temporary plan with durable sources, so the finished work remains understandable after deletion.

@@ -24,6 +24,10 @@ Flow makes the execution process explicit. Its working plan records stages, depe
 outside the conversation, giving the coordinator a record to check and resume from. Focused assignments give sub-agents
 manageable parts of the problem. Your designs and specs remain the sources of intended behavior.
 
+Context follows the current decision and affected dependencies. Agents reuse reliable material and load more when a
+specific need arises, rather than reading every available document or copying the full conversation into each task.
+Explicit reading requirements in governing instructions still apply.
+
 The workflow supports reliability by reviewing results before dependent tasks use them and checking the combined
 implementation against the agreed outcome. It also gives you opportunities to intervene: review the proposed approach,
 inspect progress, question an assumption, pause the run, or redirect work through the coordinator. You can influence the
@@ -32,6 +36,20 @@ implementation as it develops, with material changes brought back for your decis
 The efficiency comes from useful parallel work, less repeated planning, and less avoidable rework. The coordinator
 assigns work, collects results, and arranges repairs, reducing the manual effort of composing follow-up prompts and
 relaying findings between agents. The saved plan helps avoid reconstructing the whole task after an interruption.
+
+Verification follows affected behavior and risk, rather than diff size. Minor wording or presentation changes normally
+need inspection and focused checks. Larger logic changes use targeted regression tests during development, followed by
+relevant integration and full-suite checks on the combined result. Major or cross-cutting impact, uncertainty, failures,
+explicit project requirements, and your requests can justify broader runs.
+
+Visual checks cover affected views and states, with relevant responsive, theme, and accessibility checks. Shared UI
+changes call for representative checks across affected consumers, without retesting unrelated screens and features.
+
+Workers run scoped checks, shared checks have one owner, and valid results are reused across stages and handoffs.
+Comprehensive testing or 100% coverage applies to the final agreed scope, not every intermediate step. Final verification
+does not automatically mean running every repository suite; project coverage boundaries, thresholds, and mandatory
+checks still apply. Repairs trigger affected checks, unrelated failures do not silently expand the task, and verification
+ends when the agreed outcome and required checks are satisfied.
 
 Planning, delegation, and review also take time and consume tokens. Use your judgment about whether Flow's coordination
 is likely to save more effort than it adds. Task size alone is not a reason to use it.

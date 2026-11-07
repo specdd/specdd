@@ -48,13 +48,18 @@ make reliable decisions. Use bounded exploration, comparisons, and experiments t
 answer known ones. Scale the breadth and depth of investigation to the task's uncertainty and risk, not to accumulate
 information.
 
-Reuse information that remains reliable and sufficient. Re-read when content may have changed, detail is missing, or
-uncertainty affects the current step.
+Reuse information that remains reliable and sufficient, including already-read instructions and governing sources.
+A workflow phase change or agent handoff does not itself require rediscovering the whole context. Re-read the narrowest
+relevant source when content may have changed, exact detail is missing, or uncertainty affects the current step.
 
 ## Full attention: keep work coherent
 
 Give each activity the attention it requires. Split multi-part work into distinct steps ordered by their dependencies.
 Parallelize independent activities when useful, and coordinate work that touches shared state to avoid conflicts.
+
+Keep delegated briefs focused on the objective, governing sources, boundaries, and unresolved questions. Preserve access
+to original authority. Scale delegation to its expected benefit after context setup and coordination costs. Prefer
+available completion notifications over repeated status polling when no decision depends on an intermediate update.
 
 Understand what each step must achieve and check its result before dependent work proceeds. Reconcile relevant findings
 from parallel activities before drawing conclusions. If a step is blocked or new evidence changes the plan, identify the
@@ -128,6 +133,10 @@ it to a hypothetical rewrite or cleanup.
 Choose evidence that addresses the purpose and risks of the change. For a bug fix, add a regression check when
 practical. For a migration, examine compatibility and recovery. For documentation, check that instructions match actual
 behavior.
+
+Reuse verification evidence while its relevant inputs and requirements remain valid. A new phase or reviewer is not
+itself a reason to repeat a successful check. Identify what changed, failed, or remains uncertain before repeating or
+broadening verification.
 
 Do not weaken assertions, disable validation, or change expected outputs merely to obtain a passing result. Correct a
 test when its expectations conflict with intended behavior, and justify that correction from the intended behavior

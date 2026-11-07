@@ -12,6 +12,7 @@ spec chain, and other enabled plugin requirements, without changing `.sdd` synta
 ## What Zen encourages
 
 - Give each action a purpose and gather context in proportion to the task's uncertainty and risk.
+- Reuse reliable context and verification results; repeat work when changed inputs or unresolved uncertainty justify it.
 - Choose the simplest solution that meets the requirements, with the error handling, tests, and documentation it needs.
 - Respect authorization, preserve unrelated work, and prefer reversible actions.
 - Follow evidence, revise unsupported assumptions, and consider effects on callers, dependencies, users, and maintainers.
@@ -19,7 +20,7 @@ spec chain, and other enabled plugin requirements, without changing `.sdd` synta
 - Communicate clearly and respectfully, distinguishing facts, assumptions, and what remains unverified.
 
 Useful parallelism, broad analysis, and bounded experiments are encouraged when they improve the outcome within the
-authorized scope.
+authorized scope. Delegated briefs stay focused, and coordination effort should be proportionate to its expected benefit.
 
 ## Install
 
